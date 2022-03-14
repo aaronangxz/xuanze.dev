@@ -8,13 +8,13 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
     title: 'XZ LeetCode Journal',
     tagline: 'Some random notes here and there',
-    url: 'https://your-docusaurus-test-site.com',
-    baseUrl: '/',
+    url: 'https://aaronangxz.github.io/XZ-LeetCode-Journal/',
+    baseUrl: '/XZ-LeetCode-Journal/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
-    organizationName: 'xz', // Usually your GitHub org/user name.
-    projectName: 'xz-leetcode-journal', // Usually your repo name.
+    organizationName: 'aaronangxz', // Usually your GitHub org/user name.
+    projectName: 'XZ-LeetCode-Journal', // Usually your repo name.
     trailingSlash: false,
 
     presets: [
