@@ -25,12 +25,12 @@ const config = {
                 docs: {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
-                    editUrl: 'https://aaronangxz.github.io/XZ-LeetCode-Journal/',
+                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/',
                 },
                 blog: {
                     showReadingTime: true,
                     // Please change this to your repo.
-                    editUrl: 'https://aaronangxz.github.io/XZ-LeetCode-Journal/',
+                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/',
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
