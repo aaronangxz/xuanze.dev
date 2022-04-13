@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
     title: 'XZ LeetCode Journal',
     tagline: 'Some random notes here and there',
-    url: 'https://aaronangxz.github.io/XZ-LeetCode-Journal/',
+    url: 'https://aaronangxz.github.io',
     baseUrl: '/XZ-LeetCode-Journal/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
