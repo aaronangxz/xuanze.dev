@@ -8,7 +8,7 @@ const FeatureList = [
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        52 / 556
+        69 / 565
       </>
     ),
   },
@@ -17,7 +17,7 @@ const FeatureList = [
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        19 / 1183
+        29 / 1197
       </>
     ),
   },
@@ -26,7 +26,7 @@ const FeatureList = [
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        1 / 479
+        2 / 484
       </>
     ),
   },
