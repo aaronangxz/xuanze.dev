@@ -9,7 +9,7 @@ const config = {
     title: 'XZ LeetCode Journal',
     tagline: 'Some random notes here and there',
     url: 'https://aaronangxz.github.io',
-    baseUrl: '/XZ-LeetCode-Journal/',
+    baseUrl: '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
