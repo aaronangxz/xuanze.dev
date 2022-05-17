@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[3696],{8262:function(e){e.exports=JSON.parse('{"name":"Demo","permalink":"/docs/tags/demo","docs":[{"id":"easy/Valid Parentheses","title":"20. Valid Parentheses","description":"Question","permalink":"/docs/easy/Valid Parentheses"}],"allTagsPath":"/docs/tags"}')}}]);
