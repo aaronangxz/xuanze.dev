@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[3365],{9238:function(a){a.exports=JSON.parse('{"name":"Bit Manipulation","permalink":"/docs/tags/bit-manipulation","docs":[{"id":"easy/Binary Gap","title":"868. Binary Gap","description":"Question","permalink":"/docs/easy/Binary Gap"}],"allTagsPath":"/docs/tags"}')}}]);
