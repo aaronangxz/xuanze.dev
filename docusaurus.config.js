@@ -97,7 +97,7 @@ const config = {
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus.`,
+            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus. Hosted on IPFS`,
         },
         prism: {
             theme: lightCodeTheme,
