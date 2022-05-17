@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-    title: 'XZ LeetCode Journal',
-    tagline: 'Some random notes here and there',
+    title: 'xuanze.sol',
+    tagline: 'Hello there.',
     url: 'https://aaronangxz.github.io',
     baseUrl: '/',
     onBrokenLinks: 'throw',
@@ -43,7 +43,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
         navbar: {
-            title: 'XZ LeetCode Journal',
+            title: 'xuanze.sol',
             logo: {
                 alt: 'My Site Logo',
                 src: 'img/logo.svg',
@@ -54,6 +54,7 @@ const config = {
                     position: 'left',
                     label: 'LeetCode',
                 },
+                { to: '/about', label: 'About', position: 'left' },
                 { to: '/blog', label: 'Blog', position: 'left' },
                 {
                     href: 'https://github.com/facebook/docusaurus',
