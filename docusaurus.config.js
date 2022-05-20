@@ -14,7 +14,7 @@ const config = {
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
     organizationName: 'aaronangxz', // Usually your GitHub org/user name.
-    projectName: 'XZ-LeetCode-Journal', // Usually your repo name.
+    projectName: 'xuanze.sol', // Usually your repo name.
     trailingSlash: false,
 
     presets: [
@@ -54,8 +54,8 @@ const config = {
                     position: 'left',
                     label: 'LeetCode',
                 },
+                { to: '/projects', label: 'Projects', position: 'left' },
                 { to: '/about', label: 'About', position: 'left' },
-                { to: '/blog', label: 'Blog', position: 'left' },
                 {
                     href: 'https://github.com/facebook/docusaurus',
                     label: 'GitHub',
