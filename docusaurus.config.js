@@ -16,7 +16,6 @@ const config = {
     organizationName: 'aaronangxz', // Usually your GitHub org/user name.
     projectName: 'xuanze.sol', // Usually your repo name.
     trailingSlash: false,
-
     presets: [
         [
             'classic',
@@ -25,7 +24,7 @@ const config = {
                 docs: {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
-                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/blob/master/',
+                    editUrl: undefined,
                 },
                 blog: {
                     showReadingTime: true,
