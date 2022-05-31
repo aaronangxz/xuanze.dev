@@ -54,6 +54,12 @@ const config = {
                     position: 'left',
                     label: 'LeetCode',
                 },
+                {
+                    type: 'doc',
+                    docId: 'notes',
+                    position: 'left',
+                    label: 'Notes',
+                },
                 { to: '/projects', label: 'Projects', position: 'left' },
                 { to: '/about', label: 'About', position: 'left' },
                 {
