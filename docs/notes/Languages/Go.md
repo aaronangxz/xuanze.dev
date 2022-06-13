@@ -36,7 +36,6 @@ type Do interface{
     thing string
 }
 ```
-
 ### Function headers
 ```go
 func (a *A) DoSomething (b interface{},c ...interface{}) d interface{}
@@ -51,3 +50,18 @@ func (a *A) DoSomething (b interface{},c ...interface{}) d interface{}
 `d interface{}` : then returns `d`
 
 ### Reflect
+
+
+### Pointers
+To update a slice within a function
+```go
+//Append
+func update(s []string, a string){
+    *s = append(*s, a)
+}
+
+//Slice off
+func sliceFirstElement(s []string){
+    *s = (*s)[:1]
+}
+```

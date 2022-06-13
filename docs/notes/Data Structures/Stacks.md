@@ -82,9 +82,17 @@ func (s *Stack) top() interface{} {
 		return nil
 	}
 	index := len(*s) - 1
-	t := (*s)[index]
-	s.pop()
-	return t
+	return (*s)[index]
 }
 
+func main(){
+    var s Stack
+    s.push(1)
+    s.push(2)
+    fmt.Println(s.top())
+    s.pop()
+    fmt.Println(s.top())
+    s.pop()
+    fmt.Println(s.top())
+}
 ```
