@@ -5,3 +5,5 @@ displayed_sidebar: notesSideBar
 ---
 
 # Notes
+
+My random notes
