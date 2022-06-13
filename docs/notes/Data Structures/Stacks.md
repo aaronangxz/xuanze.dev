@@ -15,7 +15,7 @@ i.e. the element that is pushed at the end is popped out first. Some of the prin
 
 **Pop** - This removes the data value on top of the stack
 
-**Peek** - This returns the top data value of the stack
+**Peek** / **Top** - This returns the top data value of the stack
 
 ### Complexities
 
@@ -52,10 +52,39 @@ int peek(){
     return stack[top];
 }
 ```
-
 #### Go
 ```go
-func pop(){
+//The stack object
+type Stack []interface{}
 
+//Helper function to check if stack is empty
+func (s *Stack) isEmpty() bool {
+	return len(*s) == 0
 }
+
+//Push the new element onto the stack
+func (s *Stack) push(e interface{}) {
+	*s = append(*s, e)
+}
+
+//Removes the element on the top of the stack
+func (s *Stack) pop() {
+	if s.isEmpty() {
+		return
+	}
+	index := len(*s) - 1
+	*s = (*s)[:index]
+}
+
+//Returns the element on top of the stack
+func (s *Stack) top() interface{} {
+	if s.isEmpty() {
+		return nil
+	}
+	index := len(*s) - 1
+	t := (*s)[index]
+	s.pop()
+	return t
+}
+
 ```
