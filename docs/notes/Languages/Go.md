@@ -64,4 +64,11 @@ func update(s []string, a string){
 func sliceFirstElement(s []string){
     *s = (*s)[:1]
 }
+
+//Swapping slice elements can be done directly because the slice passed inside still points to the same address as the slice outside of the function
+func swap(s []string){
+    tmp := s[0]
+    s[0] = s[1]
+    s[1] = tmp
+}
 ```
