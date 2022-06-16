@@ -2,7 +2,7 @@
 title: Projects
 ---
 
-## Personal Projects
+# Personal Projects
 
 ### Carouhell
 <img src="/img/carouhell.png" width="500" />

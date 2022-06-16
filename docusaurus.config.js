@@ -49,7 +49,7 @@ const config = {
             },
             items: [{
                     type: 'doc',
-                    docId: 'intro',
+                    docId: 'leetcode',
                     position: 'left',
                     label: 'LeetCode',
                 },
@@ -60,9 +60,10 @@ const config = {
                     label: 'Notes',
                 },
                 { to: '/projects', label: 'Projects', position: 'left' },
-                { to: '/about', label: 'About', position: 'left' },
+                { to: '/blog', label: 'Blog', position: 'left' },
+                { to: '/about', label: 'About', position: 'right' },
                 {
-                    href: 'https://github.com/facebook/docusaurus',
+                    href: 'https://github.com/aaronangxz',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -74,8 +75,15 @@ const config = {
                     title: 'Docs',
                     items: [{
                         label: 'LeetCode',
-                        to: '/docs/intro',
-                    }, ],
+                        to: '/docs/leetcode',
+                    }, 
+                    {
+                        label: 'Notes',
+                        to: '/docs/notes',
+                    },{
+                        label: 'Projects',
+                        to: '/projects',
+                    },],
                 },
                 {
                     title: 'Socials',
@@ -98,6 +106,10 @@ const config = {
                     items: [{
                             label: 'Blog',
                             to: '/blog',
+                        },
+                        {
+                            label: 'View on IPFS',
+                            href: 'ipfs://QmU5kRx1YmSYqdd8B6HwBPNmWPSG8qZeBU7TupsTVDREQU',
                         },
                     ],
                 },

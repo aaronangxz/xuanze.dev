@@ -13,14 +13,7 @@ function HomepageHeader() {
       <div className="container">
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            a href="ipfs://QmU5kRx1YmSYqdd8B6HwBPNmWPSG8qZeBU7TupsTVDREQU">
-            View on IPFS
-          </Link>
-        </div>
-        <i>Use Brave Browser for the best experience!</i>
+        <p>I love to code and explore tech stuff. I code in Go and C++.</p>
       </div>
     </header>
   );
