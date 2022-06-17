@@ -1,0 +1,97 @@
+---
+title: Decision - Redis SET or HASH?
+authors: [xuanze]
+tags: [projects,redis]
+---
+
+## Introduction
+So I was working on [SeaHungerGamesBot](https://github.com/aaronangxz/SeaDinner), 
+and one major pain point was: when a certain user started the conversation, but did not proceed from there. (probably due to the hassle of copy-pasting the API key?)
+
+Since my current goal is to have as many active users as possible, that was a wasted opportunity. 
+So my objective was to keep track of the users that started pressing some commands, but backed off and disappear afterwards. 
+I call them the `potential users`.
+
+<!--truncate-->
+
+## What's the Plan
+The initial plan is:
+
+```
+Remind users to use the Bot if:
+- They have chatted with it before 
+- It happened in the past month
+- They still did not provide their key in the past month
+```
+
+- For such users, store their `user_id` and the time they call the commands. 
+This can be achieved easily since all `anonymous users` (aka. those that did not provide their keys) will get routed through
+a `CheckKey` function, and if it does not exist in DB, they will be urged to provide their key in the next step in order to proceed with other features.
+
+- The reason we store the `time` is because we want to have a "cool down" period before we annoy them again. E.g. A user chatted on 1st Jan, 
+we will not send him the cold message until at least 1st Feb.
+
+- If we did send him on 1st Feb, we reset the time to 1st Feb and the next message will be sent on 1st March. So on and so forth.
+
+- And if the user provide their key between 1st Feb and 1st March, we remove them from the pool and they will not receive this anymore.
+
+## Cool, Now What?
+
+### Technical Implementation
+
+### 1. Naive
+The naive solution is to have a cache key, something like `potential_user:<user_id>` with the value as `time`. Since it is pretty straight forward, and we can `GET` 
+or `SET` the value easily.
+
+**Pros**
+- Easy peasy
+
+**Cons**
+- Kinda messy
+
+### 2. Slightly more elegant?
+Then I thought of Redis Sets, and it is kinda what I prefer it to be. We can have a set called `potential_user`, and inside the set, we have list of keys `<user_id>:<time>`.
+
+**Pros**
+- Very organized, i love it
+
+**Cons**
+- Need to store all the information in the `key`, hence delimiter is needed.
+- Have to parse the key to get the relevant information.
+- Since they are not key-value pairs, in order to update the `time`, we have to `SREM` the old key and `SADD` new one afterwards.
+
+### 3. Most recommended?
+I read up on `HASH`, and it seems pretty decent (overkill maybe?) for this use case. And probably a refactor is neede to make it clean.
+
+The key can be just `<user_id>`, and contains field such as `<user_key>` (since we cache the keys to minimize DB calls), `<time>` etc.
+
+**Pros**
+- Treat it as an object, and we do not need any extra keys anymore
+
+**Cons**
+- When we need to find user that has `time` (not everyone will have this field), we have to probably check one by one.
+
+## So..
+
+I went with option 2, and implement a set. Only thing that I don't really like is the update part.
+Need to remove first -> then re-write the updated time.
+
+```go
+//Remove the old key and update with the new time in Set
+//As long as users do not give us the key, they will always be in the pool
+//We continuously update the time after each cold message to avoid annoyance
+if err := processors.RedisClient.SRem(common.POTENTIAL_USER_SET, pair).Err(); err != nil {
+	log.Error(ctx, "SendPotentialUsers | Error while writing to redis: %v", err.Error())
+} else {
+	log.Info(ctx, "SendPotentialUsers | Successful | Removed %v from potential_user set", pair)
+}
+
+toWrite := fmt.Sprint(userID, ":", time.Now().Unix())
+if err := processors.RedisClient.SAdd(common.POTENTIAL_USER_SET, toWrite).Err(); err != nil {
+	log.Error(ctx, "SendPotentialUsers | Error while writing to redis: %v", err.Error())
+} else {
+	log.Info(ctx, "SendPotentialUsers | Successful | Written %v to potential_user set", toWrite)
+}
+```
+
+I guess I will leave it as it is for now, until I can think of a better solution.

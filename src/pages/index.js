@@ -27,7 +27,7 @@ export default function Home() {
       description="Hello I'm Xuan Ze.">
       <HomepageHeader />
       <main>
-        {/* <HomepageFeatures /> */}
+        <HomepageFeatures></HomepageFeatures>
       </main>
     </Layout>
   );

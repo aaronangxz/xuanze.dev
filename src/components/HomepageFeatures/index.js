@@ -47,13 +47,22 @@ function Feature({Svg, title, description}) {
 }
 
 export default function HomepageFeatures() {
+  const recentPosts = require("../../../.docusaurus/docusaurus-plugin-content-blog/default/blog-post-list-prop-default.json");
   return (
     <section className={styles.features}>
       <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
+        <div className={clsx('col col--4')}>
+        
+        <div className="text--center">
+          <h3>Recent Posts</h3>    
+        </div>
+          <div className='text--center padding-horiz--md'>
+          {recentPosts.items.slice(0, 5).map((item, index) => (
+            <li key={index}>
+              <a href={`${item.permalink}`}>{item.title}</a>{" "}
+            </li>
           ))}
+          </div>   
         </div>
       </div>
     </section>
