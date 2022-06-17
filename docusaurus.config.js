@@ -7,16 +7,15 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'xuanze.sol',
-    tagline: 'Hello there.',
+    tagline: 'fmt.Println("Hello world.")',
     url: 'https://aaronangxz.github.io',
     baseUrl: '/XZ-LeetCode-Journal/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
     organizationName: 'aaronangxz', // Usually your GitHub org/user name.
-    projectName: 'XZ-LeetCode-Journal', // Usually your repo name.
+    projectName: 'xuanze.sol', // Usually your repo name.
     trailingSlash: false,
-
     presets: [
         [
             'classic',
@@ -25,12 +24,12 @@ const config = {
                 docs: {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
-                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/blob/master/',
+                    editUrl: undefined,
                 },
                 blog: {
                     showReadingTime: true,
                     // Please change this to your repo.
-                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/blob/master/',
+                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/blob/sol-deploy/',
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
@@ -46,18 +45,25 @@ const config = {
             title: 'xuanze.sol',
             logo: {
                 alt: 'My Site Logo',
-                src: 'img/logo.svg',
+               src: 'img/favicon.ico',
             },
             items: [{
                     type: 'doc',
-                    docId: 'intro',
+                    docId: 'leetcode',
                     position: 'left',
                     label: 'LeetCode',
                 },
-                { to: '/about', label: 'About', position: 'left' },
-                { to: '/blog', label: 'Blog', position: 'left' },
                 {
-                    href: 'https://github.com/facebook/docusaurus',
+                    type: 'doc',
+                    docId: 'notes',
+                    position: 'left',
+                    label: 'Notes',
+                },
+                { to: '/projects', label: 'Projects', position: 'left' },
+                { to: '/blog', label: 'Blog', position: 'left' },
+                { to: '/about', label: 'About', position: 'right' },
+                {
+                    href: 'https://github.com/aaronangxz',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -69,8 +75,15 @@ const config = {
                     title: 'Docs',
                     items: [{
                         label: 'LeetCode',
-                        to: '/docs/intro',
-                    }, ],
+                        to: '/docs/leetcode',
+                    }, 
+                    {
+                        label: 'Notes',
+                        to: '/docs/notes',
+                    },{
+                        label: 'Projects',
+                        to: '/projects',
+                    },],
                 },
                 {
                     title: 'Socials',
@@ -94,10 +107,14 @@ const config = {
                             label: 'Blog',
                             to: '/blog',
                         },
+                        {
+                            label: 'View on IPFS',
+                            href: 'ipfs://QmU5kRx1YmSYqdd8B6HwBPNmWPSG8qZeBU7TupsTVDREQU',
+                        },
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus.`,
+            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus. Hosted on IPFS`,
         },
         prism: {
             theme: lightCodeTheme,
