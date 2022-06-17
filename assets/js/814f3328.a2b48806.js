@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[2535],{5641:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"How long is a second?","permalink":"/XZ-LeetCode-Journal/blog/2022/06/17/how-long-is-a-second"},{"title":"Redis SET or HASH","permalink":"/XZ-LeetCode-Journal/blog/2022/06/17/redis-set-or-hash"}]}')}}]);
