@@ -111,6 +111,10 @@ const config = {
                             label: 'View on IPFS',
                             href: 'ipfs://bafybeignxfhnmpqblheb5uje6bghgy6pupb7e4i6qlhu7fazn7nesneh5y/',
                         },
+                        {
+                            label: 'View on Web',
+                            href: 'https://aaronangxz.github.io/XZ-LeetCode-Journal/',
+                        },
                     ],
                 },
             ],
