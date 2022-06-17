@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 const FeatureList = [
   {
@@ -67,8 +68,9 @@ export default function HomepageFeatures() {
           ))}
             {recentPosts1.blogPosts.slice(0, 5).map((item, index) => (
             <li key={index}>
-              <a href={`${item.metadata.permalink}`}>{item.metadata.title}</a>{" "}
-              <a href={item.metadata.permalink + ".html"}>{item.metadata.title}</a>{" "}
+              {/* <a href={`${item.metadata.permalink}`}>{item.metadata.title}</a>{" "} */}
+              <a href={useBaseUrl(item.metadata.permalink)}>{item.metadata.title}</a>{" "}
+              {/* //{window.location.href = useBaseUrl(item.metadata.permalink)} */}
             </li>
           ))}
           </div>   
