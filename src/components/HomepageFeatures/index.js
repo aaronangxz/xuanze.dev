@@ -60,6 +60,7 @@ export default function HomepageFeatures() {
           {recentPosts.items.slice(0, 5).map((item, index) => (
             <li key={index}>
               <a href={`${item.permalink}`}>{item.title}</a>{" "}
+              <a href={item.permalink}>{item.title}</a>{" "}
             </li>
           ))}
           </div>   
