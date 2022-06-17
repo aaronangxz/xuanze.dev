@@ -35,6 +35,7 @@ Created this bot to save 30 seconds everyday, just to order that free office din
 ***Broken due to obselete library.***
 
 <img src="/img/hungrylehbot.png" width="250" height="250" />
+<img src="./img/hungrylehbot.png" width="250" height="250" />
 
 A mini experimental telegram bot built to solve the ultimate question of mankind - what to eat.
 
