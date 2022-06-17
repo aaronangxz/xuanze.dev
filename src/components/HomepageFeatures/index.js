@@ -48,6 +48,8 @@ function Feature({Svg, title, description}) {
 
 export default function HomepageFeatures() {
   const recentPosts = require("../../../.docusaurus/docusaurus-plugin-content-blog/default/blog-post-list-prop-default.json");
+  const recentPosts1 = require("../../../.docusaurus/docusaurus-plugin-content-blog/default/blog-archive-80c.json");
+
   return (
     <section className={styles.features}>
       <div className="container">
@@ -60,7 +62,13 @@ export default function HomepageFeatures() {
           {recentPosts.items.slice(0, 5).map((item, index) => (
             <li key={index}>
               <a href={`${item.permalink}`}>{item.title}</a>{" "}
-              <a href={item.permalink}>{item.title}</a>{" "}
+              <a href={item.permalink + ".html"}>{item.title}</a>{" "}
+            </li>
+          ))}
+            {recentPosts1.blogPosts.slice(0, 5).map((item, index) => (
+            <li key={index}>
+              <a href={`${item.metadata.permalink}`}>{item.metadata.title}</a>{" "}
+              <a href={item.metadata.permalink + ".html"}>{item.metadata.title}</a>{" "}
             </li>
           ))}
           </div>   
