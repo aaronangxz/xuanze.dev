@@ -108,13 +108,17 @@ const config = {
                             to: '/blog',
                         },
                         {
-                            label: 'View on IPFS',
-                            href: 'ipfs://QmU5kRx1YmSYqdd8B6HwBPNmWPSG8qZeBU7TupsTVDREQU',
+                            label: 'View on IPFS (with Brave Browser)',
+                            href: 'ipfs://bafybeignxfhnmpqblheb5uje6bghgy6pupb7e4i6qlhu7fazn7nesneh5y/',
+                        },
+                        {
+                            label: 'View on Web',
+                            href: 'https://aaronangxz.github.io/XZ-LeetCode-Journal/',
                         },
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus. Hosted on IPFS`,
+            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus. Hosted on Decentralized Web.`,
         },
         prism: {
             theme: lightCodeTheme,
