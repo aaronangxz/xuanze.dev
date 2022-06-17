@@ -109,7 +109,7 @@ const config = {
                         },
                         {
                             label: 'View on IPFS',
-                            href: 'ipfs://QmU5kRx1YmSYqdd8B6HwBPNmWPSG8qZeBU7TupsTVDREQU',
+                            href: 'ipfs://bafybeignxfhnmpqblheb5uje6bghgy6pupb7e4i6qlhu7fazn7nesneh5y/',
                         },
                     ],
                 },
