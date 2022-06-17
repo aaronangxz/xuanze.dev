@@ -108,7 +108,7 @@ const config = {
                             to: '/blog',
                         },
                         {
-                            label: 'View on IPFS',
+                            label: 'View on IPFS (with Brave Browser)',
                             href: 'ipfs://bafybeignxfhnmpqblheb5uje6bghgy6pupb7e4i6qlhu7fazn7nesneh5y/',
                         },
                         {
