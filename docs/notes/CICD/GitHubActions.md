@@ -2,7 +2,7 @@
 displayed_sidebar: notesSideBar
 ---
 
-# CI/CD
+# GitHub Actions
 
 # Deploy
 - `${{secrets.X}}` will read from Github secrets

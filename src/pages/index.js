@@ -13,7 +13,8 @@ function HomepageHeader() {
       <div className="container">
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <p>I love to code and explore tech stuff. I code in Go and C++.</p>
+        <p>I love to code and explore tech. I code in Go and C++.</p>
+        <p>I write random stuff, sometimes.</p>
       </div>
     </header>
   );

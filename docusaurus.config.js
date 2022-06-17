@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'xuanze.sol',
-    tagline: 'Hello there.',
+    tagline: 'fmt.Println("Hello world.")',
     url: 'https://aaronangxz.github.io',
     baseUrl: '/',
     onBrokenLinks: 'throw',
@@ -29,7 +29,7 @@ const config = {
                 blog: {
                     showReadingTime: true,
                     // Please change this to your repo.
-                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/blob/master/',
+                    editUrl: 'https://github.com/aaronangxz/XZ-LeetCode-Journal/blob/sol-deploy/',
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
@@ -45,7 +45,7 @@ const config = {
             title: 'xuanze.sol',
             logo: {
                 alt: 'My Site Logo',
-               src: 'img/logo.svg',
+               src: 'img/favicon.ico',
             },
             items: [{
                     type: 'doc',
