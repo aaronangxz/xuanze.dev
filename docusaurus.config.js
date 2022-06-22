@@ -41,6 +41,10 @@ const config = {
     themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+        gtag: {
+            trackingID: 'G-5LDBR129KE',
+            anonymizeIP: true,
+        },
         navbar: {
             title: 'xuanze.sol',
             logo: {
