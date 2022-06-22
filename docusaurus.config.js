@@ -34,6 +34,10 @@ const config = {
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
                 },
+                gtag: {
+                    trackingID: 'G-5LDBR129KE',
+                    anonymizeIP: true,
+                },
             }),
         ],
     ],
@@ -41,10 +45,6 @@ const config = {
     themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
-        gtag: {
-            trackingID: 'G-5LDBR129KE',
-            anonymizeIP: true,
-        },
         navbar: {
             title: 'xuanze.sol',
             logo: {
