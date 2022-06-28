@@ -117,3 +117,13 @@ func swap(s []string){
     s[1] = tmp
 }
 ```
+
+### Minimum & Maximum Integer
+```go
+	var mi32 int64 = math.MinInt32
+    var mi64 int64 = math.MinInt64
+    var i32 uint64 = math.MaxInt32
+    var ui32 uint64 = math.MaxUint32
+    var i64 uint64 = math.MaxInt64
+    var ui64 uint64 = math.MaxUint64
+```
