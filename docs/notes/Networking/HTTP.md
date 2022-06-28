@@ -95,6 +95,3 @@ SSL replaced by TLS
 - Session key used for both encryption and decryption
 - Uses symmetric key
 - Valid until next session
-
-### What happens when you hit enter
-
