@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 const FeatureList = [
   {
@@ -48,6 +49,7 @@ function Feature({Svg, title, description}) {
 
 export default function HomepageFeatures() {
   const recentPosts = require("../../../.docusaurus/docusaurus-plugin-content-blog/default/blog-post-list-prop-default.json");
+
   return (
     <section className={styles.features}>
       <div className="container">

@@ -18,7 +18,10 @@ A clone of the Carousell web app.
 ---
 
 ### SeaHungerGamesBot
-<img src="./img/seahungergames.jpeg" width="250" />
+
+***Archived due to closure of API***
+
+<img src="/img/seahungergames.jpeg" width="250" />
 
 Created this bot to save 30 seconds everyday, just to order that free office dinner quickly. Worth it.
 

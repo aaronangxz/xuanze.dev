@@ -4,6 +4,51 @@ displayed_sidebar: notesSideBar
 
 # Go
 
+### Iota
+The use of `iota` indicates the start, e.g. `0` of that enum.
+```go
+const (
+	Red int = iota
+	Orange
+	Yellow
+	Green
+	Blue
+	Indigo
+	Violet
+)
+```
+The actual values will be 0 ~ 6.
+
+To skip enum,
+```go
+const (
+	_ int = iota
+	Orange
+	Yellow
+	Green
+	Blue
+	Indigo
+	Violet
+)
+```
+The actual values will be 1 ~ 6.
+
+For bitmask,
+```go
+const (
+	read   = 1 << iota // 00000001 = 1
+	write              // 00000010 = 2
+	remove             // 00000100 = 4
+)
+
+const (
+	_  = 1 << (iota * 10) // ignore the first value
+	KB                    // decimal:       1024 -> binary 00000000000000000000010000000000
+	MB                    // decimal:    1048576 -> binary 00000000000100000000000000000000
+	GB                    // decimal: 1073741824 -> binary 01000000000000000000000000000000
+)
+```
+
 ### Loops
 There is no while loop in Go.
 
@@ -71,4 +116,14 @@ func swap(s []string){
     s[0] = s[1]
     s[1] = tmp
 }
+```
+
+### Minimum & Maximum Integer
+```go
+	var mi32 int64 = math.MinInt32
+    var mi64 int64 = math.MinInt64
+    var i32 uint64 = math.MaxInt32
+    var ui32 uint64 = math.MaxUint32
+    var i64 uint64 = math.MaxInt64
+    var ui64 uint64 = math.MaxUint64
 ```
