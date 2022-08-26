@@ -4,7 +4,7 @@ title: About
 
 # Hello World.
 
-<img src="/img/profile.jpg" width="350" height="350" />
+<img src="./img/profile.jpg" width="350" height="350" />
 
 I'm Xuan Ze. 
 
