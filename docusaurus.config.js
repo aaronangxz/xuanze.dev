@@ -9,12 +9,12 @@ const config = {
     title: 'xuanze.sol',
     tagline: 'fmt.Println("Hello world.")',
     url: 'https://aaronangxz.github.io',
-    baseUrl: '/',
+    baseUrl: '/XZ-LeetCode-Journal/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
     organizationName: 'aaronangxz', // Usually your GitHub org/user name.
-    projectName: 'xuanze.sol', // Usually your repo name.
+    projectName: 'XZ-LeetCode-Journal', // Usually your repo name.
     trailingSlash: false,
     presets: [
         [
