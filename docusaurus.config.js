@@ -9,7 +9,7 @@ const config = {
     title: 'xuanze.sol',
     tagline: 'fmt.Println("Hello world.")',
     url: 'https://aaronangxz.github.io',
-    baseUrl: '/',
+    baseUrl: '/XZ-LeetCode-Journal/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
