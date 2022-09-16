@@ -1,0 +1,47 @@
+---
+slug : interviewing-with-matrixport
+title: Interviewing with MatrixPort (Backend Software Engineer)
+authors: [xuanze]
+tags: [interviews]
+---
+
+![MatrixPort](./static/matrixport_logo.png)
+
+## Introduction
+Matrixport is a very promosing SG company with a fresh $100M funding from Series-C last year. 
+And they also have plans to go public in the next few years. The exchange under MatrixPort is called bit.com.
+However, note that all interviews were conducted in Chinese.
+
+## TLDR
+
+```
+Overall Experience: Good
+Difficulty: Medium -> Medium-Hard
+Received Offer: No
+```
+
+<!--truncate-->
+
+## First Round
+
+- Previous Experiences
+- Concurrency related: 
+-- Function spawns several goroutines, wait groups implemented.
+ - How should we implement it if we want to abort all threads whenever one of it fails.
+ - Ans: Implement channels. In each goroutines, check for channel status. When it fails, close the channel.
+
+## Second Round
+
+- How does database transactions work under the hood
+- When to use transactions
+- Considerations during DB / Cache interactions
+
+## Third Round
+
+- Docker file
+- How to perform deadlock using goroutines
+- Regular expressions
+- Shell command to check process
+- Memory stacks of process
+- Kernel vs core
+- Debugging tool
