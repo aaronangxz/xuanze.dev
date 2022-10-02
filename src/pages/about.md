@@ -11,7 +11,9 @@ I'm Xuan Ze.
 
 ## Experience
 
-#### Shopee | Full-Time | June 2021 - Current
+#### TikTok | Full-Time | Oct 2022 - Current
+Testing Software Engineer
+#### Shopee | Full-Time | June 2021 - Sep 2022
 Software QA Engineer
 
 ---
