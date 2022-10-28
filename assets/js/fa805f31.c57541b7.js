@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[5348],{1566:e=>{e.exports=JSON.parse('{"permalink":"/XZ-LeetCode-Journal/blog/tags/git","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

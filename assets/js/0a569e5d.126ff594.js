@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[7863],{1584:e=>{e.exports=JSON.parse('{"label":"ventura","permalink":"/XZ-LeetCode-Journal/blog/tags/ventura","allTagsPath":"/XZ-LeetCode-Journal/blog/tags","count":1}')}}]);
