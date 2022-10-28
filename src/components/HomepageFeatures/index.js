@@ -53,8 +53,7 @@ export default function HomepageFeatures() {
   return (
     <section className={styles.features}>
       <div className="container">
-        <div className={clsx('col col--4')}>
-        
+        <div className={clsx('col col--16')}>
         <div className="text--center">
           <h3>Recent Posts</h3>    
         </div>

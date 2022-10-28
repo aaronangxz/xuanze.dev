@@ -6,7 +6,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-    title: 'xuanze.sol',
+    title: 'xuanze.dev',
     tagline: 'fmt.Println("Hello world.")',
     url: 'https://aaronangxz.github.io',
     baseUrl: '/',
@@ -46,7 +46,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
         navbar: {
-            title: 'xuanze.sol',
+            title: 'xuanze.dev',
             logo: {
                 alt: 'My Site Logo',
                src: 'img/favicon.ico',
@@ -122,7 +122,7 @@ const config = {
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus. Hosted on Decentralized Web.`,
+            copyright: `Copyright © ${new Date().getFullYear()} XZ. Built with Docusaurus.`,
         },
         prism: {
             theme: lightCodeTheme,
