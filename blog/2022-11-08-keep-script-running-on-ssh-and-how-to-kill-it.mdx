@@ -1,0 +1,72 @@
+---
+slug : keep-script-running-on-ssh-and-how-to-kill-it
+title: How to keep a Go script running on SSH plus how to kill it
+authors: [xuanze]
+tags: [go,ssh,vm,server]
+---
+
+## Introduction
+
+If you want to host some ever-running script, what option do you have?
+
+1. Run on your laptop, and never sleep / off it (??)
+2. Get a Raspberry Pi (ugh.. overkill)
+2. Pay a few dollars to host it somewhere (few dollars to host somethings so small.. worth?)
+3. Ask your friend to run on his/her laptop and never off it.
+
+Option 3 seems to be the best option if you manage to convince.
+
+Fortunately I have the opportunity of abusing my personal VM at work. 
+I mean, not abusing, it's somewhat related to work too. I'm sure.
+
+<!--truncate-->
+
+## How
+
+These are roughly the steps I took:
+
+### Clone the repo
+Clone the repo into the VM. My path is `~/xuanbot`.
+
+### Start running, but..
+We cannot just run it with the usual `go run main.go`, because if we do that, the process will hang up when we exit the ssh conenction.
+
+Instead, we can do
+
+```bash
+$ nohup go run main.go &
+
+xuanze.ang@n36-172-051:~/xuanbot$ nohup go run main.go &
+[1] 670740
+xuanze.ang@n36-172-051:~/xuanbot$ nohup: ignoring input and appending output to 'nohup.out'
+```
+
+At this point, the process is running.
+
+### Find the process id
+Next, we need to know what is the process id of our task.
+
+```bash
+$ ps -ef | grep go
+
+xuanze.ang@n36-172-051:~/xuanbot$ nohup: ignoring input and appending output to 'nohup.out'
+ps -ef | grep go
+root        1411       1  0 Nov07 ?        00:01:56 /etc/sysop/mongoosev3-agent/mongoosev3-agent
+root        3888    1411  0 Nov07 ?        00:00:36 /etc/sysop/mongoosev3-agent/plugin/driver/driver
+root        3896    1411  0 Nov07 ?        00:00:07 /etc/sysop/mongoosev3-agent/plugin/journal_watcher/journal_watcher
+root        3945    1411  0 Nov07 ?        00:01:02 /etc/sysop/mongoosev3-agent/plugin/collector/collector
+root        4016    1411  0 Nov07 ?        00:00:49 /etc/sysop/mongoosev3-agent/plugin/baseline/baseline
+xuanze.+  670740  670583  0 11:32 pts/0    00:00:00 go run main.go
+xuanze.+  670844  670740 99 11:32 pts/0    00:00:37 /tmp/go-build2256816827/b001/exe/main
+xuanze.+  671173  670583  0 11:32 pts/0    00:00:00 grep go
+```
+
+We can see that our build is running as pid `670844` for 37 seconds now.
+
+### Kill it
+Since we have enough information now, kill it!
+```bash
+kill 670844
+```
+
+Process should now be killed and removed from the list. Done!

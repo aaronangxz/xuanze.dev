@@ -1,0 +1,52 @@
+---
+slug : trick-to-keep-empty-folders-git
+title: Trick to keep empty folders on git
+authors: [xuanze]
+tags: [git]
+---
+
+## Introduction
+
+So when I was building [this](https://github.com/aaronangxz/duke) school project, I encountered a requirement to write soem data into local files.
+
+Basically, these are so called temporary files or caches, folders are created during runtime.
+
+Sounds straight forward enough, what's the problem here?
+
+<!--truncate-->
+
+## Problem
+
+So the problem is due to our beloved `git`. Apparently git will not push empty directories.
+
+For example:
+
+```
+src - main
+        - main.java
+    - sub
+```
+
+For this folder structure, `sub` will not be pushed to git. This shouldn't be an issue, most of the time. But let's find some way to make it push.
+
+## How
+
+Easy, just put somethings inside?!
+
+Actually yes, just put something inside. For me, I just create a nto so meaningful file that doesn't look random
+
+```
+.gitkeep
+```
+
+So the folder structure will be:
+```
+src - main
+        - main.java
+    - sub
+        - .gitkeep
+```
+
+And the `sub` folder can be pushed to git now.
+
+Some relatively useless knowledge here.. but here you go :)
