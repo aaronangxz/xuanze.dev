@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[3696],{8262:e=>{e.exports=JSON.parse('{"label":"Demo","permalink":"/docs/tags/demo","allTagsPath":"/docs/tags","count":1,"items":[{"id":"leetcode/easy/Valid Parentheses","title":"20. Valid Parentheses","description":"Question","permalink":"/docs/leetcode/easy/Valid Parentheses"}]}')}}]);

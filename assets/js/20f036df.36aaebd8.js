@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[8852],{9090:e=>{e.exports=JSON.parse('{"label":"go","permalink":"/XZ-LeetCode-Journal/blog/tags/go","allTagsPath":"/XZ-LeetCode-Journal/blog/tags","count":1}')}}]);

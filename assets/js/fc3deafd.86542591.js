@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkleetcode_notes=self.webpackChunkleetcode_notes||[]).push([[7659],{4568:e=>{e.exports=JSON.parse('{"label":"go","permalink":"/blog/tags/go","allTagsPath":"/blog/tags","count":2}')}}]);
