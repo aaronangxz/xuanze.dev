@@ -13,8 +13,21 @@ I'm Xuan Ze.
 
 #### TikTok | Full-Time | Oct 2022 - Current
 Testing Software Engineer
+
+> Global E-Commerce - Data Insights
+> 
+> Full stack end-to-end testing
+> 
+> Build internal QA tools
+
+<br></br>
+
 #### Shopee | Full-Time | June 2021 - Sep 2022
 Software QA Engineer
+
+> MarketPlace - Promotion - Voucher
+> 
+> Build and maintain automation tests for API endpoints
 
 ---
 

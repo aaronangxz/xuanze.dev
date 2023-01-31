@@ -1,0 +1,275 @@
+---
+slug : how-to-read-from-sql-tables-with-unknown-fields
+title: How to read from SQL tables with unknown fields
+authors: [xuanze]
+tags: [go,database,gorm,mysql]
+---
+
+## Introduction
+
+Executing a SQL query using gorm is pretty trivial. Normally this is what I'd do:
+
+1. Write a proto struct that matches the DB table schema
+2. Run query using gorm and `Scan` into the struct
+```go
+var auditDb *pb.DataInjectionAuditLogDb
+if err := orm.DataHelperDbInstance(g.c).Raw(q).Scan(&auditDb).Error; err != nil {
+    hlog.CtxErrorf(g.c, err.Error())
+    return nil, err
+}
+```
+3. Done
+
+However, what if we do not know the schema, or it is virtually impossible to create a struct for all of them?
+
+Huh?!
+
+<!--truncate-->
+
+## Problem
+
+In my recent project of building an internal data injection tool, this exact issue arisen and a task that I deemed EZPZ wasn't that straightforward after all.
+
+Specifically, I have to execute a raw query that the user passes to front end, execute it in the test environment DB and return the results.
+
+It is impossible to have structs for all hundreds of tables hard-coded in the back end, it will be a pain if the schema changes too.
+
+Thankfully, after some digging and googling, there is a solution!
+
+## How
+
+1. Execute the query as per normal, BUT we don't `Scan` it to a struct. Instead, We retrieve the `Rows` as such
+```go
+    r, err := orm.DbInstance(e.c).Raw(e.req.GetQuery()).Rows()
+```
+
+2. Once we have the rows, retrieve the corresponding columns
+```go
+    cols, err := r.Columns()
+```
+
+3. Our objective now is to construct a list of `<table column>:<table field>` maps, just like a JSON.
+
+4. Create a map of `interface` type, since we do not know what will the data type be.
+```go
+    genericMap := make([]map[string]interface{}, 0)
+```
+
+5. While for each column, we will put it into a slice of `interface`. We initialize the slice with a fixed length because at this point of time, it is known to us.
+```go
+    colItems := make([]interface{}, len(cols))
+```
+
+6. Iterate through every row. While at it, `Scan` them into the column slice `colItems` we had just now.
+```go
+ for r.Next() {
+        colItem := make(map[string]interface{}, len(cols))
+
+        for i, _ := range colItems {
+            colItems[i] = new(interface{})
+        }
+
+        if err := r.Scan(colItems...); err != nil {
+            hlog.CtxErrorf(e.c, err.Error())
+            return nil, err
+        }
+    ...
+}
+```
+
+7. Now, we can finally save those columns. However, because all of these are `interface` type, we need to case it back to `bytes`, which is `[]uint8`.
+```go
+    var row []string
+        for i, col := range cols {
+            colItem[col] = *colItems[i].(*interface{})
+
+            if colItem[col] == nil {
+                //when column is empty (no data)
+                row = append(row, "")
+            } else {
+                //otherwise cast into uint8 slice (byte array) then cast as string
+                row = append(row, string(colItem[col].([]uint8)))
+            }
+        ...
+    }
+```
+
+8. While at it, we also take the chance to save the table column names as a slice itself. This is to make things easier for FE. But we do not want to collect it over and over again (It will be the same for every row), we stop when we have collected all once.
+```go
+    //Collect the field names on the first run
+    if len(keys) < len(colItems) {
+        keys = append(keys, col)
+    }
+```
+
+9. Finally, we append all of these into our slices
+```go
+    res = append(res, &pb.TableRows{TableData: row})
+    genericMap = append(genericMap, colItem)
+```
+
+10. Well, that's it! By running `"SELECT * FROM app_lgt_dp_screen_main_metrics_rt_day LIMIT 1"`, the outcome will be such:
+```json
+{
+    "data": {
+        "table_fields": [
+            "p_date",
+            "stats_date",
+            "stats_hour",
+            "is_in_island",
+            "is_cod",
+            "provider_id",
+            "stats_time",
+            "provider_name",
+            "create_add_cnt",
+            "create_sub_cnt",
+            "return_and_refund_cnt",
+            "shipped_cnt",
+            "create_to_ship_duration",
+            "pickup_cnt",
+            "ship_to_pickup_duration",
+            "need_pickup_cnt",
+            "ontime_pickup_cnt",
+            "first_attempt_ontime_pickup_cnt",
+            "delivery_cnt",
+            "create_to_delivery_duration",
+            "pickup_to_delivery_duration",
+            "need_delivery_cnt",
+            "ontime_delivery_cnt",
+            "first_attempt_ontime_delivery_cnt",
+            "finish_delivery_failed_cnt",
+            "finish_cnt"
+        ],
+        "table_rows": [
+            {
+                "table_data": [
+                    "2022-08-02",
+                    "2022-08-03",
+                    "16",
+                    "0",
+                    "0",
+                    "6611815070777213442",
+                    "2022-08-09 00:00:00",
+                    "JNE Express",
+                    "19",
+                    "9",
+                    "0",
+                    "9",
+                    "483426",
+                    "1",
+                    "469683",
+                    "5",
+                    "3",
+                    "3",
+                    "5",
+                    "627845",
+                    "447646",
+                    "8",
+                    "0",
+                    "2",
+                    "10",
+                    "9"
+                ]
+            }
+        ]
+    },
+    "error": null
+}
+```
+
+Another day, another interesting problem solved :')
+
+### Full Code
+```go
+type ExecuteRawQuery struct {
+	c   context.Context
+	ctx *app.RequestContext
+	req *pb.ExecuteRawQueryRequest
+}
+
+func New(c context.Context, ctx *app.RequestContext) *ExecuteRawQuery {
+	e := new(ExecuteRawQuery)
+	e.c = c
+	e.ctx = ctx
+	hlog.CtxInfof(e.c, "ExecuteRawQuery | Initialized")
+	return e
+}
+
+func (e *ExecuteRawQuery) ExecuteRawQueryImpl() (*pb.ExecuteRawQueryResponse, error) {
+	e.req = new(pb.ExecuteRawQueryRequest)
+	if err := e.ctx.Bind(e.req); err != nil {
+		hlog.CtxErrorf(e.c, err.Error())
+		return nil, err
+	}
+
+	r, err := orm.DbInstance(e.c).Raw(e.req.GetQuery()).Rows()
+	if err != nil {
+		hlog.CtxErrorf(e.c, err.Error())
+		return nil, err
+	}
+
+	cols, err := r.Columns()
+	if err != nil {
+		hlog.CtxErrorf(e.c, err.Error())
+		return nil, err
+	}
+
+	var (
+		res  []*pb.TableRows
+		keys []string
+	)
+
+	//Create a list of string maps. i.e. <table column> : <table field> (JSON like)
+	//Interface type because at this point we don't know anything about the columns / fields data type
+	//We know how many columns we have tho
+	genericMap := make([]map[string]interface{}, 0)
+	colItems := make([]interface{}, len(cols))
+
+	for r.Next() {
+		colItem := make(map[string]interface{}, len(cols))
+
+		for i, _ := range colItems {
+			colItems[i] = new(interface{})
+		}
+
+		if err := r.Scan(colItems...); err != nil {
+			hlog.CtxErrorf(e.c, err.Error())
+			return nil, err
+		}
+
+		var row []string
+		for i, col := range cols {
+			colItem[col] = *colItems[i].(*interface{})
+
+			if colItem[col] == nil {
+				//when column is empty (no data)
+				row = append(row, "")
+			} else {
+				//otherwise cast into uint8 slice (byte array) then cast as string
+				row = append(row, string(colItem[col].([]uint8)))
+			}
+
+			//Collect the field names on the first run
+			if len(keys) < len(colItems) {
+				keys = append(keys, col)
+			}
+		}
+		res = append(res, &pb.TableRows{TableData: row})
+		genericMap = append(genericMap, colItem)
+	}
+
+	if err := r.Close(); err != nil {
+		hlog.CtxErrorf(e.c, err.Error())
+		return nil, err
+	}
+
+	hlog.CtxInfof(e.c, "ExecuteRawQueryImpl | Success | %v rows", len(res))
+	return &pb.ExecuteRawQueryResponse{
+		TableFields: keys,
+		TableRows:   res,
+	}, err
+}
+```
+
+##### Reference
+[farrellit.net - Golang SQL Results from Unknown Rows](https://www.farrellit.net/2018/08/12/golang-sql-unknown-rows.html)
