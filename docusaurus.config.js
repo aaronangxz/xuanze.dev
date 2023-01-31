@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
     title: 'xuanze.dev',
     tagline: 'fmt.Println("Hello world.")',
-    url: 'https://aaronangxz.github.io',
+    url: 'https://xuanze.dev',
     baseUrl: '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
