@@ -2,7 +2,16 @@
 title: Projects
 ---
 
-# Personal Projects
+# Projects
+
+### DataHelperV2
+<img src="./img/datahelperv2.png"  />
+
+An internal mock data injection tool for TikTok E-commerce - Data Insights team.
+
+*Go, TypeScript, TDesign React, MySQL*
+
+---
 
 ### Carouhell
 <img src="./img/carouhell.png" width="500" />
