@@ -12,7 +12,7 @@ I'm Xuan Ze.
 ## Experience
 
 #### TikTok | Full-Time | Oct 2022 - Current
-Testing Software Engineer
+Software Engineer In Test
 
 > Global E-Commerce - Data Insights
 > 

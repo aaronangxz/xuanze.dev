@@ -4,12 +4,21 @@ title: Projects
 
 # Projects
 
+### AffiliateManager
+An end-to-end system for affiliate marketing and sales leads.
+
+Includes a landing page for booking & payments, and a management portal for owner and affiliates.
+
+*Go, TypeScript, NextJS, React, AntDesign, TDesign, MySQL, Redis*
+
+---
+
 ### DataHelperV2
 <img src="./img/datahelperv2.png"  />
 
 An internal mock data injection tool for TikTok E-commerce - Data Insights team.
 
-*Go, TypeScript, TDesign React, MySQL*
+*Go, TypeScript, React, TDesign, MySQL*
 
 ---
 
