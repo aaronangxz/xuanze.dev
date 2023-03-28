@@ -1,0 +1,37 @@
+---
+slug : delete-redis-keys-that-matches-pattern
+title: Delete Redis keys that matches pattern
+authors: [xuanze]
+tags: [redis,cache]
+---
+
+## Introduction
+
+So in the AffiliateManager project, a lot of endpoints are being cached. And somehow for some reason, the past me decided that a TTL
+of 0 is fine. And that left with me with a redis fill with thousands of keys :(
+
+Now, time to purge it!
+
+But I want to keep some of them, like session tokens but will like to clear those that are related to id etc.
+
+So here's how...
+
+<!--truncate-->
+
+## How
+
+Apparently, we can type in a `function` into the redis-cli!
+
+To delete keys that match a pattern:
+
+``` lua
+eval "for _,k in ipairs(redis.call('keys','<redis key pattern>')) do redis.call('del',k) end" 0
+```
+
+Replace `<redis key pattern>` with the key. For example, if I want to delete all keys that look like `user_id:123`. The command will be:
+
+``` lua
+eval "for _,k in ipairs(redis.call('keys','user_id:*')) do redis.call('del',k) end" 0
+```
+
+Finally, a clean redis :)
