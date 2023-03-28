@@ -2,11 +2,26 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xuanze.dev/blog</id>
     <title>xuanze.dev Blog</title>
-    <updated>2023-01-19T00:00:00.000Z</updated>
+    <updated>2023-03-29T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xuanze.dev/blog"/>
     <subtitle>xuanze.dev Blog</subtitle>
     <icon>https://xuanze.dev/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Delete Redis keys that matches pattern]]></title>
+        <id>https://xuanze.dev/blog/delete-redis-keys-that-matches-pattern</id>
+        <link href="https://xuanze.dev/blog/delete-redis-keys-that-matches-pattern"/>
+        <updated>2023-03-29T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Introduction]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="introduction">Introduction<a href="#introduction" class="hash-link" aria-label="Direct link to Introduction" title="Direct link to Introduction">​</a></h2><p>So in the AffiliateManager project, a lot of endpoints are being cached. And somehow for some reason, the past me decided that a TTL
+of 0 is fine. And that left with me with a redis fill with thousands of keys :(</p><p>Now, time to purge it!</p><p>But I want to keep some of them, like session tokens but will like to clear those that are related to id etc.</p><p>So here's how...</p><h2 class="anchor anchorWithStickyNavbar_LWe7" id="how">How<a href="#how" class="hash-link" aria-label="Direct link to How" title="Direct link to How">​</a></h2><p>Apparently, we can type in a <code>function</code> into the redis-cli!</p><p>To delete keys that match a pattern:</p><div class="language-lua codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-lua codeBlock_bY9V thin-scrollbar"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">eval "for _,k in ipairs(redis.call('keys','&lt;redis key pattern&gt;')) do redis.call('del',k) end" 0</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg class="copyButtonIcon_y97N" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg class="copyButtonSuccessIcon_LjdS" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div><p>Replace <code>&lt;redis key pattern&gt;</code> with the key. For example, if I want to delete all keys that look like <code>user_id:123</code>. The command will be:</p><div class="language-lua codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-lua codeBlock_bY9V thin-scrollbar"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">eval "for _,k in ipairs(redis.call('keys','user_id:*')) do redis.call('del',k) end" 0</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg class="copyButtonIcon_y97N" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg class="copyButtonSuccessIcon_LjdS" viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div><p>Finally, a clean redis :)</p>]]></content>
+        <author>
+            <name>Ang Xuan Ze</name>
+            <uri>https://github.com/aaronangxz</uri>
+        </author>
+        <category label="redis" term="redis"/>
+        <category label="cache" term="cache"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[How to read from SQL tables with unknown fields]]></title>
         <id>https://xuanze.dev/blog/how-to-read-from-sql-tables-with-unknown-fields</id>
