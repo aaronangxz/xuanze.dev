@@ -2,4 +2,8 @@
 displayed_sidebar: notesSideBar
 ---
 
-# Redis
+# Web vulnerabilities
+
+## XSS
+
+## CSRF

@@ -33,7 +33,7 @@ Software QA Engineer
 
 ## Education
 
-#### National University of Singapore, Singapore | 2020 - Current
+#### National University of Singapore, Singapore | 2020-2024
 Bachelor of Technology (Computing) - Software Engineering
 #### Nanyang Polytechnic, Singapore | 2013-2016
 Diploma in Mechatronics Engineering (Specialized in Biomedical)
