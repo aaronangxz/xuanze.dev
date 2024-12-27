@@ -70,3 +70,9 @@ A situation where a set of processes are blocked because each process is holding
 | Basic | Resource allocated to a process for a limited time | Resource allocated to a process until it completes or switches state |
 | Interrupt | Can be interrupted | Cannot be interrupted |
 | Starvation | Low priority process may starve if high priority process is frequently in ready state | Process that uses CPU for a long time will starve those that use shorter time |
+
+## Race Conditions
+
+## Synchronization
+
+## Starvation

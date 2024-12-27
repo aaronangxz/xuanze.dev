@@ -4,6 +4,12 @@ displayed_sidebar: notesSideBar
 
 # Database
 
+## ACID Properties
+- Atomicity: Transactions are all-or-nothing.
+- Consistency: Ensures data validity.
+- Isolation: Transactions are independent.
+- Durability: Ensures persistence of committed transactions.
+
 ## Sharding
 **Pros**
 - Increased read/write throughput
@@ -28,6 +34,8 @@ displayed_sidebar: notesSideBar
     - But most recent shard will get more IO
 - TAG
     - Matches specific values
+
+## Indexing
 
 ## Master & Slave
 - 1 Master + many slaves
