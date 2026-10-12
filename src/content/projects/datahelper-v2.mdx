@@ -1,0 +1,35 @@
+---
+title: DataHelperV2
+kind: work
+company: TikTok, E-commerce Data Insights
+summary: Mock-data injection for test databases, built for TikTok's E-commerce Data Insights team. Runs queries against any table without knowing its schema, and logs every change.
+status: Internal tool
+period: "[2022 – 2023]"
+role: "[Designed and built it]"
+stack: [Go, Hertz, GORM, TypeScript, React, TDesign, MySQL]
+order: 2
+---
+import Draft from '../../components/Draft.astro';
+
+> Internal tool, so there are no screenshots or source here. This covers the problem and the engineering.
+
+## The problem
+
+<Draft>
+Data Insights dashboards only mean something when the tables behind them hold realistic data. Testing them meant engineers writing one-off SQL against shared test databases: slow, easy to get wrong, and with no record of who changed what.
+</Draft>
+
+## What I built
+
+- A web UI for running queries against test databases, with results shown as a table whichever table was queried.
+- An audit log of every injection.
+
+## The interesting part
+
+The backend couldn't know the schema of the hundreds of tables people might query, so it couldn't scan results into structs. It reads column names at runtime and scans each row into a slice of `interface{}` values. [Full write-up](/writing/how-to-read-from-sql-tables-with-unknown-fields).
+
+## Results
+
+<Draft>
+Used by [N] engineers and QAs. Setting up dashboard test data went from [X hours] to [Y minutes].
+</Draft>

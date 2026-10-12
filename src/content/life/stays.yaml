@@ -1,0 +1,16 @@
+# Stays on the Life page. Add `photo: /life/<file>.jpg` (put the image in public/life/)
+# to replace the colour placeholder. Remove `confirm: true` once checked.
+- id: alila-seminyak
+  name: Alila Seminyak
+  city: Bali
+  date: Oct 2026
+  note: Pool swims between beach runs.
+  tint: p2
+  confirm: true
+- id: sofitel-legend-hanoi
+  name: Sofitel Legend Metropole
+  city: Hanoi
+  date: Aug 2026
+  note: The long-run reward was breakfast here.
+  tint: p1
+  confirm: true

@@ -1,0 +1,32 @@
+---
+title: Interviewing with OKX (Backend Software Engineer)
+date: 2022-09-06
+tags: [interviews]
+---
+
+![OKX](./static/okx_logo.jpg)
+
+## Introduction
+OKX is a large-ish crypto exchange that is hiring in Singapore. However, they do not have 
+presence in SG and US.
+
+## TLDR
+
+```
+Overall Experience: Okay
+Difficulty: Hard
+Received Offer: No
+```
+
+
+
+## First Round (Senior)
+
+- Talk about hash map implementation
+ - Hash function, probing, collisions
+ - If a hashmap only has a few buckets populated, what can we optimize
+- Error handling
+ - How is error handling being done
+ - Benefits of catching exceptions
+- Coding 
+ - 🔴 [420. Strong Password Checker](https://leetcode.com/problems/strong-password-checker/)

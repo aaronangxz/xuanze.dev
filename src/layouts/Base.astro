@@ -1,0 +1,97 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Launcher from '../components/Launcher.astro';
+import { site } from '../site.config';
+import { launcherItems, toJsonScript } from '../lib/launcher';
+
+interface Props {
+  title?: string;
+  description?: string;
+  mode?: 'work' | 'life';
+  nav?: string;
+  /** The home page renders the launcher inline instead of in the ⌘K overlay. */
+  inlineLauncher?: boolean;
+}
+const { title, description = site.description, mode = 'work', nav, inlineLauncher = false } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.name;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const items = await launcherItems();
+const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
+---
+<!doctype html>
+<html lang="en" data-mode={mode === 'life' ? 'life' : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} · Writing`} href="/rss.xml" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content={mode === 'life' ? '#0B1220' : '#E8E9EC'} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" />
+    <link rel="prefetch" href={mode === 'life' ? '/' : '/life'} />
+    <script is:inline>
+      (function () {
+        var r = document.documentElement;
+        try { var t = localStorage.getItem('xz-theme'); if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t); } catch (e) {}
+        try {
+          var s = sessionStorage.getItem('xz-slide');
+          if (s) { sessionStorage.removeItem('xz-slide'); r.classList.add('slide-in'); r.setAttribute('data-slide', s); }
+        } catch (e) {}
+        // The Work/Life switch runs its own animation, so skip the default cross-page fade for it.
+        addEventListener('pagereveal', function (e) { if (r.classList.contains('slide-in') && e.viewTransition) e.viewTransition.skipTransition(); });
+        addEventListener('pageswap', function (e) { if (window.__xzSliding && e.viewTransition) e.viewTransition.skipTransition(); });
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="life-glow" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="ambient" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+
+    <div class="wrap">
+      <Header mode={mode} nav={nav} />
+      <main>
+        <slot />
+      </main>
+      {mode === 'work' && (
+        <footer class="foot">
+          <span>© {new Date().getFullYear()}</span>
+          <nav aria-label="Elsewhere">
+            <a href={site.links.github}>GitHub</a>
+            <a href={site.links.linkedin}>LinkedIn</a>
+            <a href="/writing">Writing</a>
+            <a href="/rss.xml">RSS</a>
+          </nav>
+        </footer>
+      )}
+    </div>
+
+    {mode === 'life' && (
+      <div class="loverlay" id="loverlay" hidden>
+        <div class="lpanel" id="lpanel" role="dialog" aria-modal="true" aria-label="Where to?">
+          <div class="lsearch"><Fragment set:html={PLANE_L} /><input id="lq" type="text" autocomplete="off" placeholder="Where to?" aria-label="Search trips, stays and races" aria-controls="llist" /><kbd>esc</kbd></div>
+          <div class="lsugg"><span>Try</span><button type="button" data-lq="race">race</button><button type="button" data-lq="california">california</button><button type="button" data-lq="vietnam">vietnam</button><button type="button" data-lq="bali">bali</button></div>
+          <ul class="llist" id="llist" role="listbox" aria-label="Places, stays and races"></ul>
+          <div class="lfoot2"><span><kbd>↑</kbd> <kbd>↓</kbd> browse</span><span><kbd>↵</kbd> go there</span><span><kbd>esc</kbd> close</span></div>
+        </div>
+      </div>
+    )}
+    <div class="overlay" id="overlay" hidden><div id="ov-slot" role="dialog" aria-modal="true" aria-label="Search">{!inlineLauncher && <Launcher />}</div></div>
+    <div class="toast" id="toast" role="status" hidden></div>
+
+    <script type="application/json" id="launcher-data" set:html={toJsonScript(items)} />
+    <script type="application/json" id="site-data" set:html={toJsonScript({ email: site.email })} />
+    <script>
+      import '../scripts/app';
+    </script>
+  </body>
+</html>

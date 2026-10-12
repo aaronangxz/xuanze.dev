@@ -1,0 +1,24 @@
+---
+interface Crumb { label: string; href?: string }
+interface Props { crumbs: Crumb[]; wide?: boolean }
+const { crumbs, wide = false } = Astro.props;
+const hasInspector = Astro.slots.has('inspector') && !wide;
+---
+<div class="window">
+  <div class="titlebar">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">home</a>
+      {crumbs.map((c, i) => (
+        <>
+          <span>/</span>
+          {i === crumbs.length - 1 || !c.href ? <b>{c.label}</b> : <a href={c.href}>{c.label}</a>}
+        </>
+      ))}
+    </nav>
+    <button class="kbtn" type="button" data-open>Search <kbd>⌘K</kbd></button>
+  </div>
+  <div class="doc" style={hasInspector ? undefined : 'grid-template-columns:minmax(0,1fr)'}>
+    <div class="doc-main"><slot /></div>
+    {hasInspector && <aside class="inspector" aria-label="Details"><slot name="inspector" /></aside>}
+  </div>
+</div>

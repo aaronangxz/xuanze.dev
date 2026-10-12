@@ -1,0 +1,433 @@
+// @ts-nocheck
+/* Client behaviour for the whole site: launcher, ⌘K, Life search, Work/Life slide, theme, small touches. */
+
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE = 'cubic-bezier(.2,.8,.2,1)';
+const root = document.documentElement;
+const $ = (id) => document.getElementById(id);
+const mode = root.getAttribute('data-mode') === 'life' ? 'life' : 'work';
+const site = JSON.parse($('site-data')?.textContent || '{}');
+
+/* ---------- toast + copy ---------- */
+const toastEl = $('toast');
+let toastTimer;
+function say(m) {
+  toastEl.textContent = m; toastEl.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, 2200);
+}
+function copyEmail(btn) {
+  const ok = () => {
+    if (btn) { const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = t; }, 1500); }
+    else say('Email copied');
+  };
+  try { navigator.clipboard.writeText(site.email).then(ok, () => say('Copy failed. Select the address instead.')); }
+  catch { say('Copy failed. Select the address instead.'); }
+}
+
+/* =========================================================
+   Work launcher (inline on home, ⌘K overlay elsewhere)
+   ========================================================= */
+const IC = {
+  user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>',
+  box: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"></path><path d="M3 7v10l9 4 9-4V7"></path></svg>',
+  doc: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"></path><path d="M9 12h6M9 16h6"></path></svg>',
+  work: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M9 7V4h6v3"></path></svg>',
+  mail: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>',
+  link: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg>',
+  note: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 4h14v16H5z"></path><path d="M9 8h6M9 12h6M9 16h3"></path></svg>',
+  sun: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>',
+};
+const items = JSON.parse($('launcher-data')?.textContent || '[]');
+const launcher = $('launcher');
+const slot = $('slot');
+const overlay = $('overlay');
+const isHome = !!slot;
+let closing = false;
+
+const L = launcher && (() => {
+  const input = $('q'), list = $('list'), prev = $('prev'), lw = $('lw'), moreBtn = $('more'), moreN = $('more-n'), countEl = $('count');
+  let shown = [], active = 0, hl = null, lastFocus = null;
+
+  const ctaHtml = (it) => {
+    const label = (it.cta || 'Open') + (it.external ? ' ↗' : it.copy ? '' : ' →');
+    if (it.copy) return `<button class="cta" type="button" data-copy>${label}</button>`;
+    if (it.life) return `<a class="cta" href="${it.href}" data-life-link>${label}</a>`;
+    return `<a class="cta" href="${it.href}"${it.external ? ' target="_blank" rel="noopener"' : ''}>${label}</a>`;
+  };
+
+  function render(animate) {
+    const q = input.value.trim().toLowerCase();
+    shown = items.filter((it) => q ? (it.t + ' ' + it.s + ' ' + it.k + ' ' + it.g).toLowerCase().includes(q) : !it.searchOnly);
+    if (active >= shown.length) active = 0;
+    let html = '', g = null;
+    if (!shown.length) html = '<li class="empty">No results. Try "go" or "redis".</li>';
+    shown.forEach((it, i) => {
+      if (it.g !== g) { html += `<li class="grp" role="presentation">${it.g}</li>`; g = it.g; }
+      html += `<li class="opt" role="option" id="o${i}" data-i="${i}" aria-selected="${i === active}"><span class="ic">${IC[it.i] || IC.doc}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`;
+    });
+    list.innerHTML = html;
+    hl = document.createElement('li'); hl.className = 'hl'; hl.setAttribute('role', 'presentation'); hl.setAttribute('aria-hidden', 'true');
+    list.insertBefore(hl, list.firstChild);
+    list.scrollTop = 0;
+    moveHL(true);
+    paint();
+    if (animate !== false && !reduce) {
+      list.querySelectorAll('.opt, .grp, .empty').forEach((el, i) => {
+        if (i > 16) return;
+        el.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 280, delay: i * 16, easing: EASE, fill: 'backwards' });
+      });
+    }
+    countEl.textContent = shown.length + (shown.length === 1 ? ' result' : ' results');
+    requestAnimationFrame(updateScroll);
+  }
+  function moveHL(instant) {
+    if (!hl) return;
+    const el = $('o' + active);
+    if (!el) { hl.style.opacity = '0'; return; }
+    if (instant || reduce) hl.classList.add('instant');
+    hl.style.opacity = '1';
+    hl.style.transform = `translateY(${el.offsetTop}px)`;
+    hl.style.height = el.offsetHeight + 'px';
+    if (instant || reduce) { void hl.offsetWidth; hl.classList.remove('instant'); }
+  }
+  function paint() {
+    const it = shown[active];
+    input.setAttribute('aria-activedescendant', it ? 'o' + active : '');
+    prev.innerHTML = it ? it.p + ctaHtml(it) : '';
+    if (it && !reduce) prev.animate([{ opacity: 0, transform: 'translateY(8px)', filter: 'blur(4px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 280, easing: EASE });
+  }
+  function select(i) {
+    if (i === active) return;
+    active = i;
+    list.querySelectorAll('.opt').forEach((o) => o.setAttribute('aria-selected', String(+o.dataset.i === i)));
+    moveHL(false);
+    paint();
+    const el = $('o' + i);
+    if (el) {
+      const top = el.offsetTop, bottom = top + el.offsetHeight, view = list.clientHeight - 56;
+      if (top < list.scrollTop + 8) list.scrollTo({ top: Math.max(0, top - 40), behavior: reduce ? 'auto' : 'smooth' });
+      else if (bottom > list.scrollTop + view) list.scrollTo({ top: bottom - view + 8, behavior: reduce ? 'auto' : 'smooth' });
+    }
+  }
+  function updateScroll() {
+    const below = list.scrollHeight - list.scrollTop - list.clientHeight > 4;
+    lw.classList.toggle('below', below);
+    lw.classList.toggle('above', list.scrollTop > 4);
+    const edge = list.scrollTop + list.clientHeight - 56;
+    let n = 0;
+    list.querySelectorAll('.opt').forEach((o) => { if (o.offsetTop + o.offsetHeight / 2 > edge) n++; });
+    moreBtn.hidden = !below || n === 0;
+    moreN.textContent = n;
+  }
+  function open() {
+    const it = shown[active]; if (!it) return;
+    if (it.copy) { copyEmail(prev.querySelector('[data-copy]')); return; }
+    if (it.life) { slideTo('life', it.href); return; }
+    if (it.external) { window.open(it.href, '_blank', 'noopener'); return; }
+    location.href = it.href;
+  }
+
+  let raf = 0;
+  list.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(updateScroll); }, { passive: true });
+  moreBtn.addEventListener('click', () => list.scrollBy({ top: list.clientHeight * 0.7, behavior: reduce ? 'auto' : 'smooth' }));
+  moreBtn.addEventListener('mousedown', (e) => e.preventDefault());
+  window.addEventListener('resize', () => { moveHL(true); updateScroll(); });
+  input.addEventListener('input', () => { active = 0; render(); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (shown.length) select((active + 1) % shown.length); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (shown.length) select((active - 1 + shown.length) % shown.length); }
+    else if (e.key === 'Enter') { e.preventDefault(); open(); }
+    else if (e.key === 'Escape') { e.preventDefault(); if (!overlay.hidden) closeOverlay(); else { input.value = ''; active = 0; render(); } }
+  });
+  list.addEventListener('mousedown', (e) => e.preventDefault());
+  list.addEventListener('mousemove', (e) => { const o = e.target.closest('.opt'); if (o && +o.dataset.i !== active) select(+o.dataset.i); });
+  list.addEventListener('click', (e) => { const o = e.target.closest('.opt'); if (!o) return; const i = +o.dataset.i; if (i === active) open(); else { select(i); input.focus(); } });
+  document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { input.value = b.dataset.q; active = 0; render(); input.focus(); }));
+
+  // Focus mode on home: everything around the launcher blurs back while you search.
+  const homeEl = document.querySelector('.page.home');
+  if (homeEl) {
+    input.addEventListener('focus', () => homeEl.classList.add('searching'));
+    input.addEventListener('blur', () => homeEl.classList.remove('searching'));
+  }
+
+  render(!isHome);
+  return {
+    input, render, moveHL, updateScroll,
+    reset() { input.value = ''; active = 0; render(false); },
+    set lastFocus(v) { lastFocus = v; }, get lastFocus() { return lastFocus; },
+  };
+})();
+
+function openOverlay() {
+  if (!L) return;
+  if (isHome) { L.input.focus(); L.input.select(); window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); return; }
+  L.lastFocus = document.activeElement;
+  overlay.hidden = false;
+  L.reset();
+  if (!reduce) {
+    overlay.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+    launcher.animate([{ opacity: 0, transform: 'translateY(14px) scale(.975)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 300, easing: EASE });
+  }
+  setTimeout(() => L.input.focus(), 0);
+}
+function closeOverlay() {
+  if (overlay.hidden || closing) return;
+  const done = () => { overlay.hidden = true; closing = false; const f = L.lastFocus; if (f && f.focus) f.focus(); };
+  if (reduce) { done(); return; }
+  closing = true;
+  overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
+  const an = launcher.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(8px) scale(.985)' }], { duration: 170, easing: 'ease-in' });
+  an.onfinish = () => { overlay.getAnimations().forEach((x) => x.cancel()); done(); };
+}
+overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) closeOverlay(); });
+
+/* =========================================================
+   Life search ("Where to?")
+   ========================================================= */
+const LS = $('loverlay') && (() => {
+  const lov = $('loverlay'), lpanel = $('lpanel'), lq = $('lq'), llist = $('llist');
+  const litems = JSON.parse($('life-data')?.textContent || '[]');
+  let shown = [], act = 0, last = null, isClosing = false;
+
+  function render(animate) {
+    const q = lq.value.trim().toLowerCase();
+    shown = litems.filter((it) => !q || (it.t + ' ' + it.s + ' ' + it.k + ' ' + it.cat).toLowerCase().includes(q));
+    if (act >= shown.length) act = 0;
+    llist.innerHTML = shown.length
+      ? shown.map((it, i) => `<li class="lopt" role="option" id="lo${i}" data-i="${i}" aria-selected="${i === act}"><span class="cat">${it.cat}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`).join('')
+      : '<li class="lempty">Nowhere yet. Try "race".</li>';
+    lq.setAttribute('aria-activedescendant', shown.length ? 'lo' + act : '');
+    if (animate !== false && !reduce) llist.querySelectorAll('.lopt, .lempty').forEach((el, i) => {
+      if (i < 12) el.animate([{ opacity: 0, transform: 'translateX(18px)', filter: 'blur(4px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 360, delay: i * 22, easing: EASE, fill: 'backwards' });
+    });
+  }
+  function select(i) {
+    act = i;
+    llist.querySelectorAll('.lopt').forEach((o) => o.setAttribute('aria-selected', String(+o.dataset.i === i)));
+    lq.setAttribute('aria-activedescendant', 'lo' + i);
+    $('lo' + i)?.scrollIntoView({ block: 'nearest' });
+  }
+  function go() {
+    const it = shown[act]; if (!it) return;
+    close(true);
+    const el = document.querySelector(it.sel); if (!el) return;
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    setTimeout(() => { el.classList.remove('ping'); void el.offsetWidth; el.classList.add('ping'); setTimeout(() => el.classList.remove('ping'), 2800); }, reduce ? 0 : 500);
+  }
+  function open() {
+    if (!lov.hidden) return;
+    last = document.activeElement; lov.hidden = false; lq.value = ''; act = 0; render(false);
+    if (!reduce) {
+      lov.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+      lpanel.animate([{ opacity: 0, transform: 'translateY(16px) scale(.97)', filter: 'blur(8px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 380, easing: EASE });
+      llist.querySelectorAll('.lopt').forEach((el, i) => { if (i < 10) el.animate([{ opacity: 0, transform: 'translateX(18px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 120 + i * 30, easing: EASE, fill: 'backwards' }); });
+    }
+    setTimeout(() => lq.focus(), 0);
+  }
+  function close(silent) {
+    if (lov.hidden || isClosing) return;
+    const done = () => { lov.hidden = true; isClosing = false; if (!silent && last && last.focus) last.focus(); };
+    if (reduce) { done(); return; }
+    isClosing = true;
+    lov.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'ease-in', fill: 'forwards' });
+    const an = lpanel.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(10px) scale(.98)', filter: 'blur(6px)' }], { duration: 180, easing: 'ease-in' });
+    an.onfinish = () => { lov.getAnimations().forEach((x) => x.cancel()); done(); };
+  }
+  lq.addEventListener('input', () => { act = 0; render(); });
+  lq.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (shown.length) select((act + 1) % shown.length); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (shown.length) select((act - 1 + shown.length) % shown.length); }
+    else if (e.key === 'Enter') { e.preventDefault(); go(); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  });
+  llist.addEventListener('mousedown', (e) => e.preventDefault());
+  llist.addEventListener('mousemove', (e) => { const o = e.target.closest('.lopt'); if (o && +o.dataset.i !== act) select(+o.dataset.i); });
+  llist.addEventListener('click', (e) => { const o = e.target.closest('.lopt'); if (o) { select(+o.dataset.i); go(); } });
+  lov.addEventListener('mousedown', (e) => { if (e.target === lov) close(); });
+  document.querySelectorAll('[data-lq]').forEach((b) => {
+    b.addEventListener('mousedown', (e) => e.preventDefault());
+    b.addEventListener('click', () => { lq.value = b.dataset.lq; act = 0; render(); lq.focus(); });
+  });
+  return { open, close, get isOpen() { return !lov.hidden; } };
+})();
+
+/* =========================================================
+   Global clicks and keys
+   ========================================================= */
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  const cp = t.closest('[data-copy]'); if (cp) { copyEmail(cp); return; }
+  if (t.closest('[data-open]')) { openOverlay(); return; }
+  if (t.closest('[data-lopen]')) { LS?.open(); return; }
+  const lifeLink = t.closest('[data-life-link]');
+  if (lifeLink) { e.preventDefault(); slideTo('life', lifeLink.getAttribute('href')); return; }
+  const mb = t.closest('[data-mode-btn]');
+  if (mb) {
+    const want = mb.dataset.modeBtn;
+    if (want === mode) return;
+    slideTo(want, want === 'life' ? '/life' : lastWork());
+  }
+});
+window.addEventListener('keydown', (e) => {
+  const typing = e.target.closest && e.target.closest('input, textarea');
+  if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    if (mode === 'life' && LS) { LS.isOpen ? LS.close() : LS.open(); return; }
+    if (!overlay.hidden) closeOverlay(); else openOverlay();
+    return;
+  }
+  if (e.key === '/' && !typing) { e.preventDefault(); if (mode === 'life' && LS) LS.open(); else openOverlay(); }
+});
+
+/* =========================================================
+   Work / Life parallax slide (works across page loads)
+   ========================================================= */
+const ss = {
+  get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { sessionStorage.setItem(k, v); } catch {} },
+};
+function lastWork() { return ss.get('xz-last-work') || '/'; }
+if (mode === 'work') ss.set('xz-last-work', location.pathname);
+
+function visibleMods(pg) {
+  const list = [];
+  for (const c of pg.children) {
+    if (c.matches('.l-hero')) list.push(...c.children);
+    else list.push(c);
+  }
+  return list.filter((el) => { const r = el.getBoundingClientRect(); return r.height > 0 && r.bottom > 0 && r.top < innerHeight; });
+}
+const navLinks = () => [...document.querySelectorAll('.top nav > *')].filter((el) => el.offsetParent !== null);
+let sliding = false;
+
+function slideTo(toMode, href) {
+  if (sliding) return;
+  if (reduce) { location.href = href; return; }
+  sliding = true;
+  window.__xzSliding = true;
+  const dir = toMode === 'life' ? -1 : 1;
+  const OUT = 'cubic-bezier(.55,0,.8,.3)';
+  const knob = document.querySelector('.mode');
+  knob.setAttribute('data-pos', toMode);
+  knob.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modeBtn === toMode)));
+  root.classList.add('sliding');
+  closeOverlay(); LS?.close(true);
+
+  const pg = document.querySelector('.page');
+  const mods = pg ? visibleMods(pg) : [];
+  const step = 45, exitDur = 440;
+  mods.forEach((m, i) => m.animate(
+    [{ transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }, { transform: `translateX(${dir * (90 + i * 80)}px)`, opacity: 0, filter: 'blur(10px)' }],
+    { duration: exitDur, delay: i * step, easing: OUT, fill: 'forwards' }));
+  navLinks().forEach((l, i) => l.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${dir * 24}px)`, opacity: 0 }], { duration: 260, delay: i * 30, easing: OUT, fill: 'forwards' }));
+  const amb = document.querySelector('.ambient'), glow = document.querySelector('.life-glow');
+  (dir < 0 ? amb : glow).animate([{ transform: 'translateX(0)' }, { transform: `translateX(${dir * 16}vw)` }], { duration: 900, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' });
+
+  const total = exitDur + Math.max(0, mods.length - 1) * step;
+  // Halfway through, start shifting the page colours to the other side so the reload lands on matching colours.
+  setTimeout(() => { if (toMode === 'life') root.setAttribute('data-mode', 'life'); else root.removeAttribute('data-mode'); }, total * 0.6);
+  ss.set('xz-slide', toMode);
+  setTimeout(() => { location.href = href; }, total + 260);
+}
+
+// Arriving on the other side: swipe the new modules in from the opposite edge.
+if (root.classList.contains('slide-in')) {
+  const toMode = root.getAttribute('data-slide');
+  const dir = toMode === 'life' ? -1 : 1;
+  const IN = 'cubic-bezier(.16,1,.3,1)';
+  const pg = document.querySelector('.page');
+  if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+  const mods = pg ? visibleMods(pg) : [];
+  mods.forEach((m, i) => m.animate(
+    [{ transform: `translateX(${-dir * (200 + i * 110)}px)`, opacity: 0, filter: 'blur(10px)' }, { transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }],
+    { duration: 760, delay: i * 70, easing: IN, fill: 'backwards' }));
+  navLinks().forEach((l, i) => l.animate([{ transform: `translateX(${-dir * 28}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 520, delay: 120 + i * 50, easing: IN, fill: 'backwards' }));
+  const amb = document.querySelector('.ambient'), glow = document.querySelector('.life-glow');
+  (dir < 0 ? glow : amb).animate([{ transform: `translateX(${-dir * 16}vw)` }, { transform: 'translateX(0)' }], { duration: 1300, delay: 150, easing: IN, fill: 'backwards' });
+  root.classList.add('slide-go');
+}
+window.addEventListener('pageshow', (e) => {
+  // Coming back with the browser's Back button restores the old page mid-slide; reset it.
+  if (e.persisted && sliding) location.reload();
+});
+
+/* =========================================================
+   Theme, glass sheen, writing filter, flip board, countdown
+   ========================================================= */
+const themeBtn = $('theme');
+if (themeBtn) {
+  const modes = ['auto', 'light', 'dark'];
+  const label = () => { themeBtn.textContent = 'Theme: ' + (root.getAttribute('data-theme') || 'auto'); };
+  label();
+  themeBtn.addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme') || 'auto';
+    const next = modes[(modes.indexOf(cur) + 1) % 3];
+    if (next === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', next);
+    try { localStorage.setItem('xz-theme', next); } catch {}
+    label();
+  });
+}
+
+if (!reduce && window.matchMedia('(pointer: fine)').matches) {
+  document.addEventListener('pointermove', (e) => {
+    const g = e.target.closest && e.target.closest('.app, .window, .widget, .top');
+    if (!g) return;
+    const r = g.getBoundingClientRect();
+    g.style.setProperty('--mx', e.clientX - r.left + 'px');
+    g.style.setProperty('--my', e.clientY - r.top + 'px');
+  }, { passive: true });
+}
+
+const pf = $('pf');
+if (pf) {
+  pf.addEventListener('input', () => {
+    const q = pf.value.trim().toLowerCase();
+    document.querySelectorAll('#posts a').forEach((a) => {
+      a.parentElement.hidden = !!q && !(a.textContent + ' ' + (a.dataset.k || '')).toLowerCase().includes(q);
+    });
+    document.querySelectorAll('#posts .grp').forEach((g) => {
+      let n = g.nextElementSibling, any = false;
+      while (n && !n.classList.contains('grp')) { if (!n.hidden) any = true; n = n.nextElementSibling; }
+      g.hidden = !any;
+    });
+  });
+}
+
+const board = document.querySelector('.board');
+if (board) {
+  const CH = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  board.querySelectorAll('.flaps').forEach((el) => {
+    const t = el.dataset.flap || '';
+    el.setAttribute('role', 'cell'); el.setAttribute('aria-label', t.trim() || 'not recorded');
+    el.innerHTML = t.split('').map((c) => `<span class="flap" aria-hidden="true">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+  });
+  const run = () => {
+    if (reduce) return;
+    board.querySelectorAll('.board-row:not(.board-th)').forEach((row, ri) => {
+      row.querySelectorAll('.flap').forEach((f, ci) => {
+        const fin = f.textContent;
+        if (!fin.trim() || fin === ' ') return;
+        const steps = 5 + ci * 2 + ri * 2, digit = /[0-9]/.test(fin);
+        let n = 0;
+        const iv = setInterval(() => {
+          n++;
+          f.textContent = n >= steps ? fin : digit ? CH[26 + Math.floor(Math.random() * 10)] : CH[Math.floor(Math.random() * 26)];
+          f.classList.remove('tick'); void f.offsetWidth; f.classList.add('tick');
+          if (n >= steps) clearInterval(iv);
+        }, 55);
+      });
+    });
+  };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { run(); io.disconnect(); } }), { threshold: 0.3 });
+    io.observe(board);
+  } else run();
+}
+
+const days = $('days');
+if (days) {
+  const target = Date.parse(days.dataset.date + 'T00:00:00+08:00');
+  const d = Math.ceil((target - Date.now()) / 864e5);
+  days.textContent = String(Math.max(0, d));
+}

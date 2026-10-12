@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import DocWindow from '../components/DocWindow.astro';
+import { site } from '../site.config';
+const a = site.about;
+---
+<Base title="About" nav="about" description={a.lede}>
+  <article class="page">
+    <DocWindow crumbs={[{ label: 'about' }]}>
+      <span class="k">profile</span>
+      <h1>About</h1>
+      <p class="lede">{a.lede}</p>
+      <div class="prose">
+        {a.paragraphs.map((p) => <p>{p}</p>)}
+        <h2>Experience</h2>
+        <ul class="jobs">
+          {site.experience.map((x) => (
+            <li>
+              <span class="when">{x.from} – {x.to}</span>
+              <div><h3>{x.org}</h3><p>{x.role}{'detail' in x && x.detail ? ` ${x.detail}` : ''}</p></div>
+            </li>
+          ))}
+        </ul>
+        <h2>How I work</h2>
+        <ul>{a.howIWork.map((h) => <li>{h}</li>)}</ul>
+      </div>
+      <Fragment slot="inspector">
+        <div class="photo" role="img" aria-label="Placeholder for a headshot">[Photo: recent headshot]</div>
+        <dl class="insp">
+          <div><dt>focus</dt><dd>{a.focus}</dd></div>
+          <div><dt>based in</dt><dd>{site.location} ({site.timezone})</dd></div>
+          <div><dt>languages</dt><dd><div class="chips">{a.languages.map((l) => <span>{l}</span>)}</div></dd></div>
+          <div><dt>tools</dt><dd><div class="chips">{a.tools.map((l) => <span>{l}</span>)}</div></dd></div>
+          <div><dt>contact</dt><dd>{site.email} <button class="btn-s" type="button" data-copy>Copy</button></dd></div>
+          <div><dt>elsewhere</dt><dd><a href={site.links.github}>GitHub</a> · <a href={site.links.linkedin}>LinkedIn</a> · <a href={site.resume}>Résumé</a></dd></div>
+        </dl>
+      </Fragment>
+    </DocWindow>
+  </article>
+</Base>

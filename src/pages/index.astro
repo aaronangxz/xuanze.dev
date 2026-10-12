@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import Launcher from '../components/Launcher.astro';
+import { site } from '../site.config';
+const xp = site.experience.slice(1);
+const yr = (s: string) => s.split(' ').pop();
+---
+<Base mode="work" inlineLauncher>
+  <div class="page home">
+    <h1 class="rise">{site.hero.greeting} <span>{site.hero.line}</span></h1>
+    <ul class="facts rise" style="--d:1" aria-label="At a glance">
+      {site.hero.facts.map((f, i) => <li>{i === 0 ? <b>{f}</b> : f}</li>)}
+    </ul>
+
+    <div id="slot" class="rise" style="--d:2"><Launcher /></div>
+
+    <div class="try rise" style="--d:3">
+      <span>Try</span>
+      <button type="button" data-q="redis">redis</button>
+      <button type="button" data-q="go">go</button>
+      <button type="button" data-q="tiktok">tiktok</button>
+      <button type="button" data-q="system design">system design</button>
+    </div>
+
+    <div class="widgets rise" style="--d:4">
+      <section class="widget" aria-labelledby="w1">
+        <h2 id="w1">Currently</h2>
+        <ul class="mini">
+          {site.currently.map((c) => (
+            <li>
+              <div><b>{c.href ? <a href={c.href}>{c.title}</a> : c.title}</b><small>{c.sub}</small></div>
+              <span>{c.meta}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section class="widget" aria-labelledby="w2">
+        <h2 id="w2">Experience <a href="/about" style="font-weight:500">All</a></h2>
+        <ul class="mini">
+          {xp.map((x) => (
+            <li>
+              <div><b>{x.org === 'National University of Singapore' ? 'NUS' : x.org}</b><small>{x.role.split(',')[0]}</small></div>
+              <span>{yr(x.from)}–{x.to === 'now' ? 'now' : yr(x.to)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section class="widget" aria-labelledby="w3">
+        <h2 id="w3">Get in touch</h2>
+        <div class="mailbox"><span>{site.email}</span><button class="btn-s" type="button" data-copy>Copy</button></div>
+        <div class="links"><a href={site.links.linkedin}>LinkedIn</a><a href={site.links.github}>GitHub</a><a href={site.resume}>Résumé</a></div>
+      </section>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,27 @@
+---
+import { site } from '../site.config';
+interface Props { mode: 'work' | 'life'; nav?: string }
+const { mode, nav } = Astro.props;
+const PLANE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
+---
+<header class="top">
+  <div class="lead">
+    <a class="mark" id="mark" href={mode === 'life' ? '/life' : '/'} aria-label="Home"><span aria-hidden="true">{site.monogram}</span></a>
+    <div class="mode" role="group" aria-label="Choose a side" data-pos={mode}>
+      <button type="button" data-mode-btn="work" aria-pressed={String(mode === 'work')}>Work</button>
+      <button type="button" data-mode-btn="life" aria-pressed={String(mode === 'life')}>Life</button>
+      <span class="knob" aria-hidden="true"></span>
+    </div>
+  </div>
+  <nav aria-label="Main">
+    <a href="/writing" data-only="work" aria-current={nav === 'writing' ? 'page' : undefined}>Writing</a>
+    <a href="/notes" data-only="work" aria-current={nav === 'notes' ? 'page' : undefined}>Notes</a>
+    <a href="/about" data-only="work" aria-current={nav === 'about' ? 'page' : undefined}>About</a>
+    <a href="#l-travel" data-only="life">Travel</a>
+    <a href="#l-run" data-only="life">Running</a>
+    <a href="#l-misc" data-only="life">Other</a>
+    <button class="theme" type="button" id="theme" data-only="work" aria-label="Switch colour theme">Theme: auto</button>
+    <button class="kbtn" type="button" data-open data-only="work" aria-label="Search (press slash or Command K)">Search <kbd>/</kbd></button>
+    <button class="kbtn lbtn" type="button" data-lopen data-only="life" aria-label="Where to? Search trips, stays and races (Command K)"><Fragment set:html={PLANE} />Where to? <kbd>⌘K</kbd></button>
+  </nav>
+</header>

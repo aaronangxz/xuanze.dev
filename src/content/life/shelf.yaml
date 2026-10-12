@@ -1,0 +1,16 @@
+# Small favourites on the Life page. Remove `example: true` once an entry is real.
+- id: reading
+  label: Reading
+  value: "[Book title]"
+  example: true
+- id: on-repeat
+  label: On repeat
+  value: "[Album or playlist]"
+  example: true
+- id: hawker
+  label: Hawker order
+  value: Char kway teow, extra cockles
+  example: true
+- id: watch
+  label: Running with
+  value: Garmin Forerunner 265

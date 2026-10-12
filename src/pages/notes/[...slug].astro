@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DocWindow from '../../components/DocWindow.astro';
+import { noteTitle, noteGroup } from '../../lib/content';
+export async function getStaticPaths() {
+  const all = await getCollection('notes');
+  return all.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+const { note } = Astro.props;
+const { Content } = await render(note);
+const title = noteTitle(note);
+const group = noteGroup(note, 'src/content/notes');
+---
+<Base title={title} nav="notes">
+  <article class="page">
+    <DocWindow crumbs={[{ label: 'notes', href: '/notes' }, { label: group.toLowerCase() }]} wide>
+      <span class="k">note · {group.toLowerCase()}</span>
+      <h1>{title}</h1>
+      <div class="prose"><Content /></div>
+      <a class="nextcard" href="/notes"><div><span>Back to</span><b>All notes</b></div><span aria-hidden="true">→</span></a>
+    </DocWindow>
+  </article>
+</Base>

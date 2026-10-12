@@ -1,0 +1,35 @@
+---
+import { render, getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DocWindow from '../../components/DocWindow.astro';
+import { posts, fmtDay, readingTime } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const all = await posts();
+  return all.map((post, i) => ({ params: { slug: post.id }, props: { post, older: all[i + 1], newer: all[i - 1] } }));
+}
+const { post, older, newer } = Astro.props;
+const { Content } = await render(post);
+const project = post.data.project ? await getEntry('projects', post.data.project) : undefined;
+const next = older ?? newer;
+---
+<Base title={post.data.title} nav="writing" description={post.data.description ?? post.data.title}>
+  <article class="page">
+    <DocWindow crumbs={[{ label: 'writing', href: '/writing' }, { label: post.id }]}>
+      <span class="k">post · {fmtDay(post.data.date)} · {readingTime(post.body)} min read</span>
+      <h1>{post.data.title}</h1>
+      <div class="prose"><Content /></div>
+      {project && <a class="nextcard" href={`/projects/${project.id}`}><div><span>The project behind this post</span><b>{project.data.title}</b></div><span aria-hidden="true">→</span></a>}
+      {next && <a class="nextcard" href={`/writing/${next.id}`}><div><span>{older ? 'Older post' : 'Newer post'}</span><b>{next.data.title}</b></div><span aria-hidden="true">→</span></a>}
+      <Fragment slot="inspector">
+        <h2>Details</h2>
+        <dl class="insp">
+          <div><dt>published</dt><dd>{fmtDay(post.data.date)}</dd></div>
+          <div><dt>reading time</dt><dd>{readingTime(post.body)} min</dd></div>
+          {post.data.tags.length > 0 && <div><dt>topics</dt><dd><div class="chips">{post.data.tags.map((t) => <span>{t}</span>)}</div></dd></div>}
+          {project && <div><dt>from project</dt><dd><a href={`/projects/${project.id}`}>{project.data.title}</a></dd></div>}
+        </dl>
+      </Fragment>
+    </DocWindow>
+  </article>
+</Base>

@@ -1,0 +1,13 @@
+# Polaroids on the Life page. Put the image in public/life/ and add `photo: /life/<file>.jpg` to replace the colour placeholder.
+- id: golden-gate
+  caption: Golden Gate Bridge
+  tint: p1
+  example: true
+- id: hoan-kiem
+  caption: Hoan Kiem Lake, 6am
+  tint: p3
+  example: true
+- id: ubud
+  caption: Rafting in Ubud
+  tint: p2
+  example: true

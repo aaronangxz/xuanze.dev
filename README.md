@@ -1,41 +1,41 @@
-# Website
+# xuanze.dev
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+Personal site of Ang Xuan Ze. Two sides: **Work** (projects, writing, notes) and **Life** (travel, running).
+Built with [Astro](https://astro.build); deployed to GitHub Pages on every push to `master`.
 
-### Installation
-
-```
-$ yarn
-```
-
-### Local Development
-
-```
-$ yarn start
+```sh
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # static site in dist/
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+## Adding and editing content
 
-### Build
+You never need to touch the design or code to change content. Edit a file, push, and the site redeploys.
 
-```
-$ yarn build
-```
+| What | Where | Notes |
+| --- | --- | --- |
+| Name, hero, email, links, experience, About page | `src/site.config.ts` | One file for everything about you |
+| Blog posts | `src/content/writing/<slug>.md` | Front matter: `title`, `date`, `tags`, optional `description`, `project`, `draft: true` |
+| Projects / case studies | `src/content/projects/<slug>.mdx` | Front matter feeds the side panel and search. Projects with `href` link out instead of getting a page |
+| Study notes | `src/content/notes/<Group>/<Note>.md` | Title comes from the first `# Heading` |
+| LeetCode | `src/content/leetcode/<easy\|medium\|hard>/<n>. <Title>.md` | |
+| Flights | `src/content/life/flights.yaml` | `featured: true` also prints a boarding pass (max 3) |
+| Hotels | `src/content/life/stays.yaml` | `photo: /life/<file>.jpg` with the image in `public/life/` |
+| Races | `src/content/life/races.yaml` | One bib per race; `pb: true` adds the stamp |
+| Running totals and PBs | `src/content/life/running.json` | Snapshot from Strava |
+| Polaroids, "Everything else" | `src/content/life/polaroids.yaml`, `shelf.yaml` | |
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+The ⌘K search, the Life "Where to?" search, the stats and the city strip are all generated from these files.
 
-### Deployment
+### Drafted text
 
-Using SSH:
+Some case-study paragraphs were drafted for you and are wrapped in `<Draft>…</Draft>`. They show a dashed
+"Draft" label on the site until you confirm the wording and remove the wrapper.
+Anything in `[brackets]` is a placeholder. See `CONTENT-TODO.md` for the full list.
 
-```
-$ USE_SSH=true yarn deploy
-```
+## Deploying
 
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+`.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to `master`.
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+The custom domain comes from `public/CNAME`.
