@@ -347,9 +347,16 @@ function init(tm) {
       // Another city while immersive: cross-fade the details and fly the map over.
       const swap = () => { viewBody.innerHTML = html; info.scrollTop = 0; };
       if (reduce) swap();
-      else viewBody.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).finished.then(() => {
-        swap(); viewBody.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: EASE });
-      });
+      else {
+        viewBody.getAnimations().forEach((a) => a.cancel());
+        const out = viewBody.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' });
+        out.finished.then(() => {
+          swap();
+          // Drop the held fade-out, or its fill keeps the new details invisible.
+          out.cancel();
+          viewBody.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: EASE });
+        }).catch(() => {});
+      }
       zoomToCity(c);
       return;
     }

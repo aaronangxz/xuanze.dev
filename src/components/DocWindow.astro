@@ -15,7 +15,6 @@ const hasInspector = Astro.slots.has('inspector') && !wide;
         </>
       ))}
     </nav>
-    <button class="kbtn" type="button" data-open>Search <kbd>⌘K</kbd></button>
   </div>
   <div class="doc" style={hasInspector ? undefined : 'grid-template-columns:minmax(0,1fr)'}>
     <div class="doc-main"><slot /></div>

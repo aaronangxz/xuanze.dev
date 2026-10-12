@@ -103,7 +103,9 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 /* Overlay (launcher on inner pages) */
 .overlay { position: fixed; inset: 0; z-index: 60; background: color-mix(in srgb, var(--bg) 55%, rgba(0,0,0,.45)); display: flex; justify-content: center; align-items: flex-start; padding: calc(env(safe-area-inset-top, 0px) + 8vh) 16px 16px; }
 .overlay[hidden], .more[hidden] { display: none !important; }
-.overlay .app { width: min(900px, 100%); max-height: 84vh; }
+/* The slot is the flex child: size it to the panel, so the panel is centred and clicks beside it reach the backdrop. */
+#ov-slot { width: min(900px, 100%); }
+.overlay .app { width: 100%; max-height: 84vh; }
 @keyframes pop { from { transform: translateY(6px) scale(.985); opacity: .6; } }
 
 /* ---------- Document window ---------- */

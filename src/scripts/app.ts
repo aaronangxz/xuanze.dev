@@ -191,7 +191,7 @@ function closeOverlay() {
   const an = launcher.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(8px) scale(.985)' }], { duration: 170, easing: 'ease-in' });
   an.onfinish = () => { overlay.getAnimations().forEach((x) => x.cancel()); done(); };
 }
-overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) closeOverlay(); });
+overlay.addEventListener('mousedown', (e) => { if (!launcher.contains(e.target)) closeOverlay(); });
 
 /* =========================================================
    Life search ("Where to?")
