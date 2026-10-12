@@ -18,9 +18,9 @@ const { Content } = await render(project);
 const related = (await posts()).filter((p) => p.data.project === project.id);
 const kindLabel = d.kind === 'product' ? 'product · case study' : 'built at work · case study';
 ---
-<Base title={d.title} description={d.summary}>
+<Base title={d.title} nav="projects" description={d.summary}>
   <article class="page">
-    <DocWindow crumbs={[{ label: 'projects' }, { label: project.id }]}>
+    <DocWindow crumbs={[{ label: 'projects', href: '/projects' }, { label: project.id }]}>
       <span class="k">{kindLabel}</span>
       <h1 class={d.logo ? 'with-logo' : undefined}>{d.logo && <img class="tlogo" src={d.logo} alt="" width="48" height="48" />}{d.title}</h1>
       <p class="lede">{d.summary}</p>

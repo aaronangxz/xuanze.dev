@@ -270,7 +270,9 @@ function init(tm) {
     const runs = c.runs.length ? `<div class="tp-runs">${c.runs.map((r) => `<figure class="run${r.race ? ' race' : ''}">
         <svg viewBox="${r.vb}" aria-hidden="true"><path d="${r.d}" /></svg>
         <figcaption><b>${esc(r.title)}</b><small>${r.km} km · ${day(r.date)}</small></figcaption></figure>`).join('')}</div>` : '';
-    return head + stays + runs;
+    return `<div class="tp-a">${head}</div>`
+      + (stays ? `<div class="tp-b"><span class="lab">stayed</span>${stays}</div>` : '')
+      + (runs ? `<div class="tp-c"><span class="lab">ran</span>${runs}</div>` : '');
   }
   let openSlug = null;
   const defaultPanel = panel.innerHTML;
@@ -282,6 +284,9 @@ function init(tm) {
     panel.innerHTML = renderCity(c);
     panel.classList.add('open');
     if (!reduce) panel.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    // The panel sits under the map: bring its top into view if it starts below the fold.
+    const r = panel.getBoundingClientRect();
+    if (r.top > innerHeight - 140) scrollBy({ top: Math.min(r.height, 320) + r.top - innerHeight + 24, behavior: reduce ? 'auto' : 'smooth' });
     if (zoom) {
       // Zoom in on the city, unless it is already comfortably in view at a closer zoom.
       const k = Math.min(vb.w, data.regions.sea.w * 1.2);
@@ -304,7 +309,7 @@ function init(tm) {
     const city = ev.target.closest('.tm-city');
     if (city) { openCity(city.dataset.city); return; }
     const quick = ev.target.closest('[data-goto]');
-    if (quick) { openCity(quick.dataset.goto); stage.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }); return; }
+    if (quick) { openCity(quick.dataset.goto); return; }
     if (ev.target.closest('[data-close]')) { closeCity(); setRegion(region === 'city' ? 'world' : region); }
   });
   // Life search ("Where to?") can ask the map to show a city.

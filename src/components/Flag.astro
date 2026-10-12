@@ -1,0 +1,32 @@
+---
+/** Small country flags drawn inline (emoji flags show as letters on Windows). */
+interface Props { code: string; size?: number }
+const { code, size = 22 } = Astro.props;
+const h = Math.round(size * 2 / 3);
+const star = (cx: number, cy: number, r: number, rot = 0) => {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const a = (Math.PI / 5) * i - Math.PI / 2 + rot;
+    const rr = i % 2 ? r * 0.382 : r;
+    pts.push(`${(cx + rr * Math.cos(a)).toFixed(2)},${(cy + rr * Math.sin(a)).toFixed(2)}`);
+  }
+  return pts.join(' ');
+};
+---
+<span class="flag" role="img" aria-label={code === 'SG' ? 'Singapore' : code === 'CN' ? 'China' : code}>
+  {code === 'SG' && (
+    <svg viewBox="0 0 30 20" width={size} height={h} aria-hidden="true">
+      <rect width="30" height="10" fill="#EF3340" /><rect y="10" width="30" height="10" fill="#fff" />
+      <circle cx="7" cy="5" r="3.6" fill="#fff" /><circle cx="8.3" cy="5" r="3.3" fill="#EF3340" />
+      {[[10, 2.6], [12.3, 4.2], [11.4, 6.9], [8.6, 6.9], [7.7, 4.2]].map(([x, y]) => <polygon points={star(x, y, 0.75)} fill="#fff" />)}
+    </svg>
+  )}
+  {code === 'CN' && (
+    <svg viewBox="0 0 30 20" width={size} height={h} aria-hidden="true">
+      <rect width="30" height="20" fill="#EE1C25" />
+      <polygon points={star(5, 5, 3)} fill="#FFFF00" />
+      {[[10, 2, 0.6], [12, 4, 0.9], [12, 7, 1.2], [10, 9, 0.9]].map(([x, y, r]) => <polygon points={star(x, y, 1, r)} fill="#FFFF00" />)}
+    </svg>
+  )}
+  {code !== 'SG' && code !== 'CN' && <b>{code}</b>}
+</span>

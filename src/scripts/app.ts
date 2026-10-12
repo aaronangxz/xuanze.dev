@@ -354,7 +354,13 @@ if (root.classList.contains('slide-in')) {
   const dir = toMode === 'life' ? -1 : 1;
   const IN = 'cubic-bezier(.16,1,.3,1)';
   const pg = document.querySelector('.page');
+  // A side switch always lands at the top of the other side (or on its anchor), never at a remembered offset.
   if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+  else {
+    try { history.scrollRestoration = 'manual'; } catch {}
+    scrollTo(0, 0);
+    addEventListener('load', () => { if (scrollY > 0 && !location.hash) scrollTo(0, 0); }, { once: true });
+  }
   const mods = pg ? visibleMods(pg) : [];
   mods.forEach((m, i) => m.animate(
     [{ transform: `translateX(${-dir * (160 + Math.min(i, 5) * 70)}px)`, opacity: 0, filter: 'blur(8px)' }, { transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }],
@@ -448,4 +454,4 @@ nrs.forEach((li) => {
   li.querySelector('[data-days]').textContent = d === 0 ? 'Today' : String(d);
   if (d === 0) li.querySelector('.countdown span').textContent = 'race day';
 });
-if (nrs.length && !document.querySelector('.nr')) document.querySelector('.next-race')?.remove();
+if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races')?.remove();

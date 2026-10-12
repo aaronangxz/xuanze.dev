@@ -62,14 +62,34 @@ export const site = {
   ],
 
   life: {
-    headline: 'Somewhere between a <em>departure gate</em> and a <em>start line.</em>',
-    /** Under the headline. {km}, {nights} and {next} are filled in from the travel and race data. */
-    sub: '{km} km flown, {nights} nights in hotels, and {next} next.',
-    /** Upcoming races, soonest first. The first one that hasn't happened yet gets the big countdown; past ones hide themselves. */
+    /** Mirrors the Work hero: the same greeting, then the other half of the sentence. */
+    tagline: 'I travel whenever I can, and run <em>wherever I land.</em>',
+    /** Printed on the race bibs. */
+    bibName: 'XUAN ZE',
+    /**
+     * Upcoming races, soonest first. The first one that hasn't happened yet gets the big card; past ones hide themselves.
+     * `course` is the landmarks in running order (not to scale). Add `route` (an encoded polyline) and
+     * `elevation` (metres every km) once there's a GPX; until then the card shows the landmarks only.
+     */
     upcoming: [
-      { name: 'Garmin Singapore Half Marathon', distance: '21.1 km', date: '2026-10-25' },
-      { name: 'Shanghai Marathon', distance: '42.2 km', date: '2026-12-05', note: 'first full marathon' },
-    ] as { name: string; distance: string; date: string; goal?: string; note?: string }[],
+      {
+        name: 'Garmin Run Marathon Series Singapore', short: 'Garmin Run Singapore', city: 'Singapore', country: 'SG',
+        distance: '21.1 km', date: '2026-10-25', start: 'Marina Barrage',
+        labels: ['Half marathon', '3rd edition'],
+        course: ['Marina Barrage', 'Helix Bridge', 'Tanjong Rhu', 'East Coast Park', 'Marina Barrage'], turn: 3,
+        terrain: 'Flat, out and back along the bay and the coast',
+      },
+      {
+        name: 'Shanghai Marathon', short: 'Shanghai Marathon', city: 'Shanghai', country: 'CN',
+        distance: '42.195 km', date: '2026-12-06', start: 'The Bund', note: 'first full marathon',
+        labels: ['World Athletics Platinum Label', 'Abbott WMM candidate'],
+        course: ['The Bund', 'Nanjing Road', "Jing'an Temple", 'Huaihai Road', 'Xintiandi', 'Shanghai Stadium'],
+        terrain: 'Flat city course, about 25 m of climb end to end',
+      },
+    ] as {
+      name: string; short: string; city: string; country: 'SG' | 'CN' | string; distance: string; date: string; start?: string;
+      labels?: string[]; course?: string[]; turn?: number; terrain?: string; goal?: string; note?: string; route?: string; elevation?: number[];
+    }[],
   },
 } as const;
 
