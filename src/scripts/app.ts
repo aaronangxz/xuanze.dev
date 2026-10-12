@@ -288,7 +288,8 @@ document.addEventListener('click', (e) => {
   if (mb) {
     const want = mb.dataset.modeBtn;
     if (want === mode) return;
-    slideTo(want, want === 'life' ? '/life' : lastWork());
+    // Each side always opens on its main page, not wherever it was left.
+    slideTo(want, want === 'life' ? '/life' : '/');
   }
 });
 window.addEventListener('keydown', (e) => {
@@ -309,8 +310,6 @@ const ss = {
   get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { sessionStorage.setItem(k, v); } catch {} },
 };
-function lastWork() { return ss.get('xz-last-work') || '/'; }
-if (mode === 'work') ss.set('xz-last-work', location.pathname);
 
 function visibleMods(pg) {
   const list = [];
@@ -477,4 +476,35 @@ if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races
   addEventListener('resize', queue);
   new ResizeObserver(queue).observe(document.body);
   edges();
+}
+
+/* =========================================================
+   Prefetch: fetch a page the moment a link is hovered, touched or focused,
+   so the click itself only has to render. Covers links added by scripts too.
+   ========================================================= */
+{
+  const seen = new Set([location.pathname]);
+  const save = navigator.connection?.saveData;
+  const want = (a) => {
+    if (!a || save || a.target === '_blank' || a.hasAttribute('download')) return null;
+    const u = new URL(a.href, location.href);
+    if (u.origin !== location.origin || !/^https?:$/.test(u.protocol)) return null;
+    if (u.pathname === location.pathname && u.hash) return null;
+    if (/\.(pdf|xml|json|png|jpe?g|webp|svg|zip)$/i.test(u.pathname)) return null;
+    return u.pathname + u.search;
+  };
+  const prefetch = (e) => {
+    const url = want(e.target.closest?.('a[href]'));
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    const l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = url; l.as = 'document';
+    document.head.appendChild(l);
+  };
+  addEventListener('pointerover', prefetch, { passive: true });
+  addEventListener('touchstart', prefetch, { passive: true });
+  addEventListener('focusin', prefetch);
+  // The header's few destinations are worth having before anyone points at them.
+  const warm = () => document.querySelectorAll('.top nav a[href]').forEach((a) => prefetch({ target: a }));
+  if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 2500 }); else setTimeout(warm, 1200);
 }
