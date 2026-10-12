@@ -390,6 +390,8 @@ if (themeBtn) {
     const next = modes[(modes.indexOf(cur) + 1) % 3];
     if (next === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', next);
     try { localStorage.setItem('xz-theme', next); } catch {}
+    // Mirror into window.name so the choice survives navigation where storage is blocked.
+    window.name = (window.name || '').replace(/(?:^|;)xz-theme=\w+/g, '') + ';xz-theme=' + next;
     label();
   });
 }
@@ -476,6 +478,8 @@ if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races
   addEventListener('resize', queue);
   new ResizeObserver(queue).observe(document.body);
   edges();
+  // Fade the edges only after the first frames, so arriving on a page never animates them in.
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('edge-ready')));
 }
 
 /* =========================================================

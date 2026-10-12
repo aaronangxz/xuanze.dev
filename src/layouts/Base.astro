@@ -38,10 +38,19 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" />
     <link rel="prefetch" href={mode === 'life' ? '/' : '/life'} />
+    <!-- Chrome/Edge: render the next page in the background once a link is hovered or pressed, so the click is instant.
+         The Work/Life switch is excluded: it runs its own animation and must load fresh. -->
+    <script type="speculationrules" is:inline set:html={JSON.stringify({ prerender: [{ source: 'document', where: { and: [{ href_matches: '/*' }, { not: { selector_matches: '[data-life-link], [data-mode-btn], [download], a[href$=".pdf"], a[href$=".xml"]' } }] }, eagerness: 'moderate' }] })} />
     <script is:inline>
       (function () {
         var r = document.documentElement;
-        try { var t = localStorage.getItem('xz-theme'); if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t); } catch (e) {}
+        // Theme: localStorage, or the tab's window.name where storage is blocked (sandboxed previews).
+        var t = null;
+        try { t = localStorage.getItem('xz-theme'); } catch (e) {}
+        if (!t) { var m = /(?:^|;)xz-theme=(\w+)/.exec(window.name || ''); if (m) t = m[1]; }
+        if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t);
+        // Pages usually continue below the fold: show the bottom edge blur from the first frame (no fade-in flash).
+        r.classList.add('edge-down');
         try {
           var s = sessionStorage.getItem('xz-slide');
           if (s) { sessionStorage.removeItem('xz-slide'); r.classList.add('slide-in'); r.setAttribute('data-slide', s); }
