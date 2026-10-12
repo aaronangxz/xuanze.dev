@@ -14,7 +14,6 @@ const data = {
   ground: ground.map((g) => ({ from: g.from, to: g.to, km: g.km, date: g.date })),
   cities,
 };
-const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) => s.tag).map((s) => [s.tag, s])).values()];
 ---
 <section id="l-map" class="tm-sec" aria-labelledby="l-map-h">
   <div class="l-head"><span class="l-no">01</span><h2 id="l-map-h">Where I've been</h2></div>
@@ -59,18 +58,16 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
 
       <div class="tm-overlay" id="tm-overlay">
         {cities.map((c) => {
-          const tags = cityTags(c);
           return (
             <button type="button" class:list={['tm-city', c.nights > 0 && 'stayed', c.upcoming && 'up']} data-city={c.slug}
               style={`--x:${c.x};--y:${c.y};--n:${Math.min(c.nights, 20)}`} aria-label={`${c.name}, ${c.country}`}>
               <i class="tm-dot" aria-hidden="true"></i>
               <span class="tm-lbl" aria-hidden="true">
                 <b>{c.name}</b>
-                {(tags.length > 0 || c.runs.length > 0) && (
+                {/* Hotel brand tags come back once there are proper brand icons; only the run count shows for now. */}
+                {c.runs.length > 0 && (
                   <span class="tm-tags">
-                    {tags.slice(0, 3).map((s) => <span class="htag" data-chain={s.chain?.toLowerCase()}>{s.tag}</span>)}
-                    {tags.length > 3 && <span class="htag more">+{tags.length - 3}</span>}
-                    {c.runs.length > 0 && <span class="htag run">{c.runs.length} run{c.runs.length > 1 ? 's' : ''}</span>}
+                    <span class="htag run">{c.runs.length} run{c.runs.length > 1 ? 's' : ''}</span>
                   </span>
                 )}
               </span>
@@ -99,15 +96,12 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
         </div>
       </div>
     </div>
-  </div>
-  <div class="cityview" id="cityview" hidden>
-    <div class="cv-scrim" data-close aria-hidden="true"></div>
-    <section class="cv-card" role="dialog" aria-modal="true" aria-labelledby="cv-title" tabindex="-1">
-      <button type="button" class="cv-x" data-close aria-label="Close city view">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
-      </button>
-      <div class="cv-body" id="cv-body"></div>
-    </section>
+
+    <!-- City view: the map section goes full-screen, the city's details sit under the map. -->
+    <button type="button" class="cv-x" data-close aria-label="Close city view" hidden>
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+    </button>
+    <section class="cv-info" id="cv-info" aria-labelledby="cv-title" hidden><div class="cv-inner" id="cv-body"></div></section>
   </div>
   <script type="application/json" id="tm-data" set:html={toJsonScript(data)} />
 </section>

@@ -955,23 +955,24 @@ a.pass:hover { transform: rotate(0deg) translateY(-4px); }
 .projlist .plogo-s { width: 30px; height: 30px; border-radius: 22%; box-shadow: 0 0 0 1px var(--line); }
 .projlist .sum { display: block; color: var(--body); font-size: .875rem; line-height: 1.5; margin-top: 4px; }
 
-/* Life · full-screen city view */
+/* Life · city view: the map section goes full-screen (moved to <body> by travel-map.ts) */
 html.cv-lock, html.cv-lock body { overflow: hidden; }
-.cityview { position: fixed; inset: 0; z-index: 65; display: grid; place-items: center; padding: max(20px, env(safe-area-inset-top, 0px)) 20px max(20px, env(safe-area-inset-bottom, 0px)); }
-.cityview[hidden] { display: none; }
-.cv-scrim { position: absolute; inset: 0; background: rgba(5, 9, 17, .5); -webkit-backdrop-filter: blur(22px) saturate(115%); backdrop-filter: blur(22px) saturate(115%); opacity: 0; transition: opacity .38s ease; }
-.cv-card { position: relative; width: min(1320px, 100%); max-height: 100%; overflow: auto; overscroll-behavior: contain; outline: none; border-radius: 24px; border: 1px solid rgba(var(--l-ink-rgb), .14);
-  background: linear-gradient(160deg, rgba(23, 33, 52, .94), rgba(11, 18, 32, .96)); box-shadow: 0 40px 120px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
-  color: var(--l-ink); padding: clamp(24px, 4vw, 48px); opacity: 0; transform: translateY(24px) scale(.97); transition: opacity .38s cubic-bezier(.2,.8,.2,1), transform .48s cubic-bezier(.2,.8,.2,1); scrollbar-width: thin; scrollbar-color: rgba(var(--l-ink-rgb), .2) transparent; }
-.cityview.open .cv-scrim { opacity: 1; }
-.cityview.open .cv-card { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .cv-scrim, .cv-card { transition: none; } }
-.cv-x { position: absolute; top: 18px; right: 18px; z-index: 2; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--l-line); background: rgba(var(--l-ink-rgb), .06); color: var(--l-ink); cursor: pointer; transition: background .2s, transform .2s; }
-.cv-x:hover { background: rgba(var(--l-ink-rgb), .14); transform: rotate(90deg); }
-.cv-card .lab { font: 500 .6875rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--l-a); }
-.cv-head { padding-right: 56px; padding-bottom: 26px; margin-bottom: 28px; border-bottom: 1px solid var(--l-line); }
-.cv-head h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 1; margin-top: 6px; }
-.cv-stats { display: flex; flex-wrap: wrap; gap: 14px 40px; margin: 22px 0 0; }
+.tm.immersive { position: fixed; inset: 0; z-index: 65; margin: 0; gap: 0; width: auto; display: grid; grid-template-rows: minmax(0, 1fr) auto; background: var(--l-bg); }
+.tm.immersive .tm-chips, .tm.immersive .tm-panel { display: none; }
+.tm.immersive .tm-stage { width: 100%; height: 100%; max-height: none; aspect-ratio: auto; margin: 0; border: 0; border-radius: 0; }
+.tm.immersive .tm-zoom { top: auto; bottom: 14px; }
+.tm.immersive .tm-legend { display: none; }
+.cv-info { position: relative; max-height: min(46vh, 520px); overflow: auto; overscroll-behavior: contain; border-top: 1px solid rgba(var(--l-ink-rgb), .14);
+  background: linear-gradient(180deg, rgba(18, 27, 44, .98), var(--l-bg)); box-shadow: 0 -30px 60px -20px rgba(0,0,0,.6); color: var(--l-ink); scrollbar-width: thin; scrollbar-color: rgba(var(--l-ink-rgb), .2) transparent; }
+.cv-inner { max-width: 1440px; margin: 0 auto; padding: 28px clamp(20px, 4vw, 56px) calc(28px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 24px 48px; align-items: start; }
+@media (max-width: 860px) { .cv-inner { grid-template-columns: minmax(0, 1fr); } .cv-info { max-height: 52vh; } }
+.cv-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px); right: 16px; z-index: 6; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--l-line); background: rgba(7, 12, 21, .65); color: var(--l-ink); cursor: pointer; transition: background .2s, transform .2s; }
+.cv-x:hover { background: rgba(30, 42, 64, .85); transform: rotate(90deg); }
+.cv-x[hidden] { display: none; }
+.cv-info .lab { font: 500 .6875rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--l-a); }
+.cv-head { position: sticky; top: 0; }
+.cv-head h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(2.4rem, 4.6vw, 3.8rem); line-height: 1; margin-top: 6px; }
+.cv-stats { display: flex; flex-wrap: wrap; gap: 14px 32px; margin: 18px 0 0; }
 .cv-stats div { display: flex; flex-direction: column-reverse; gap: 4px; }
 .cv-stats dt { font: .6875rem var(--mono); color: var(--l-muted); }
 .cv-stats dd { margin: 0; font-family: var(--serif); font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1; font-variant-numeric: tabular-nums; }
@@ -989,13 +990,8 @@ html.cv-lock, html.cv-lock body { overflow: hidden; }
 .cv-stays i { grid-column: 2; grid-row: 1 / span 2; font-style: normal; color: var(--l-muted); transition: transform .2s, color .2s; }
 .cv-stays a:hover i { color: var(--l-a); transform: translateX(3px); }
 .cv-stays li.up { opacity: .65; }
-.cv-card .tp-runs { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
-@media (max-width: 640px) {
-  .cityview { place-items: end stretch; padding: 0; }
-  .cv-card { width: 100%; max-height: 92vh; border-radius: 22px 22px 0 0; padding: 24px 18px calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateY(40px); }
-  .cv-x { top: 14px; right: 14px; }
-  .cv-card .tp-runs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+.cv-info .tp-runs { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+@media (max-width: 640px) { .cv-info .tp-runs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cv-head { position: static; } }
 
 /* Edge blur: layered backdrop blurs, each masked to a band, so the blur ramps up toward the screen edge.
    Shown only while there is more page above (top) or below (bottom). */

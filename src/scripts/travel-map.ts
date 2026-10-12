@@ -258,11 +258,10 @@ function init(tm) {
   });
 
   /* ---------- city view (full-screen) ---------- */
-  const view = document.getElementById('cityview');
+  const info = document.getElementById('cv-info');
   const viewBody = document.getElementById('cv-body');
-  const viewCard = view.querySelector('.cv-card');
-  // Live on <body> so no transformed ancestor can trap the fixed overlay.
-  document.body.appendChild(view);
+  const closeBtn = tm.querySelector('.cv-x');
+  const home = document.createComment('tm-home');
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   function renderCity(c) {
     const stats = [
@@ -275,7 +274,7 @@ function init(tm) {
       <dl class="cv-stats">${stats.map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></header>`;
     const stays = c.stays.length ? `<ul class="cv-stays">${c.stays.map((s) => `<li class="${s.upcoming ? 'up' : ''}"><a href="/life/hotels/${esc(s.slug)}">
         <b>${esc(s.name)}</b>
-        <span class="cv-meta">${s.tag ? `<span class="htag" data-chain="${esc(s.chain?.toLowerCase())}">${esc(s.tag)}</span>` : '<span class="htag indie">INDEPENDENT</span>'}<small>${day(s.checkIn)} · ${plural(s.nights, 'night')}${s.upcoming ? ' · upcoming' : ''}</small></span>
+        <span class="cv-meta"><small>${day(s.checkIn)} · ${plural(s.nights, 'night')}${s.upcoming ? ' · upcoming' : ''}</small></span>
         <i aria-hidden="true">→</i></a></li>`).join('')}</ul>`
       : c.flights ? '<p class="tp-note">Passed through, no hotel on record.</p>' : '';
     const runs = c.runs.length ? `<div class="tp-runs">${c.runs.map((r) => `<figure class="run${r.race ? ' race' : ''}">
@@ -290,59 +289,80 @@ function init(tm) {
   let openSlug = null;
   let before = null;
   let lastFocus = null;
+  let spacer = null;
   let hideT = 0;
-  function showView(html) {
+  const EASE = 'cubic-bezier(.2,.8,.2,1)';
+  const zoomToCity = (c) => {
+    const k = Math.min(vb.w, data.regions.sea.w * 1.2);
+    zoomTo({ x: c.x - k / 2, y: c.y - k / 4, w: k, h: k / 2 });
+    region = 'city';
+    tm.dataset.region = 'city';
+    tm.querySelectorAll('.tm-chips button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+  };
+  // Immersive mode: the whole map section is lifted out to <body> (so no transformed ancestor can
+  // trap position: fixed), a spacer holds its place, and the page underneath stops scrolling.
+  function enterImmersive() {
     clearTimeout(hideT);
-    const wasOpen = view.classList.contains('open');
-    if (wasOpen && !reduce) {
-      // Already open (e.g. picked another city from search): cross-fade the contents.
-      viewBody.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).finished.then(() => {
-        viewBody.innerHTML = html; viewCard.scrollTop = 0;
-        viewBody.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
-      });
-      return;
-    }
-    viewBody.innerHTML = html; viewCard.scrollTop = 0;
     lastFocus = document.activeElement;
-    view.hidden = false;
+    spacer = document.createElement('div');
+    spacer.style.height = tm.offsetHeight + 'px';
+    tm.before(home); home.after(spacer);
+    document.body.appendChild(tm);
+    tm.classList.add('immersive');
+    info.hidden = false; closeBtn.hidden = false;
     document.documentElement.classList.add('cv-lock');
-    requestAnimationFrame(() => requestAnimationFrame(() => view.classList.add('open')));
-    viewCard.focus({ preventScroll: true });
+    if (!reduce) {
+      tm.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: 'ease-out' });
+      info.animate([{ transform: 'translateY(40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 480, delay: 120, easing: EASE, fill: 'backwards' });
+    }
+    closeBtn.focus({ preventScroll: true });
   }
-  function hideView() {
-    if (view.hidden) return;
-    view.classList.remove('open');
-    document.documentElement.classList.remove('cv-lock');
-    hideT = setTimeout(() => { view.hidden = true; viewBody.innerHTML = ''; }, reduce ? 0 : 380);
-    lastFocus?.focus?.({ preventScroll: true });
+  function exitImmersive() {
+    const done = () => {
+      tm.classList.remove('immersive');
+      info.hidden = true; closeBtn.hidden = true; viewBody.innerHTML = '';
+      home.after(tm); home.remove(); spacer?.remove(); spacer = null;
+      document.documentElement.classList.remove('cv-lock');
+      lastFocus?.focus?.({ preventScroll: true });
+      if (before) {
+        // Back to the view the city was opened from.
+        if (data.regions[before.region]) setRegion(before.region);
+        else { region = before.region; tm.dataset.region = region; zoomTo(before.vb); }
+        before = null;
+      }
+    };
+    if (reduce) { done(); return; }
+    const a = tm.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
+    hideT = setTimeout(() => { done(); a.cancel(); }, 220);
   }
-  function openCity(slug, { zoom = true } = {}) {
+  function openCity(slug) {
     const c = cityBy[slug];
     if (!c) return;
-    // Remember the view the city was opened from, so closing returns to it.
-    if (!openSlug) before = { vb: { ...vb }, region };
+    const wasOpen = !!openSlug;
+    if (!wasOpen) before = { vb: { ...vb }, region };
     openSlug = slug;
     cityEls.forEach((el) => el.classList.toggle('sel', el.dataset.city === slug));
-    showView(renderCity(c));
-    if (zoom) {
-      // The map zooms to the city behind the blur, so closing lands on it.
-      const k = Math.min(vb.w, data.regions.sea.w * 1.2);
-      zoomTo({ x: c.x - k / 2, y: c.y - k / 4, w: k, h: k / 2 });
-      region = 'city';
-      tm.dataset.region = 'city';
-      tm.querySelectorAll('.tm-chips button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    const html = renderCity(c);
+    if (wasOpen) {
+      // Another city while immersive: cross-fade the details and fly the map over.
+      const swap = () => { viewBody.innerHTML = html; info.scrollTop = 0; };
+      if (reduce) swap();
+      else viewBody.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).finished.then(() => {
+        swap(); viewBody.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: EASE });
+      });
+      zoomToCity(c);
+      return;
     }
+    viewBody.innerHTML = html;
+    enterImmersive();
+    // Let the stage settle at its full-screen size before zooming in.
+    requestAnimationFrame(() => requestAnimationFrame(() => zoomToCity(c)));
   }
   function closeCity() {
     if (!openSlug) return;
     openSlug = null;
     cityEls.forEach((el) => el.classList.remove('sel'));
-    hideView();
-    if (before) {
-      if (data.regions[before.region]) setRegion(before.region);
-      else { region = before.region; tm.dataset.region = region; zoomTo(before.vb); }
-      before = null;
-    }
+    exitImmersive();
   }
 
   tm.addEventListener('click', (ev) => {
@@ -353,16 +373,16 @@ function init(tm) {
     const quick = ev.target.closest('[data-goto]');
     if (quick) { openCity(quick.dataset.goto); return; }
   });
-  view.addEventListener('click', (ev) => { if (ev.target.closest('[data-close]')) closeCity(); });
+  closeBtn.addEventListener('click', closeCity);
   addEventListener('keydown', (ev) => {
     if (!openSlug) return;
     if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); closeCity(); return; }
     // Keep Tab inside the city view while it's open.
     if (ev.key === 'Tab') {
-      const f = [...view.querySelectorAll('a[href], button')];
+      const f = [...tm.querySelectorAll('a[href], button')].filter((el) => el.offsetParent !== null);
       if (!f.length) return;
       const first = f[0], last = f[f.length - 1];
-      if (ev.shiftKey && (document.activeElement === first || document.activeElement === viewCard)) { ev.preventDefault(); last.focus(); }
+      if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
       else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
     }
   }, true);
