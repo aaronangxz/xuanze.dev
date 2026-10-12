@@ -189,7 +189,10 @@ function closeOverlay() {
   closing = true;
   overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
   const an = launcher.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(8px) scale(.985)' }], { duration: 170, easing: 'ease-in' });
-  an.onfinish = () => { overlay.getAnimations().forEach((x) => x.cancel()); done(); };
+  // Close on the animation's end, or after its duration at the latest: a heavy backdrop blur can stall frames.
+  const finish = () => { if (!closing) return; overlay.getAnimations().forEach((x) => x.cancel()); an.cancel(); done(); };
+  an.onfinish = finish;
+  setTimeout(finish, 220);
 }
 overlay.addEventListener('mousedown', (e) => { if (!launcher.contains(e.target)) closeOverlay(); });
 
@@ -249,7 +252,9 @@ const LS = $('loverlay') && (() => {
     isClosing = true;
     lov.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'ease-in', fill: 'forwards' });
     const an = lpanel.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(10px) scale(.98)', filter: 'blur(6px)' }], { duration: 180, easing: 'ease-in' });
-    an.onfinish = () => { lov.getAnimations().forEach((x) => x.cancel()); done(); };
+    const finish = () => { if (!isClosing) return; lov.getAnimations().forEach((x) => x.cancel()); an.cancel(); done(); };
+    an.onfinish = finish;
+    setTimeout(finish, 230);
   }
   lq.addEventListener('input', () => { act = 0; render(); });
   lq.addEventListener('keydown', (e) => {
