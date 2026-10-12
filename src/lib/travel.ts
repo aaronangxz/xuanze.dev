@@ -1,15 +1,22 @@
 /**
  * Everything the Life page knows about travel, computed at build time from
- * src/data/travel/travel.json (scripts/travel-import.mjs) and runs.json (Strava).
+ * src/data/travel/travel.json (scripts/travel-import.mjs), manual-stays.json (added by hand) and runs.json (Strava).
  */
 import { geoNaturalEarth1, geoPath, geoClipRectangle, geoBounds } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import land110 from 'world-atlas/land-110m.json';
 import land50 from 'world-atlas/land-50m.json';
 import countries110 from 'world-atlas/countries-110m.json';
-import travel from '../data/travel/travel.json';
+import travelFile from '../data/travel/travel.json';
+import manual from '../data/travel/manual-stays.json';
 import runsFile from '../data/travel/runs.json';
 import config from '../data/travel/config.json';
+
+// AwayBook's stays plus the ones added by hand, in date order.
+const travel = {
+  ...travelFile,
+  stays: [...travelFile.stays, ...(manual.stays as typeof travelFile.stays)].sort((a, b) => a.checkIn.localeCompare(b.checkIn)),
+};
 
 export type Flight = (typeof travel.flights)[number];
 export type Stay = (typeof travel.stays)[number];

@@ -1001,17 +1001,18 @@ html.cv-lock, html.cv-lock body { overflow: hidden; }
    Shown only while there is more page above (top) or below (bottom). */
 .edge { --edge-tint: var(--bg); position: fixed; left: 0; right: 0; z-index: 35; pointer-events: none; opacity: 0; transition: opacity .35s ease; }
 html[data-mode="life"] .edge { --edge-tint: var(--l-bg); }
-.edge-t { top: 0; height: calc(env(safe-area-inset-top, 0px) + 76px); }
-.edge-b { bottom: 0; height: calc(env(safe-area-inset-bottom, 0px) + 72px); }
+/* The top band reaches well past the floating nav bar, so the ramp is visible below it rather than hidden behind it. */
+.edge-t { top: 0; height: calc(env(safe-area-inset-top, 0px) + 148px); }
+.edge-b { bottom: 0; height: calc(env(safe-area-inset-bottom, 0px) + 92px); }
 html.edge-up .edge-t, html.edge-down .edge-b { opacity: 1; }
 .edge i, .edge b { position: absolute; inset: 0; }
 .edge i:nth-child(1) { -webkit-backdrop-filter: blur(1px); backdrop-filter: blur(1px); --m: transparent 0%, #000 25%, #000 50%, transparent 75%; }
-.edge i:nth-child(2) { -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); --m: transparent 25%, #000 50%, #000 75%, transparent 100%; }
-.edge i:nth-child(3) { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); --m: transparent 50%, #000 75%, #000 100%; }
-.edge i:nth-child(4) { -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); --m: transparent 75%, #000 100%; }
+.edge i:nth-child(2) { -webkit-backdrop-filter: blur(2.5px); backdrop-filter: blur(2.5px); --m: transparent 25%, #000 50%, #000 75%, transparent 100%; }
+.edge i:nth-child(3) { -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); --m: transparent 50%, #000 75%, #000 100%; }
+.edge i:nth-child(4) { -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); --m: transparent 75%, #000 100%; }
 .edge-t i { -webkit-mask-image: linear-gradient(to top, var(--m)); mask-image: linear-gradient(to top, var(--m)); }
 .edge-b i { -webkit-mask-image: linear-gradient(to bottom, var(--m)); mask-image: linear-gradient(to bottom, var(--m)); }
 /* A light tint on top of the blur, so text fades as well as softens. */
-.edge-t b { background: linear-gradient(to bottom, color-mix(in srgb, var(--edge-tint) 55%, transparent), transparent); }
+.edge-t b { background: linear-gradient(to bottom, color-mix(in srgb, var(--edge-tint) 75%, transparent) 30%, transparent); }
 .edge-b b { background: linear-gradient(to top, color-mix(in srgb, var(--edge-tint) 55%, transparent), transparent); }
 @media print { .edge { display: none; } }

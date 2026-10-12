@@ -15,7 +15,7 @@ const h = Math.round(height * (WORDMARKS[key] ?? 1.15));
 const svg = raw
   ?.replace(/<\?xml[\s\S]*?\?>/, '')
   .replace(/<!--[\s\S]*?-->/g, '')
-  .replace(/<title>[\s\S]*?<\/title>/g, '')
+  .replace(/<(title|desc)>[\s\S]*?<\/(title|desc)>/g, '')
   .replace(/<metadata[\s\S]*?<\/metadata>/g, '')
   // Every non-white fill (gradients too) takes the ink colour; white stays (masks and knock-outs).
   .replace(/fill(:|=")\s*#(?!fff\b|ffffff\b)[0-9a-fA-F]{3,6}/gi, (_m, sep) => `fill${sep}currentColor`)

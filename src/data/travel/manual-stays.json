@@ -1,0 +1,15 @@
+{
+  "$comment": "Stays that never made it into AwayBook, added by hand. Merged with travel.json's stays in src/lib/travel.ts, so a re-import keeps them. Pins are city-level, like the rest.",
+  "stays": [
+    { "name": "Courtyard by Marriott Tokyo Station", "brand": "Courtyard", "chain": "Marriott", "tag": "COURTYARD", "city": "Tokyo", "country": "JP", "lat": 35.6812, "lon": 139.7671, "checkIn": "2019-06-07", "checkOut": "2019-06-08", "nights": 1 },
+    { "name": "Hilton Tokyo Narita Airport", "brand": "Hilton Hotels & Resorts", "chain": "Hilton", "tag": "HILTON", "city": "Tokyo", "country": "JP", "lat": 35.6812, "lon": 139.7671, "checkIn": "2019-06-08", "checkOut": "2019-06-09", "nights": 1 },
+    { "name": "Four Points by Sheraton Hakodate", "brand": "Four Points by Sheraton", "chain": "Marriott", "tag": "FOUR POINTS", "city": "Hakodate", "country": "JP", "lat": 41.7687, "lon": 140.7288, "checkIn": "2019-07-04", "checkOut": "2019-07-05", "nights": 1 },
+    { "name": "ibis Styles Siem Reap", "brand": "ibis Styles", "chain": "Accor", "tag": "IBIS STYLES", "city": "Siem Reap", "country": "KH", "lat": 13.3633, "lon": 103.8564, "checkIn": "2019-12-27", "checkOut": "2019-12-30", "nights": 3 },
+    { "name": "PARKROYAL COLLECTION Pickering, Singapore", "brand": "PARKROYAL COLLECTION", "chain": "Pan Pacific", "tag": "PARKROYAL", "city": "Singapore", "country": "SG", "lat": 1.2966, "lon": 103.8547, "checkIn": "2021-02-28", "checkOut": "2021-03-01", "nights": 1 },
+    { "name": "Ramada Encore by Wyndham Busan Station", "brand": "Ramada Encore", "chain": "Wyndham", "tag": "RAMADA ENCORE", "city": "Busan", "country": "KR", "lat": 35.1796, "lon": 129.0756, "checkIn": "2022-12-08", "checkOut": "2022-12-10", "nights": 2 },
+    { "name": "Natra Bintan, a Tribute Portfolio Resort", "brand": "Tribute Portfolio", "chain": "Marriott", "tag": "TRIBUTE", "city": "Bintan", "country": "ID", "lat": 1.17, "lon": 104.36, "checkIn": "2023-06-29", "checkOut": "2023-07-02", "nights": 3 },
+    { "name": "DoubleTree by Hilton Surabaya", "brand": "DoubleTree by Hilton", "chain": "Hilton", "tag": "DOUBLETREE", "city": "Surabaya", "country": "ID", "lat": -7.2575, "lon": 112.7521, "checkIn": "2024-05-20", "checkOut": "2024-05-22", "nights": 2 },
+    { "name": "Jiwa Jawa Resort Bromo", "city": "Bromo", "country": "ID", "lat": -7.92, "lon": 112.95, "checkIn": "2024-05-22", "checkOut": "2024-05-23", "nights": 1 },
+    { "name": "JW Marriott Hotel Surabaya", "brand": "JW Marriott", "chain": "Marriott", "tag": "JW", "city": "Surabaya", "country": "ID", "lat": -7.2575, "lon": 112.7521, "checkIn": "2024-05-24", "checkOut": "2024-05-25", "nights": 1 }
+  ]
+}
