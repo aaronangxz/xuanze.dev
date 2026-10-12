@@ -36,11 +36,11 @@ const kindLabel = d.kind === 'product' ? 'product · case study' : 'built at wor
       <Fragment slot="inspector">
         <h2>Details</h2>
         <dl class="insp">
-          <div><dt>status</dt><dd>{d.kind === 'product' ? <span class="status" style="font-weight:500">{d.status}</span> : d.status}</dd></div>
+          <div><dt>status</dt><dd>{d.kind === 'product' && d.active ? <span class="status" style="font-weight:500">{d.status}</span> : d.status}</dd></div>
           {d.company && <div><dt>company</dt><dd>{d.company}</dd></div>}
           {d.role && <div><dt>role</dt><dd>{d.role}</dd></div>}
           <div><dt>period</dt><dd>{d.period}</dd></div>
-          <div><dt>stack</dt><dd><div class="chips">{d.stack.map((s) => <span>{s}</span>)}</div></dd></div>
+          {d.stack.length > 0 && <div><dt>stack</dt><dd><div class="chips">{d.stack.map((s) => <span>{s}</span>)}</div></dd></div>}
           {d.live && <div><dt>links</dt><dd><a href={d.live}>Live site ↗</a></dd></div>}
         </dl>
       </Fragment>

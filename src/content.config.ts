@@ -32,6 +32,8 @@ const projects = defineCollection({
     href: z.string().url().optional(),
     live: z.string().url().optional(),
     order: z.number().default(100),
+    /** Inactive projects are listed under "Inactive" in search. */
+    active: z.boolean().default(true),
     draft: z.boolean().default(false),
   }),
 });

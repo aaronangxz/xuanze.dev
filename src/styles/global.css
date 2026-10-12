@@ -623,3 +623,22 @@ pre, code, kbd { font-variant-ligatures: none; font-feature-settings: "liga" 0, 
   .lead { gap: 10px; }
   .mode button { padding: 6px 12px; }
 }
+
+/* Launcher: hover is a hint only; selection follows clicks and arrow keys. */
+.list .opt:not([aria-selected="true"]):hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.more svg { transition: transform .25s; }
+.more.up svg { transform: rotate(180deg); animation: none; }
+
+/* Generic avatar until there's a real headshot */
+.photo.avatar { padding: 0; overflow: hidden; border-style: solid; border-color: var(--glass-line); background: linear-gradient(160deg, var(--sel-a), var(--sel-b)), linear-gradient(140deg, var(--glass-a), var(--glass-b)); }
+.photo.avatar svg { display: block; width: 100%; height: 100%; fill: color-mix(in srgb, var(--muted) 42%, transparent); }
+
+/* Upcoming races: the soonest is the hero, the rest sit underneath */
+.nr-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.nr { display: flex; flex-direction: column; gap: 10px; }
+.nr + .nr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 14px; row-gap: 2px; align-items: center; padding-top: 14px; border-top: 1px solid rgba(var(--l-a-rgb), .22); }
+.nr + .nr h3 { grid-column: 1; font-size: 1.3rem; }
+.nr + .nr small { grid-column: 1; }
+.nr + .nr .countdown { grid-column: 2; grid-row: 1 / span 2; margin: 0; flex-direction: column; align-items: flex-end; gap: 2px; }
+.nr + .nr .countdown b { font-size: 2.1rem; }
+.nr + .nr .countdown span { font-size: .75rem; }

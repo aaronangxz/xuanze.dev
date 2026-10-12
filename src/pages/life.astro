@@ -20,14 +20,15 @@ const countries = new Set(flights.map((f) => f.country)).size;
 const featured = flights.filter((f) => f.featured).slice(0, 3);
 const tilt = [-1.6, 1.2, -0.8, 1.4];
 const PLANE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
-const hasPlaceholders = [...shelf, ...polaroids].some((x) => x.example) || L.nextRace.name.startsWith('[');
+const hasPlaceholders = [...shelf, ...polaroids].some((x) => x.example);
+const upcoming = [...L.upcoming].sort((a, b) => a.date.localeCompare(b.date));
 const fmtKm = (n: number) => Math.round(n).toLocaleString('en-US');
 
 const lifeSearch = [
   ...flights.map((f) => ({ cat: 'FLIGHT', t: f.toCity, s: `${f.from} → ${f.to} · ${niceMonth(f.date)}`, k: `${f.country} ${f.remark} ${f.sub ?? ''} ${f.fromCity}`, sel: `#f-${f.id}` })),
   ...stays.map((s) => ({ cat: 'STAY', t: s.name, s: `${s.city} · ${s.date}`, k: `hotel stay ${s.city} ${s.note}`, sel: `#s-${s.id}` })),
   ...races.map((r) => ({ cat: 'RACE', t: r.name, s: `${r.time}${r.pb ? ' · PB' : ''}`, k: `race run ${r.label} ${r.distance} half marathon`, sel: `#r-${r.id}` })),
-  { cat: 'NEXT', t: L.nextRace.name.replace(/^\[|\]$/g, ''), s: niceDay(L.nextRace.date), k: 'next race marathon goal countdown', sel: '.next-race' },
+  ...upcoming.map((r, i) => ({ cat: 'NEXT', t: r.name, s: `${niceDay(r.date)} · ${r.distance}`, k: `next race upcoming countdown ${r.note ?? ''}`, sel: `#nr-${i}` })),
   ...running.pbs.map((p) => ({ cat: 'PB', t: p.label, s: p.time, k: `personal best pb ${p.note}`, sel: '.pbs' })),
   ...shelf.map((s) => ({ cat: 'NOTE', t: s.label, s: s.value, k: s.value, sel: `#sh-${s.id}` })),
   { cat: 'NOTE', t: 'Polaroids', s: polaroids.map((p) => p.caption).join(' · '), k: 'photos polaroid', sel: '.polaroids' },
@@ -105,13 +106,19 @@ const lifeSearch = [
     )}
 
     <section id="l-run" aria-labelledby="l-run-h">
-      <div class="l-head"><span class="l-no">03</span><h2 id="l-run-h">Running</h2><p>Two half marathons in, the first full one is next.</p></div>
+      <div class="l-head"><span class="l-no">03</span><h2 id="l-run-h">Running</h2><p>Two half marathons in. One more this month, then the first full one.</p></div>
       <div class="run-top">
         <div class="next-race">
-          <span class="lab">next race</span>
-          <h3>{L.nextRace.name}</h3>
-          <div class="countdown"><b id="days" data-date={L.nextRace.date}>--</b><span>days to go</span></div>
-          <small>{niceDay(L.nextRace.date)} · goal: {L.nextRace.goal}</small>
+          <span class="lab">next up</span>
+          <ol class="nr-list">
+            {upcoming.map((r, i) => (
+              <li class="nr" id={`nr-${i}`} data-date={r.date}>
+                <h3>{r.name}</h3>
+                <div class="countdown"><b data-days>--</b><span>days to go</span></div>
+                <small>{niceDay(r.date)} · {r.distance}{r.note && ` · ${r.note}`}{r.goal && ` · goal ${r.goal}`}</small>
+              </li>
+            ))}
+          </ol>
         </div>
         <div class="pbs">
           <span class="lab">personal bests</span>

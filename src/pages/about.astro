@@ -17,7 +17,7 @@ const a = site.about;
           {site.experience.map((x) => (
             <li>
               <span class="when">{x.from} – {x.to}</span>
-              <div><h3>{x.org}</h3><p>{x.role}{'detail' in x && x.detail ? ` ${x.detail}` : ''}</p></div>
+              <div><h3>{x.org}</h3><p>{x.role}{'detail' in x && x.detail ? `. ${x.detail}` : ''}</p></div>
             </li>
           ))}
         </ul>
@@ -25,7 +25,9 @@ const a = site.about;
         <ul>{a.howIWork.map((h) => <li>{h}</li>)}</ul>
       </div>
       <Fragment slot="inspector">
-        <div class="photo" role="img" aria-label="Placeholder for a headshot">[Photo: recent headshot]</div>
+        <div class="photo avatar" role="img" aria-label="Profile picture">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="46" r="21" /><path d="M18 120c3-26 20-40 42-40s39 14 42 40z" /></svg>
+        </div>
         <dl class="insp">
           <div><dt>focus</dt><dd>{a.focus}</dd></div>
           <div><dt>based in</dt><dd>{site.location} ({site.timezone})</dd></div>

@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Launcher from '../components/Launcher.astro';
 import { site } from '../site.config';
-const xp = site.experience.slice(1);
+const xp = site.experience;
 const yr = (s: string) => s.split(' ').pop();
 ---
 <Base mode="work" inlineLauncher>
@@ -39,7 +39,7 @@ const yr = (s: string) => s.split(' ').pop();
         <ul class="mini">
           {xp.map((x) => (
             <li>
-              <div><b>{x.org === 'National University of Singapore' ? 'NUS' : x.org}</b><small>{x.role.split(',')[0]}</small></div>
+              <div><b>{'short' in x ? x.short : x.org}</b><small>{x.role.split(',')[0]}</small></div>
               <span>{yr(x.from)}–{x.to === 'now' ? 'now' : yr(x.to)}</span>
             </li>
           ))}

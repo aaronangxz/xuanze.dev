@@ -8,8 +8,7 @@ export const site = {
   monogram: 'xz',
   url: 'https://xuanze.dev',
   description: 'Software engineer in Singapore. I build software in Go and TypeScript, and I make sure it doesn’t break.',
-  // TODO: replace with an address you actually read.
-  email: 'hello@xuanze.dev',
+  email: 'angxze@gmail.com',
   location: 'Singapore',
   timezone: 'GMT+8',
   // TODO: add your résumé as public/resume.pdf
@@ -28,9 +27,9 @@ export const site = {
 
   /** The "Currently" card on the home page. */
   currently: [
-    { title: 'AffiliateManager', sub: 'Building and running it', meta: 'product', href: '/projects/affiliate-manager' },
-    { title: 'Writing', sub: 'Go, databases and caching', meta: 'posts', href: '/writing' },
-    { title: 'Singapore', sub: 'Where I live and work', meta: 'GMT+8' },
+    { title: 'TikTok', sub: 'Software Engineer in Test', meta: 'work' },
+    { title: 'Avanly', sub: 'Building it', meta: 'product', href: '/projects/avanly' },
+    { title: 'Clozit', sub: 'Building it', meta: 'product', href: '/projects/clozit' },
   ],
 
   about: {
@@ -38,7 +37,7 @@ export const site = {
     focus: 'Backend systems, product engineering, testing',
     paragraphs: [
       'I build backend systems and the products around them, and I care about what happens to software after it ships.',
-      'I started in test engineering. At Shopee I wrote API automation for voucher services in Marketplace Promotions. At TikTok I tested Data Insights products end to end and built internal tools like DataHelperV2. I studied for a B.Tech in Software Engineering at NUS alongside both jobs. Now I build my own products, starting with AffiliateManager.',
+      'I started in test engineering. At Shopee I wrote API automation for voucher services in Marketplace Promotions. At TikTok I test Data Insights products end to end and build internal tools like DataHelperV2. I finished a B.Tech in Software Engineering at NUS alongside both jobs. Outside work I build my own products: right now that’s Avanly and Clozit.',
     ],
     howIWork: [
       'Small changes, shipped often.',
@@ -51,21 +50,24 @@ export const site = {
   },
 
   experience: [
-    { org: 'Independent', role: 'Building and running AffiliateManager, and a new product in development.', from: '[2025]', to: 'now' },
-    { org: 'TikTok', role: 'Software Engineer in Test, Global E-commerce Data Insights', from: 'Oct 2022', to: '[end]',
+    { org: 'TikTok', role: 'Software Engineer in Test, Global E-commerce Data Insights', from: 'Oct 2022', to: 'now',
       detail: 'Built DataHelperV2, a mock-data injection tool for test databases. End-to-end testing of data products.' },
     { org: 'Shopee', role: 'Software QA Engineer, Marketplace Promotions (Vouchers)', from: 'Jun 2021', to: 'Sep 2022',
       detail: 'API automation for voucher services.' },
-    { org: 'National University of Singapore', role: 'B.Tech (Computing), Software Engineering', from: '2020', to: '[year]' },
+    { org: 'National University of Singapore', short: 'NUS', role: 'B.Tech (Computing), Software Engineering', from: '2020', to: '2024' },
+    { org: 'Nanyang Polytechnic', short: 'NYP', role: 'Diploma in Mechatronics Engineering', from: '2013', to: '2016' },
   ],
 
   life: {
     headline: 'When I’m not shipping code, I’m usually <em>running</em> or <em>on a plane</em>.',
     sub: 'Trips, races and the odd detour. A slower, more personal corner of the site.',
-    // TODO: confirm your next race and its date.
     /** Cities in the slow-moving strip under the Life hero. */
     places: ['Bali', 'Yosemite', 'San Francisco', 'New York', 'Hanoi', 'Da Nang', 'Hong Kong', 'Guangzhou', 'Jakarta'],
-    nextRace: { name: '[Your first marathon]', date: '2026-12-06', goal: '[goal time]' },
+    /** Upcoming races, soonest first. The first one that hasn't happened yet gets the big countdown; past ones hide themselves. */
+    upcoming: [
+      { name: 'Garmin Singapore Half Marathon', distance: '21.1 km', date: '2026-10-25' },
+      { name: 'Shanghai Marathon', distance: '42.2 km', date: '2026-12-05', note: 'first full marathon' },
+    ] as { name: string; distance: string; date: string; goal?: string; note?: string }[],
   },
 } as const;
 

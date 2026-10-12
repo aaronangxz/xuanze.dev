@@ -104,9 +104,14 @@ const L = launcher && (() => {
     paint();
     const el = $('o' + i);
     if (el) {
-      const top = el.offsetTop, bottom = top + el.offsetHeight, view = list.clientHeight - 56;
-      if (top < list.scrollTop + 8) list.scrollTo({ top: Math.max(0, top - 40), behavior: reduce ? 'auto' : 'smooth' });
-      else if (bottom > list.scrollTop + view) list.scrollTo({ top: bottom - view + 8, behavior: reduce ? 'auto' : 'smooth' });
+      // Keep the row clear of the top fade and the bottom "more" pill, scrolling the same way in both directions.
+      const PAD_T = 40, PAD_B = 56;
+      // The first row of a group brings its heading with it.
+      const head = el.previousElementSibling?.classList.contains('grp') ? el.previousElementSibling : el;
+      const top = head.offsetTop, bottom = el.offsetTop + el.offsetHeight;
+      const behavior = reduce ? 'auto' : 'smooth';
+      if (top - PAD_T < list.scrollTop) list.scrollTo({ top: Math.max(0, top - PAD_T), behavior });
+      else if (bottom + PAD_B > list.scrollTop + list.clientHeight) list.scrollTo({ top: bottom + PAD_B - list.clientHeight, behavior });
     }
   }
   function updateScroll() {
@@ -116,8 +121,11 @@ const L = launcher && (() => {
     const edge = list.scrollTop + list.clientHeight - 56;
     let n = 0;
     list.querySelectorAll('.opt').forEach((o) => { if (o.offsetTop + o.offsetHeight / 2 > edge) n++; });
-    moreBtn.hidden = !below || n === 0;
-    moreN.textContent = n;
+    // At the end of a long list the pill flips to take you back up.
+    const up = !(below && n > 0) && list.scrollTop > 4;
+    moreBtn.hidden = !(below && n > 0) && !up;
+    moreBtn.classList.toggle('up', up);
+    moreN.textContent = up ? 'Back to top' : n + ' more';
   }
   function open() {
     const it = shown[active]; if (!it) return;
@@ -129,7 +137,11 @@ const L = launcher && (() => {
 
   let raf = 0;
   list.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(updateScroll); }, { passive: true });
-  moreBtn.addEventListener('click', () => list.scrollBy({ top: list.clientHeight * 0.7, behavior: reduce ? 'auto' : 'smooth' }));
+  moreBtn.addEventListener('click', () => {
+    const behavior = reduce ? 'auto' : 'smooth';
+    if (moreBtn.classList.contains('up')) list.scrollTo({ top: 0, behavior });
+    else list.scrollBy({ top: list.clientHeight * 0.7, behavior });
+  });
   moreBtn.addEventListener('mousedown', (e) => e.preventDefault());
   window.addEventListener('resize', () => { moveHL(true); updateScroll(); });
   input.addEventListener('input', () => { active = 0; render(); });
@@ -140,7 +152,6 @@ const L = launcher && (() => {
     else if (e.key === 'Escape') { e.preventDefault(); if (!overlay.hidden) closeOverlay(); else { input.value = ''; active = 0; render(); } }
   });
   list.addEventListener('mousedown', (e) => e.preventDefault());
-  list.addEventListener('mousemove', (e) => { const o = e.target.closest('.opt'); if (o && +o.dataset.i !== active) select(+o.dataset.i); });
   list.addEventListener('click', (e) => { const o = e.target.closest('.opt'); if (!o) return; const i = +o.dataset.i; if (i === active) open(); else { select(i); input.focus(); } });
   document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { input.value = b.dataset.q; active = 0; render(); input.focus(); }));
 
@@ -425,9 +436,12 @@ if (board) {
   } else run();
 }
 
-const days = $('days');
-if (days) {
-  const target = Date.parse(days.dataset.date + 'T00:00:00+08:00');
-  const d = Math.ceil((target - Date.now()) / 864e5);
-  days.textContent = String(Math.max(0, d));
-}
+// Upcoming races: count down to each, and drop the ones already run so the next one takes the big slot.
+const nrs = document.querySelectorAll('.nr[data-date]');
+nrs.forEach((li) => {
+  const d = Math.ceil((Date.parse(li.dataset.date + 'T00:00:00+08:00') - Date.now()) / 864e5);
+  if (d < 0) { li.remove(); return; }
+  li.querySelector('[data-days]').textContent = d === 0 ? 'Today' : String(d);
+  if (d === 0) li.querySelector('.countdown span').textContent = 'race day';
+});
+if (nrs.length && !document.querySelector('.nr')) document.querySelector('.next-race')?.remove();

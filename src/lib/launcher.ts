@@ -34,19 +34,23 @@ export async function launcherItems(): Promise<LauncherItem[]> {
       p: preview('action', site.email, 'The fastest way to reach me. I usually reply within a day.') },
   );
 
-  for (const pr of await projects()) {
+  // Products in progress first, then everything else, then what's no longer running.
+  const pgroup = (d: { kind: string; active: boolean }) => (!d.active ? 'Inactive' : d.kind === 'product' ? 'Building now' : 'Projects');
+  const rank = { 'Building now': 0, Projects: 1, Inactive: 2 } as const;
+  const prs = (await projects()).sort((a, b) => rank[pgroup(a.data)] - rank[pgroup(b.data)] || a.data.order - b.data.order);
+  for (const pr of prs) {
     const d = pr.data;
     const sub = d.kind === 'product' ? `Product · ${d.period}` : d.kind === 'work' ? `${d.company?.split(',')[0] ?? 'Work'} · internal tool` : d.status;
     items.push({
-      g: 'Projects', t: d.title, s: sub, i: 'box', k: `${d.kind} ${d.stack.join(' ')} ${d.summary}`,
+      g: pgroup(d), t: d.title, s: sub, i: 'box', k: `${d.kind} ${pgroup(d)} ${d.stack.join(' ')} ${d.summary}`,
       href: projectHref(pr), external: !!d.href, cta: d.href ? 'View on GitHub' : 'Read the case study',
       p: preview(`${d.kind === 'side' ? 'side project' : d.kind === 'work' ? 'built at work' : 'product'} · ${d.status}`, d.title, d.summary, chips(d.stack.slice(0, 5))),
     });
   }
 
-  for (const x of site.experience.slice(1, 3)) {
+  for (const x of site.experience.slice(0, 2)) {
     items.push({
-      g: 'Experience', t: x.org, s: `${x.role.split(',')[0]} · ${x.from.split(' ').pop()}–`, i: 'work', k: `${x.org} ${x.role} ${'detail' in x ? x.detail : ''}`,
+      g: 'Experience', t: x.org, s: `${x.role.split(',')[0]} · ${x.from.split(' ').pop()}–${x.to === 'now' ? 'now' : x.to.split(' ').pop()}`, i: 'work', k: `${x.org} ${x.role} ${'detail' in x ? x.detail : ''}`,
       href: '/about', cta: 'See all experience',
       p: preview(`${x.from} – ${x.to}`, x.org, x.role, 'detail' in x && x.detail ? `<p>${esc(x.detail)}</p>` : ''),
     });
