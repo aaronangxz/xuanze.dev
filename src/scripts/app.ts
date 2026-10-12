@@ -396,6 +396,22 @@ if (themeBtn) {
   });
 }
 
+/* Phone menu: the header's links and theme switch fold behind one button */
+const mbtn = $('mbtn');
+const topBar = document.querySelector<HTMLElement>('header.top');
+if (mbtn && topBar) {
+  const setMenu = (open: boolean) => {
+    topBar.classList.toggle('menu-open', open);
+    mbtn.setAttribute('aria-expanded', String(open));
+    mbtn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+  };
+  mbtn.addEventListener('click', () => setMenu(!topBar.classList.contains('menu-open')));
+  topBar.querySelectorAll('nav a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('pointerdown', (e) => { if (!topBar.contains(e.target as Node)) setMenu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && topBar.classList.contains('menu-open')) { setMenu(false); mbtn.focus(); } });
+  window.matchMedia('(max-width: 640px)').addEventListener('change', (m) => { if (!m.matches) setMenu(false); });
+}
+
 if (!reduce && window.matchMedia('(pointer: fine)').matches) {
   document.addEventListener('pointermove', (e) => {
     const g = e.target.closest && e.target.closest('.app, .window, .widget, .top');

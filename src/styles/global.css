@@ -117,8 +117,10 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 .crumbs b { color: var(--ink); font-weight: 500; }
 .kbtn { display: inline-flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 8px 0 12px; border-radius: 9px; border: 1px solid var(--line2); background: var(--win); color: var(--muted); font: 500 .875rem var(--sans); cursor: pointer; white-space: nowrap; }
 .kbtn:hover { color: var(--ink); border-color: var(--muted); }
+.kbtn .kic { display: none; }
+@media (max-width: 640px) { .top nav .kbtn .kic { display: block; } }
 .doc { display: grid; grid-template-columns: minmax(0, 1fr) 17rem; }
-@media (max-width: 900px) { .doc { grid-template-columns: minmax(0, 1fr); } .inspector { order: -1; border-left: 0 !important; border-bottom: 1px solid var(--line); position: static !important; } }
+@media (max-width: 900px) { .doc { grid-template-columns: minmax(0, 1fr); } .inspector { order: 1; border-left: 0 !important; border-top: 1px solid var(--line); position: static !important; } }
 .doc-main { padding: clamp(24px, 5vw, 56px); display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .doc-main > .k { font-family: var(--mono); font-size: .75rem; color: var(--muted); }
 .doc-main h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); line-height: 1.06; letter-spacing: -.035em; font-weight: 600; text-wrap: balance; }
@@ -681,13 +683,35 @@ html.sliding .top nav > * { opacity: 0; transition: opacity .2s; }
 /* Code: no ligatures, so != stays != */
 pre, code, kbd { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
 
-/* Phones: one-row header; pages stay reachable through search */
+/* Phones: one-row header with a menu button; the links and theme fold into a panel under it */
+.mbtn { display: none; }
 @media (max-width: 640px) {
-  .top { padding: 8px 8px 8px 10px; flex-wrap: nowrap; }
-  .top nav a, .top nav .theme { display: none !important; }
+  .top { padding: 8px 8px 8px 10px; flex-wrap: wrap; gap: 0 8px; }
+  .top .lead { order: 0; gap: 8px; }
+  .top nav { order: 1; margin-left: auto; gap: 8px; }
+  .top nav a, .top nav .theme { display: none; }
   .top nav kbd { display: none; }
-  .lead { gap: 10px; }
-  .mode button { padding: 6px 12px; }
+  .mode button { padding: 6px 14px; min-height: 40px; }
+  .mark { width: 40px; height: 40px; }
+  .kbtn { min-height: 40px; }
+  .top nav .kbtn { width: 40px; padding: 0; justify-content: center; gap: 0; }
+  .top nav .kbtn .kt { display: none; }
+  .mbtn { order: 2; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line2); background: none; color: var(--muted); cursor: pointer; }
+  html[data-mode="life"] .mbtn { border-color: var(--l-line); color: var(--l-muted); }
+  .mbtn span, .mbtn span::before, .mbtn span::after { display: block; width: 16px; height: 1.5px; border-radius: 1px; background: currentColor; transition: transform .25s, opacity .2s; }
+  .mbtn span { position: relative; }
+  .mbtn span::before, .mbtn span::after { content: ""; position: absolute; left: 0; }
+  .mbtn span::before { top: -5px; } .mbtn span::after { top: 5px; }
+  .top.menu-open .mbtn span { background: transparent; }
+  .top.menu-open .mbtn span::before { transform: translateY(5px) rotate(45deg); }
+  .top.menu-open .mbtn span::after { transform: translateY(-5px) rotate(-45deg); }
+  /* the open panel: links as full-width rows, then the theme switch */
+  .top.menu-open nav { order: 3; flex-basis: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 0; margin: 8px 0 2px; padding-top: 6px; border-top: 1px solid var(--line); }
+  html[data-mode="life"] .top.menu-open nav { border-top-color: var(--l-line); }
+  .top.menu-open nav a { display: flex; align-items: center; min-height: 46px; padding: 0 6px; font-size: 1rem; }
+  html:not([data-mode="life"]) .top.menu-open nav .theme { display: flex; align-items: center; min-height: 46px; margin: 4px 0 0; padding: 0 6px; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; font-size: 1rem; color: var(--muted); }
+  .top.menu-open nav .kbtn { display: none; }
+  .top.menu-open nav a[aria-current="page"] { color: var(--ink); font-weight: 600; }
 }
 
 /* Launcher: hover is a hint only; selection follows clicks and arrow keys. */
@@ -1017,3 +1041,45 @@ html.edge-up .edge-t, html.edge-down .edge-b { opacity: 1; }
 .edge-t b { background: linear-gradient(to bottom, color-mix(in srgb, var(--edge-tint) 75%, transparent) 30%, transparent); }
 .edge-b b { background: linear-gradient(to top, color-mix(in srgb, var(--edge-tint) 55%, transparent), transparent); }
 @media print { .edge { display: none; } }
+
+/* Phones: every control gets a thumb-sized hit area, and no reading text drops under 12px */
+@media (max-width: 640px) {
+  .try button { min-height: 40px; padding-inline: 14px; }
+  .crumbs a, .foot a, .d-back { display: inline-block; padding-block: 11px; margin-block: -11px; }
+  .foot nav { gap: 22px; }
+  .d-back { margin-bottom: 12px; margin-top: -11px; padding-top: 11px; padding-bottom: 11px; }
+  .tm-zoom button { width: 40px; height: 40px; }
+  .htag { font-size: .6875rem; padding: 3px 7px 3px 6px; }
+  .hc-bname, .insp dt, .cv-stats dt { font-size: .75rem; }
+  .hb-name, .d-neighbours .hb-name { font-size: .8125rem; }
+  .hb-count { font-size: .6875rem; }
+  .top nav kbd, .kbtn kbd, .app .search kbd, .lfoot kbd { display: none; }
+  .search input { min-height: 40px; font-size: 1.0625rem; }
+  .more { min-height: 40px; }
+  .btn-s { min-height: 40px; padding-inline: 14px; }
+  .links { gap: 6px 18px; }
+  .links a { display: inline-flex; align-items: center; min-height: 40px; }
+  .widget b a, .widget h2 a, .lede a, .strava-credit a, .insp dd a { padding-block: 10px; }
+  .doc-main ul li > a { display: block; padding-block: 9px; }
+  .tm-chips button { min-height: 40px; font-size: .8125rem; }
+  .tm-quick button { min-height: 40px; padding-inline: 14px; font-size: .875rem; }
+  pre { font-size: .8125rem; }
+  /* small mono labels: up to 12px on phones */
+  .tm-stats dt, .run-stats dt, .rs-year small, .shelf dt, .rc-facts dt, .dp-facts dt, .pb-d, .rc-dist,
+  .board-th span, .rmk small, .tm-legend li, .d-pager a span, .dp-top span { font-size: .75rem; }
+  /* the printed objects (passes, bibs, race chips) keep their proportions but nothing under 11px */
+  .pass-top span, .pass-meta span, .pass-stub span, .rc-next, .wa-label span, .bib-cat span, .bib-tear span, .bib-ev { font-size: .6875rem; }
+  /* departures board: date · from · to on one line, the remark (a link to the flight) underneath, no sideways scroll */
+  .board { overflow-x: visible; padding: 10px 12px 12px; }
+  .board-row { min-width: 0; grid-template-columns: 7.4rem 3.7rem minmax(0, 1fr); gap: 8px 12px; padding: 10px 2px; }
+  .board-row > :nth-child(4), .board-th > :nth-child(5) { display: none; }
+  .board-row > .rmk { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 36px; margin-block: -6px; font-size: .9375rem; white-space: nowrap; }
+  .board-row > .rmk small { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .flaps { gap: 2px; }
+  .flap { width: 1.12rem; height: 1.55rem; font-size: .875rem; }
+  .pass-stub { padding: 16px 12px; }
+  .pass-stub p { font-size: .875rem; }
+  .hb-name { -webkit-line-clamp: 3; }
+  .polaroid { max-width: 35%; margin-left: -10px; padding: 8px 8px 12px; }
+  .polaroid figcaption { font-size: .8125rem; margin-top: 8px; }
+}
