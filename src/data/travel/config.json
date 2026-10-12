@@ -1,0 +1,81 @@
+{
+  "$comment": "Hand-maintained inputs for scripts/travel-import.mjs. Edit here, then re-run the import.",
+  "excludeStays": [
+    "Sofitel Guangzhou Sunrich|2025-11-05",
+    "Hilton Garden Inn Hong Kong Mongkok|2025-11-03"
+  ],
+  "airports": {
+    "BKI": "Kota Kinabalu", "BKK": "Bangkok", "CAN": "Guangzhou", "CGK": "Jakarta", "CTS": "Sapporo",
+    "DAD": "Da Nang", "DMK": "Bangkok", "DPS": "Bali", "EWR": "New York", "FUK": "Fukuoka",
+    "HAN": "Hanoi", "HKD": "Hakodate", "HKG": "Hong Kong", "HKT": "Phuket", "HND": "Tokyo",
+    "ICN": "Seoul", "IST": "Istanbul", "JFK": "New York", "JHB": "Johor Bahru", "KIX": "Osaka",
+    "KUL": "Kuala Lumpur", "LAX": "Los Angeles", "LHR": "London", "MEL": "Melbourne", "NRT": "Tokyo",
+    "PEK": "Beijing", "PNH": "Phnom Penh", "PVG": "Shanghai", "REP": "Siem Reap", "SFO": "San Francisco",
+    "SGN": "Ho Chi Minh City", "SHA": "Shanghai", "SIN": "Singapore", "SUB": "Surabaya", "SYD": "Sydney",
+    "ZRH": "Zurich"
+  },
+  "airportOverrides": {
+    "REP": { "lat": 13.410676, "lon": 103.812074, "country": "KH", "$comment": "Closed in 2023 (replaced by SAI), so OurAirports no longer lists the code" }
+  },
+  "airlines": {
+    "AIQ": ["FD", "Thai AirAsia"], "ANA": ["NH", "ANA"], "AXM": ["AK", "AirAsia"], "CPA": ["CX", "Cathay Pacific"],
+    "HKE": ["UO", "HK Express"], "JBU": ["B6", "JetBlue"], "JSA": ["3K", "Jetstar Asia"], "JST": ["JQ", "Jetstar"],
+    "MAS": ["MH", "Malaysia Airlines"], "MXD": ["OD", "Batik Air Malaysia"], "SIA": ["SQ", "Singapore Airlines"],
+    "TGW": ["TR", "Scoot"], "THA": ["TG", "Thai Airways"], "THY": ["TK", "Turkish Airlines"], "XAX": ["D7", "AirAsia X"]
+  },
+  "places": {
+    "$comment": "AwayBook city (|country) → where the pin goes. `city` groups pins on the map; coordinates are city-level, not the hotel's address.",
+    "Anaheim|United States": { "city": "Anaheim", "lat": 33.8003, "lon": -117.9199 },
+    "Bandar Penawar|Malaysia": { "city": "Desaru Coast", "lat": 1.5600, "lon": 104.2600 },
+    "Bangkok|Thailand": { "city": "Bangkok", "lat": 13.7400, "lon": 100.5480 },
+    "Batam|Indonesia": { "city": "Batam", "lat": 1.1301, "lon": 104.0529 },
+    "Carmel|United States": { "city": "Carmel", "lat": 36.5115, "lon": -121.9387 },
+    "Coulterville|United States": { "city": "Yosemite", "lat": 37.7460, "lon": -119.5747, "$comment": "AwayBook lists The Ahwahnee in Coulterville; it is in Yosemite Valley" },
+    "Da Nang City|Vietnam": { "city": "Da Nang", "lat": 16.0544, "lon": 108.2022 },
+    "El Portal|United States": { "city": "Yosemite", "lat": 37.6749, "lon": -119.7838 },
+    "Guangzhou|China": { "city": "Guangzhou", "lat": 23.1291, "lon": 113.3244 },
+    "Hanoi|Vietnam": { "city": "Hanoi", "lat": 21.0245, "lon": 105.8541 },
+    "Hong Kong|Hong Kong": { "city": "Hong Kong", "lat": 22.3027, "lon": 114.1772 },
+    "Interlaken|Switzerland": { "city": "Interlaken", "lat": 46.6863, "lon": 7.8632 },
+    "Istanbul|Türkiye": { "city": "Istanbul", "lat": 41.0082, "lon": 28.9784 },
+    "Jakarta|Indonesia": { "city": "Jakarta", "lat": -6.2088, "lon": 106.8456 },
+    "Jakarta Selatan|Indonesia": { "city": "Jakarta", "lat": -6.2250, "lon": 106.8270 },
+    "Johor Bahru|Malaysia": { "city": "Johor Bahru", "lat": 1.4600, "lon": 103.7634 },
+    "Johor Bahru, Johor|Malaysia": { "city": "Johor Bahru", "lat": 1.4600, "lon": 103.7634 },
+    "Kuala Lumpur|Malaysia": { "city": "Kuala Lumpur", "lat": 3.1478, "lon": 101.6953 },
+    "London|United Kingdom": { "city": "London", "lat": 51.5033, "lon": -0.1137 },
+    "Midpines|United States": { "city": "Yosemite", "lat": 37.5449, "lon": -119.9227 },
+    "New York|United States": { "city": "New York", "lat": 40.7580, "lon": -73.9855 },
+    "Paris|France": { "city": "Paris", "lat": 48.8718, "lon": 2.3260 },
+    "Pismo Beach|United States": { "city": "Pismo Beach", "lat": 35.1428, "lon": -120.6413 },
+    "San Francisco|United States": { "city": "San Francisco", "lat": 37.7946, "lon": -122.3954 },
+    "Santa Monica|United States": { "city": "Santa Monica", "lat": 34.0195, "lon": -118.4912 },
+    "Seminyak, Bali|Indonesia": { "city": "Bali", "lat": -8.6913, "lon": 115.1682 },
+    "Singapore|Singapore": { "city": "Singapore", "lat": 1.2966, "lon": 103.8547 }
+  },
+  "countries": {
+    "AU": "Australia", "CH": "Switzerland", "CN": "China", "FR": "France", "GB": "United Kingdom", "HK": "Hong Kong",
+    "ID": "Indonesia", "JP": "Japan", "KH": "Cambodia", "KR": "South Korea", "MY": "Malaysia", "SG": "Singapore",
+    "TH": "Thailand", "TR": "Türkiye", "US": "United States", "VN": "Vietnam"
+  },
+  "countryCodes": {
+    "Australia": "AU", "China": "CN", "France": "FR", "Hong Kong": "HK", "Indonesia": "ID", "Malaysia": "MY",
+    "Singapore": "SG", "Switzerland": "CH", "Thailand": "TH", "Türkiye": "TR", "United Kingdom": "GB",
+    "United States": "US", "Vietnam": "VN"
+  },
+  "brandTags": {
+    "$comment": "Short label printed on each hotel's tag until real logos replace them.",
+    "Alila": "ALILA", "AutoCamp": "AUTOCAMP", "Curio Collection by Hilton": "CURIO", "Four Points by Sheraton": "FOUR POINTS",
+    "Hampton by Hilton": "HAMPTON", "Hilton Hotels & Resorts": "HILTON", "Holiday Inn": "HOLIDAY INN",
+    "Holiday Inn Express": "HI EXPRESS", "Hyatt Centric": "CENTRIC", "Hyatt Hotels": "HYATT", "Hyatt House": "HYATT HOUSE",
+    "Hyatt Regency": "REGENCY", "JW Marriott": "JW", "MGallery Collection": "MGALLERY", "Other": "",
+    "Park Hyatt": "PARK HYATT", "Raffles": "RAFFLES", "Sheraton": "SHERATON", "Sofitel": "SOFITEL",
+    "St. Regis": "ST. REGIS", "The Luxury Collection": "LUXURY COLL.", "The Ritz-Carlton": "RITZ-CARLTON",
+    "The Unbound Collection by Hyatt": "UNBOUND", "voco": "VOCO", "W Hotels": "W", "Westin Hotels & Resorts": "WESTIN"
+  },
+  "ground": {
+    "$comment": "Overland legs are inferred: consecutive places at least minKm apart, within maxDays, not joined by a flight.",
+    "minKm": 100,
+    "maxDays": 10
+  }
+}

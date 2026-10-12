@@ -1,0 +1,1775 @@
+{
+  "generated": "2026-10-12",
+  "airports": {
+    "BKI": {
+      "city": "Kota Kinabalu",
+      "country": "MY",
+      "lat": 5.932743,
+      "lon": 116.049324
+    },
+    "BKK": {
+      "city": "Bangkok",
+      "country": "TH",
+      "lat": 13.6811,
+      "lon": 100.747002
+    },
+    "CAN": {
+      "city": "Guangzhou",
+      "country": "CN",
+      "lat": 23.392401,
+      "lon": 113.299004
+    },
+    "CGK": {
+      "city": "Jakarta",
+      "country": "ID",
+      "lat": -6.12557,
+      "lon": 106.655998
+    },
+    "CTS": {
+      "city": "Sapporo",
+      "country": "JP",
+      "lat": 42.774753,
+      "lon": 141.690414
+    },
+    "DAD": {
+      "city": "Da Nang",
+      "country": "VN",
+      "lat": 16.0439,
+      "lon": 108.198997
+    },
+    "DMK": {
+      "city": "Bangkok",
+      "country": "TH",
+      "lat": 13.9126,
+      "lon": 100.607002
+    },
+    "DPS": {
+      "city": "Bali",
+      "country": "ID",
+      "lat": -8.748409,
+      "lon": 115.167123
+    },
+    "EWR": {
+      "city": "New York",
+      "country": "US",
+      "lat": 40.6894,
+      "lon": -74.170545
+    },
+    "FUK": {
+      "city": "Fukuoka",
+      "country": "JP",
+      "lat": 33.585899353027344,
+      "lon": 130.4510040283203
+    },
+    "HAN": {
+      "city": "Hanoi",
+      "country": "VN",
+      "lat": 21.221201,
+      "lon": 105.806999
+    },
+    "HKD": {
+      "city": "Hakodate",
+      "country": "JP",
+      "lat": 41.77,
+      "lon": 140.822006
+    },
+    "HKG": {
+      "city": "Hong Kong",
+      "country": "HK",
+      "lat": 22.31184,
+      "lon": 113.914862
+    },
+    "HKT": {
+      "city": "Phuket",
+      "country": "TH",
+      "lat": 8.113257,
+      "lon": 98.3174
+    },
+    "HND": {
+      "city": "Tokyo",
+      "country": "JP",
+      "lat": 35.549678,
+      "lon": 139.786958
+    },
+    "ICN": {
+      "city": "Seoul",
+      "country": "KR",
+      "lat": 37.469101,
+      "lon": 126.450996
+    },
+    "IST": {
+      "city": "Istanbul",
+      "country": "TR",
+      "lat": 41.274874,
+      "lon": 28.732136
+    },
+    "JFK": {
+      "city": "New York",
+      "country": "US",
+      "lat": 40.639447,
+      "lon": -73.779317
+    },
+    "JHB": {
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.64131,
+      "lon": 103.669998
+    },
+    "KIX": {
+      "city": "Osaka",
+      "country": "JP",
+      "lat": 34.427299,
+      "lon": 135.244003
+    },
+    "KUL": {
+      "city": "Kuala Lumpur",
+      "country": "MY",
+      "lat": 2.74558,
+      "lon": 101.709999
+    },
+    "LAX": {
+      "city": "Los Angeles",
+      "country": "US",
+      "lat": 33.942501,
+      "lon": -118.407997
+    },
+    "LHR": {
+      "city": "London",
+      "country": "GB",
+      "lat": 51.470748,
+      "lon": -0.459909
+    },
+    "MEL": {
+      "city": "Melbourne",
+      "country": "AU",
+      "lat": -37.670732,
+      "lon": 144.837898
+    },
+    "NRT": {
+      "city": "Tokyo",
+      "country": "JP",
+      "lat": 35.76858,
+      "lon": 140.388714
+    },
+    "PEK": {
+      "city": "Beijing",
+      "country": "CN",
+      "lat": 40.077349,
+      "lon": 116.596702
+    },
+    "PNH": {
+      "city": "Phnom Penh",
+      "country": "KH",
+      "lat": 11.547155,
+      "lon": 104.844699
+    },
+    "PVG": {
+      "city": "Shanghai",
+      "country": "CN",
+      "lat": 31.1434,
+      "lon": 121.805
+    },
+    "REP": {
+      "city": "Siem Reap",
+      "country": "KH",
+      "lat": 13.410676,
+      "lon": 103.812074
+    },
+    "SFO": {
+      "city": "San Francisco",
+      "country": "US",
+      "lat": 37.619806,
+      "lon": -122.374821
+    },
+    "SGN": {
+      "city": "Ho Chi Minh City",
+      "country": "VN",
+      "lat": 10.8188,
+      "lon": 106.652
+    },
+    "SHA": {
+      "city": "Shanghai",
+      "country": "CN",
+      "lat": 31.198104,
+      "lon": 121.33426
+    },
+    "SIN": {
+      "city": "Singapore",
+      "country": "SG",
+      "lat": 1.35019,
+      "lon": 103.994003
+    },
+    "SUB": {
+      "city": "Surabaya",
+      "country": "ID",
+      "lat": -7.37983,
+      "lon": 112.787003
+    },
+    "SYD": {
+      "city": "Sydney",
+      "country": "AU",
+      "lat": -33.946098,
+      "lon": 151.177002
+    },
+    "ZRH": {
+      "city": "Zurich",
+      "country": "CH",
+      "lat": 47.458056,
+      "lon": 8.548056
+    }
+  },
+  "flights": [
+    {
+      "date": "2017-09-22",
+      "airline": "Scoot",
+      "flight": "TR 2",
+      "from": "SIN",
+      "to": "SYD",
+      "km": 6293,
+      "aircraft": "Boeing 787-9"
+    },
+    {
+      "date": "2017-10-01",
+      "airline": "Scoot",
+      "flight": "TR 25",
+      "from": "MEL",
+      "to": "SIN",
+      "km": 6033,
+      "aircraft": "Boeing 787-8"
+    },
+    {
+      "date": "2017-10-01",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 982",
+      "from": "SIN",
+      "to": "BKK",
+      "km": 1417,
+      "aircraft": "Boeing 777-200 ER"
+    },
+    {
+      "date": "2018-01-27",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 636",
+      "from": "SIN",
+      "to": "HND",
+      "km": 5300,
+      "aircraft": "Boeing 777-300 ER"
+    },
+    {
+      "date": "2018-02-13",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 11",
+      "from": "NRT",
+      "to": "SIN",
+      "km": 5358,
+      "aircraft": "Boeing 777-300 ER"
+    },
+    {
+      "date": "2018-11-04",
+      "airline": "Cathay Pacific",
+      "flight": "CX 650",
+      "from": "SIN",
+      "to": "HKG",
+      "km": 2566,
+      "aircraft": "Airbus A330-300"
+    },
+    {
+      "date": "2018-11-10",
+      "airline": "Cathay Pacific",
+      "flight": "CX 635",
+      "from": "HKG",
+      "to": "SIN",
+      "km": 2566,
+      "aircraft": "Airbus A330-300"
+    },
+    {
+      "date": "2019-03-18",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 800",
+      "from": "SIN",
+      "to": "PEK",
+      "km": 4491,
+      "aircraft": "Boeing 777-200 ER"
+    },
+    {
+      "date": "2019-03-24",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 807",
+      "from": "PEK",
+      "to": "SIN",
+      "km": 4491
+    },
+    {
+      "date": "2019-05-25",
+      "airline": "ANA",
+      "flight": "NH 842",
+      "from": "SIN",
+      "to": "HND",
+      "km": 5300,
+      "aircraft": "Boeing 787-9"
+    },
+    {
+      "date": "2019-06-09",
+      "airline": "ANA",
+      "flight": "NH 801",
+      "from": "NRT",
+      "to": "SIN",
+      "km": 5358,
+      "aircraft": "Boeing 787-10"
+    },
+    {
+      "date": "2019-06-29",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 632",
+      "from": "SIN",
+      "to": "HND",
+      "km": 5300,
+      "aircraft": "Airbus A350-900"
+    },
+    {
+      "date": "2019-07-04",
+      "airline": "ANA",
+      "flight": "NH 553",
+      "from": "HND",
+      "to": "HKD",
+      "km": 697,
+      "aircraft": "Boeing 787-8"
+    },
+    {
+      "date": "2019-07-05",
+      "airline": "ANA",
+      "flight": "NH 4854",
+      "from": "HKD",
+      "to": "CTS",
+      "km": 133,
+      "aircraft": "DHC-8-400 Dash 8Q"
+    },
+    {
+      "date": "2019-07-06",
+      "airline": "ANA",
+      "flight": "NH 82",
+      "from": "CTS",
+      "to": "HND",
+      "km": 820,
+      "aircraft": "Boeing 777-200 ER"
+    },
+    {
+      "date": "2019-07-07",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 631",
+      "from": "HND",
+      "to": "SIN",
+      "km": 5300,
+      "aircraft": "Boeing 777-300 ER"
+    },
+    {
+      "date": "2019-08-10",
+      "airline": "AirAsia",
+      "flight": "AK 6045",
+      "from": "JHB",
+      "to": "KUL",
+      "km": 250,
+      "aircraft": "Airbus A320"
+    },
+    {
+      "date": "2019-08-10",
+      "airline": "Malaysia Airlines",
+      "flight": "MH 766",
+      "from": "KUL",
+      "to": "SGN",
+      "km": 1050,
+      "aircraft": "Boeing 737-800"
+    },
+    {
+      "date": "2019-08-13",
+      "airline": "Malaysia Airlines",
+      "flight": "MH 759",
+      "from": "SGN",
+      "to": "KUL",
+      "km": 1050,
+      "aircraft": "Boeing 737-800"
+    },
+    {
+      "date": "2019-08-13",
+      "airline": "AirAsia",
+      "flight": "AK 6048",
+      "from": "KUL",
+      "to": "JHB",
+      "km": 250,
+      "aircraft": "Airbus A320"
+    },
+    {
+      "date": "2019-08-30",
+      "airline": "Thai Airways",
+      "flight": "TG 404",
+      "from": "SIN",
+      "to": "BKK",
+      "km": 1417,
+      "aircraft": "Airbus A350-900"
+    },
+    {
+      "date": "2019-08-30",
+      "airline": "Thai Airways",
+      "flight": "TG 564",
+      "from": "BKK",
+      "to": "HAN",
+      "km": 995,
+      "aircraft": "Boeing 777-300 ER"
+    },
+    {
+      "date": "2019-09-02",
+      "airline": "Thai Airways",
+      "flight": "TG 561",
+      "from": "HAN",
+      "to": "BKK",
+      "km": 995,
+      "aircraft": "Airbus A330-300"
+    },
+    {
+      "date": "2019-09-02",
+      "airline": "Thai Airways",
+      "flight": "TG 401",
+      "from": "BKK",
+      "to": "SIN",
+      "km": 1417,
+      "aircraft": "Boeing 777-300"
+    },
+    {
+      "date": "2019-12-01",
+      "airline": "Scoot",
+      "flight": "TR 452",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Airbus A320"
+    },
+    {
+      "date": "2019-12-22",
+      "airline": "AirAsia X",
+      "flight": "D7 679",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Airbus A330-300"
+    },
+    {
+      "date": "2019-12-24",
+      "airline": "AirAsia",
+      "flight": "AK 6048",
+      "from": "KUL",
+      "to": "JHB",
+      "km": 250,
+      "aircraft": "Airbus A320neo"
+    },
+    {
+      "date": "2019-12-26",
+      "airline": "Malaysia Airlines",
+      "flight": "MH 1038",
+      "from": "JHB",
+      "to": "KUL",
+      "km": 250,
+      "aircraft": "Boeing 737-800"
+    },
+    {
+      "date": "2019-12-26",
+      "airline": "AirAsia",
+      "flight": "AK 538",
+      "from": "KUL",
+      "to": "PNH",
+      "km": 1038,
+      "aircraft": "Airbus A320neo"
+    },
+    {
+      "date": "2019-12-30",
+      "airline": "AirAsia",
+      "flight": "AK 541",
+      "from": "REP",
+      "to": "KUL",
+      "km": 1208,
+      "aircraft": "Airbus A320"
+    },
+    {
+      "date": "2019-12-30",
+      "airline": "AirAsia",
+      "flight": "AK 6028",
+      "from": "KUL",
+      "to": "JHB",
+      "km": 250,
+      "aircraft": "Airbus A320"
+    },
+    {
+      "date": "2020-01-04",
+      "airline": "AirAsia",
+      "flight": "AK 702",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Airbus A321neo"
+    },
+    {
+      "date": "2020-02-01",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 982",
+      "from": "SIN",
+      "to": "BKK",
+      "km": 1417,
+      "aircraft": "Boeing 787-10"
+    },
+    {
+      "date": "2020-02-02",
+      "airline": "Cathay Pacific",
+      "flight": "CX 619",
+      "from": "BKK",
+      "to": "SIN",
+      "km": 1417,
+      "aircraft": "Airbus A350-900"
+    },
+    {
+      "date": "2020-02-29",
+      "airline": "AirAsia X",
+      "flight": "D7 673",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Airbus A330-300"
+    },
+    {
+      "date": "2020-03-01",
+      "airline": "AirAsia X",
+      "flight": "D7 678",
+      "from": "KUL",
+      "to": "SIN",
+      "km": 297,
+      "aircraft": "Airbus A330-300"
+    },
+    {
+      "date": "2021-12-16",
+      "airline": "Jetstar",
+      "flight": "JQ 7",
+      "from": "MEL",
+      "to": "SIN",
+      "km": 6033,
+      "aircraft": "Boeing 787-8"
+    },
+    {
+      "date": "2022-09-10",
+      "airline": "Thai AirAsia",
+      "flight": "FD 358",
+      "from": "SIN",
+      "to": "DMK",
+      "km": 1446,
+      "aircraft": "Airbus A321neo"
+    },
+    {
+      "date": "2022-09-12",
+      "airline": "Scoot",
+      "flight": "TR 605",
+      "from": "BKK",
+      "to": "SIN",
+      "km": 1417,
+      "aircraft": "Airbus A321neo"
+    },
+    {
+      "date": "2022-09-16",
+      "airline": "Scoot",
+      "flight": "TR 652",
+      "from": "SIN",
+      "to": "HKT",
+      "km": 980,
+      "aircraft": "Airbus A320neo"
+    },
+    {
+      "date": "2022-09-21",
+      "airline": "Scoot",
+      "flight": "TR 653",
+      "from": "HKT",
+      "to": "SIN",
+      "km": 980,
+      "aircraft": "Airbus A320neo"
+    },
+    {
+      "date": "2022-12-08",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 608",
+      "from": "SIN",
+      "to": "ICN",
+      "km": 4627,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2022-12-15",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 607",
+      "from": "ICN",
+      "to": "SIN",
+      "km": 4627,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2023-12-15",
+      "airline": "Cathay Pacific",
+      "flight": "CX 658",
+      "from": "SIN",
+      "to": "HKG",
+      "km": 2566,
+      "aircraft": "Airbus A350-1000",
+      "cabin": "Business"
+    },
+    {
+      "date": "2023-12-17",
+      "airline": "HK Express",
+      "flight": "UO 638",
+      "from": "HKG",
+      "to": "FUK",
+      "km": 2047,
+      "aircraft": "Airbus A321neo",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2023-12-25",
+      "airline": "Cathay Pacific",
+      "flight": "CX 567",
+      "from": "KIX",
+      "to": "HKG",
+      "km": 2475,
+      "aircraft": "Boeing 777-300",
+      "cabin": "Business"
+    },
+    {
+      "date": "2023-12-25",
+      "airline": "Cathay Pacific",
+      "flight": "CX 657",
+      "from": "HKG",
+      "to": "SIN",
+      "km": 2566,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Business"
+    },
+    {
+      "date": "2024-03-01",
+      "airline": "Malaysia Airlines",
+      "flight": "MH 610",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Boeing 737-800",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2024-03-03",
+      "airline": "Batik Air Malaysia",
+      "flight": "OD 805",
+      "from": "KUL",
+      "to": "SIN",
+      "km": 297,
+      "aircraft": "Boeing 737-800",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2024-03-16",
+      "airline": "AirAsia",
+      "flight": "AK 1794",
+      "from": "SIN",
+      "to": "BKI",
+      "km": 1431,
+      "aircraft": "Airbus A320"
+    },
+    {
+      "date": "2024-03-19",
+      "airline": "Scoot",
+      "flight": "TR 491",
+      "from": "BKI",
+      "to": "SIN",
+      "km": 1431,
+      "aircraft": "Airbus A320",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2024-05-20",
+      "airline": "Jetstar Asia",
+      "flight": "3K 247",
+      "from": "SIN",
+      "to": "SUB",
+      "km": 1376,
+      "aircraft": "Airbus A320",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2024-05-25",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 929",
+      "from": "SUB",
+      "to": "SIN",
+      "km": 1376,
+      "aircraft": "Boeing 737 MAX 8",
+      "cabin": "Business"
+    },
+    {
+      "date": "2024-07-26",
+      "airline": "AirAsia",
+      "flight": "AK 710",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Airbus A320",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2024-07-28",
+      "airline": "AirAsia",
+      "flight": "AK 719",
+      "from": "KUL",
+      "to": "SIN",
+      "km": 297,
+      "aircraft": "Airbus A320neo",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2024-08-06",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 956",
+      "from": "SIN",
+      "to": "CGK",
+      "km": 882,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Premium Economy"
+    },
+    {
+      "date": "2024-08-10",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 963",
+      "from": "CGK",
+      "to": "SIN",
+      "km": 882,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Premium Economy"
+    },
+    {
+      "date": "2024-10-07",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 392",
+      "from": "SIN",
+      "to": "IST",
+      "km": 8681,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Business",
+      "seat": "12F"
+    },
+    {
+      "date": "2024-10-07",
+      "airline": "Turkish Airlines",
+      "flight": "TK 1913",
+      "from": "IST",
+      "to": "ZRH",
+      "km": 1739,
+      "aircraft": "Airbus A321",
+      "cabin": "Business",
+      "seat": "5B"
+    },
+    {
+      "date": "2024-10-18",
+      "airline": "Turkish Airlines",
+      "flight": "TK 1972",
+      "from": "LHR",
+      "to": "IST",
+      "km": 2487,
+      "aircraft": "Boeing 777-300 ER",
+      "cabin": "Business",
+      "seat": "2J"
+    },
+    {
+      "date": "2024-10-21",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 391",
+      "from": "IST",
+      "to": "SIN",
+      "km": 8681,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Business",
+      "seat": "16D"
+    },
+    {
+      "date": "2024-10-27",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 958",
+      "from": "SIN",
+      "to": "CGK",
+      "km": 882,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Premium Economy",
+      "seat": "32A"
+    },
+    {
+      "date": "2024-11-09",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 963",
+      "from": "CGK",
+      "to": "SIN",
+      "km": 882,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Business",
+      "seat": "19A"
+    },
+    {
+      "date": "2025-03-01",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 114",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Boeing 737-800",
+      "cabin": "Economy",
+      "seat": "42K"
+    },
+    {
+      "date": "2025-03-03",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 121",
+      "from": "KUL",
+      "to": "SIN",
+      "km": 297,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Economy",
+      "seat": "47J"
+    },
+    {
+      "date": "2025-05-01",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 710",
+      "from": "SIN",
+      "to": "BKK",
+      "km": 1417,
+      "aircraft": "Boeing 787-10",
+      "cabin": "Economy",
+      "seat": "61D"
+    },
+    {
+      "date": "2025-05-05",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 711",
+      "from": "BKK",
+      "to": "SIN",
+      "km": 1417,
+      "aircraft": "Boeing 787-10",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2025-10-06",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 956",
+      "from": "SIN",
+      "to": "CGK",
+      "km": 882,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Premium Economy",
+      "seat": "33H"
+    },
+    {
+      "date": "2025-10-10",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 965",
+      "from": "CGK",
+      "to": "SIN",
+      "km": 882,
+      "aircraft": "Boeing 777-300 ER"
+    },
+    {
+      "date": "2025-11-02",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 892",
+      "from": "SIN",
+      "to": "HKG",
+      "km": 2566,
+      "aircraft": "Boeing 777-300 ER",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2025-11-10",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 851",
+      "from": "CAN",
+      "to": "SIN",
+      "km": 2648,
+      "aircraft": "Boeing 787-10",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2026-03-20",
+      "airline": "Scoot",
+      "flight": "TR 314",
+      "from": "SIN",
+      "to": "DAD",
+      "km": 1698,
+      "aircraft": "Airbus A321neo",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2026-03-23",
+      "airline": "Scoot",
+      "flight": "TR 315",
+      "from": "DAD",
+      "to": "SIN",
+      "km": 1698,
+      "aircraft": "Airbus A321neo",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2026-08-08",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 192",
+      "from": "SIN",
+      "to": "HAN",
+      "km": 2218,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2026-08-10",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 195",
+      "from": "HAN",
+      "to": "SIN",
+      "km": 2218,
+      "aircraft": "Boeing 737 MAX 8",
+      "cabin": "Business"
+    },
+    {
+      "date": "2026-08-28",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 38",
+      "from": "SIN",
+      "to": "LAX",
+      "km": 14102,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Business",
+      "seat": "11D"
+    },
+    {
+      "date": "2026-09-08",
+      "airline": "JetBlue",
+      "flight": "B6 16",
+      "from": "SFO",
+      "to": "JFK",
+      "km": 4152,
+      "aircraft": "Airbus A321",
+      "cabin": "Economy",
+      "seat": "16D"
+    },
+    {
+      "date": "2026-09-13",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 21",
+      "from": "EWR",
+      "to": "SIN",
+      "km": 15337,
+      "aircraft": "Airbus A350-900",
+      "cabin": "Business",
+      "seat": "12F"
+    },
+    {
+      "date": "2026-10-03",
+      "airline": "Singapore Airlines",
+      "flight": "SQ 936",
+      "from": "SIN",
+      "to": "DPS",
+      "km": 1672,
+      "aircraft": "Boeing 787-10",
+      "cabin": "Business",
+      "seat": "16D"
+    },
+    {
+      "date": "2026-10-05",
+      "airline": "Scoot",
+      "flight": "TR 243",
+      "from": "DPS",
+      "to": "SIN",
+      "km": 1672,
+      "aircraft": "Airbus A321neo",
+      "cabin": "Economy"
+    },
+    {
+      "date": "2026-10-31",
+      "airline": "Scoot",
+      "flight": "TR 450",
+      "from": "SIN",
+      "to": "KUL",
+      "km": 297,
+      "aircraft": "Airbus A320neo"
+    },
+    {
+      "date": "2026-11-02",
+      "airline": "Scoot",
+      "flight": "TR 443",
+      "from": "KUL",
+      "to": "SIN",
+      "km": 297,
+      "aircraft": "Airbus A320neo"
+    },
+    {
+      "date": "2026-12-03",
+      "airline": "Cathay Pacific",
+      "flight": "CX 714",
+      "from": "SIN",
+      "to": "HKG",
+      "km": 2566,
+      "aircraft": "Airbus A330-300",
+      "cabin": "Business"
+    },
+    {
+      "date": "2026-12-03",
+      "airline": "Cathay Pacific",
+      "flight": "CX 348",
+      "from": "HKG",
+      "to": "SHA",
+      "km": 1232,
+      "aircraft": "Airbus A330-300",
+      "cabin": "Business"
+    },
+    {
+      "date": "2026-12-07",
+      "airline": "Cathay Pacific",
+      "flight": "CX 381",
+      "from": "PVG",
+      "to": "HKG",
+      "km": 1255,
+      "aircraft": "Boeing 777-300 ER",
+      "cabin": "Business"
+    },
+    {
+      "date": "2026-12-08",
+      "airline": "Cathay Pacific",
+      "flight": "CX 659",
+      "from": "HKG",
+      "to": "SIN",
+      "km": 2566,
+      "aircraft": "Airbus A330-300",
+      "cabin": "Business"
+    }
+  ],
+  "stays": [
+    {
+      "name": "JW Marriott Hotel Kuala Lumpur",
+      "brand": "JW Marriott",
+      "chain": "Marriott",
+      "tag": "JW",
+      "city": "Kuala Lumpur",
+      "country": "MY",
+      "lat": 3.1478,
+      "lon": 101.6953,
+      "checkIn": "2024-07-26",
+      "checkOut": "2024-07-28",
+      "nights": 2
+    },
+    {
+      "name": "Holiday Inn Johor Bahru City Centre",
+      "brand": "Holiday Inn",
+      "chain": "IHG",
+      "tag": "HOLIDAY INN",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2024-08-03",
+      "checkOut": "2024-08-04",
+      "nights": 1
+    },
+    {
+      "name": "Hotel Royal St. Georges Interlaken MGallery",
+      "brand": "MGallery Collection",
+      "chain": "Accor",
+      "tag": "MGALLERY",
+      "city": "Interlaken",
+      "country": "CH",
+      "lat": 46.6863,
+      "lon": 7.8632,
+      "checkIn": "2024-10-08",
+      "checkOut": "2024-10-11",
+      "nights": 3
+    },
+    {
+      "name": "Hilton Paris Opera",
+      "brand": "Hilton Hotels & Resorts",
+      "chain": "Hilton",
+      "tag": "HILTON",
+      "city": "Paris",
+      "country": "FR",
+      "lat": 48.8718,
+      "lon": 2.326,
+      "checkIn": "2024-10-11",
+      "checkOut": "2024-10-15",
+      "nights": 4
+    },
+    {
+      "name": "Hampton by Hilton London Waterloo",
+      "brand": "Hampton by Hilton",
+      "chain": "Hilton",
+      "tag": "HAMPTON",
+      "city": "London",
+      "country": "GB",
+      "lat": 51.5033,
+      "lon": -0.1137,
+      "checkIn": "2024-10-15",
+      "checkOut": "2024-10-18",
+      "nights": 3
+    },
+    {
+      "name": "Hampton by Hilton Istanbul Old City",
+      "brand": "Hampton by Hilton",
+      "chain": "Hilton",
+      "tag": "HAMPTON",
+      "city": "Istanbul",
+      "country": "TR",
+      "lat": 41.0082,
+      "lon": 28.9784,
+      "checkIn": "2024-10-18",
+      "checkOut": "2024-10-21",
+      "nights": 3
+    },
+    {
+      "name": "The Westin Jakarta",
+      "brand": "Westin Hotels & Resorts",
+      "chain": "Marriott",
+      "tag": "WESTIN",
+      "city": "Jakarta",
+      "country": "ID",
+      "lat": -6.2088,
+      "lon": 106.8456,
+      "checkIn": "2024-10-27",
+      "checkOut": "2024-10-31",
+      "nights": 4
+    },
+    {
+      "name": "The Ritz-Carlton Jakarta, Pacific Place",
+      "brand": "The Ritz-Carlton",
+      "chain": "Marriott",
+      "tag": "RITZ-CARLTON",
+      "city": "Jakarta",
+      "country": "ID",
+      "lat": -6.2088,
+      "lon": 106.8456,
+      "checkIn": "2024-10-31",
+      "checkOut": "2024-11-02",
+      "nights": 2
+    },
+    {
+      "name": "Raffles Jakarta",
+      "brand": "Raffles",
+      "chain": "Accor",
+      "tag": "RAFFLES",
+      "city": "Jakarta",
+      "country": "ID",
+      "lat": -6.2088,
+      "lon": 106.8456,
+      "checkIn": "2024-11-02",
+      "checkOut": "2024-11-05",
+      "nights": 3
+    },
+    {
+      "name": "The St. Regis Jakarta",
+      "brand": "St. Regis",
+      "chain": "Marriott",
+      "tag": "ST. REGIS",
+      "city": "Jakarta",
+      "country": "ID",
+      "lat": -6.225,
+      "lon": 106.827,
+      "checkIn": "2024-11-05",
+      "checkOut": "2024-11-09",
+      "nights": 4
+    },
+    {
+      "name": "Four Points by Sheraton Batam",
+      "brand": "Four Points by Sheraton",
+      "chain": "Marriott",
+      "tag": "FOUR POINTS",
+      "city": "Batam",
+      "country": "ID",
+      "lat": 1.1301,
+      "lon": 104.0529,
+      "checkIn": "2024-11-23",
+      "checkOut": "2024-11-24",
+      "nights": 1
+    },
+    {
+      "name": "The Westin Desaru Coast Resort",
+      "brand": "Westin Hotels & Resorts",
+      "chain": "Marriott",
+      "tag": "WESTIN",
+      "city": "Desaru Coast",
+      "country": "MY",
+      "lat": 1.56,
+      "lon": 104.26,
+      "checkIn": "2024-12-14",
+      "checkOut": "2024-12-15",
+      "nights": 1
+    },
+    {
+      "name": "The Ritz-Carlton, Kuala Lumpur",
+      "brand": "The Ritz-Carlton",
+      "chain": "Marriott",
+      "tag": "RITZ-CARLTON",
+      "city": "Kuala Lumpur",
+      "country": "MY",
+      "lat": 3.1478,
+      "lon": 101.6953,
+      "checkIn": "2025-03-01",
+      "checkOut": "2025-03-03",
+      "nights": 2
+    },
+    {
+      "name": "Holiday Inn Express & Suites Johor Bahru",
+      "brand": "Holiday Inn Express",
+      "chain": "IHG",
+      "tag": "HI EXPRESS",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2025-04-05",
+      "checkOut": "2025-04-06",
+      "nights": 1
+    },
+    {
+      "name": "The Athenee Hotel, a Luxury Collection Hotel, Bangkok",
+      "brand": "The Luxury Collection",
+      "chain": "Marriott",
+      "tag": "LUXURY COLL.",
+      "city": "Bangkok",
+      "country": "TH",
+      "lat": 13.74,
+      "lon": 100.548,
+      "checkIn": "2025-05-01",
+      "checkOut": "2025-05-04",
+      "nights": 3
+    },
+    {
+      "name": "The Ritz-Carlton, Bangkok",
+      "brand": "The Ritz-Carlton",
+      "chain": "Marriott",
+      "tag": "RITZ-CARLTON",
+      "city": "Bangkok",
+      "country": "TH",
+      "lat": 13.74,
+      "lon": 100.548,
+      "checkIn": "2025-05-04",
+      "checkOut": "2025-05-05",
+      "nights": 1
+    },
+    {
+      "name": "Holiday Inn Johor Bahru City Centre",
+      "brand": "Holiday Inn",
+      "chain": "IHG",
+      "tag": "HOLIDAY INN",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2025-07-05",
+      "checkOut": "2025-07-06",
+      "nights": 1
+    },
+    {
+      "name": "Holiday Inn Johor Bahru City Centre",
+      "brand": "Holiday Inn",
+      "chain": "IHG",
+      "tag": "HOLIDAY INN",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2025-08-09",
+      "checkOut": "2025-08-11",
+      "nights": 2
+    },
+    {
+      "name": "Holiday Inn Johor Bahru City Centre",
+      "brand": "Holiday Inn",
+      "chain": "IHG",
+      "tag": "HOLIDAY INN",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2025-08-15",
+      "checkOut": "2025-08-16",
+      "nights": 1
+    },
+    {
+      "name": "The Ritz-Carlton, Millenia Singapore",
+      "brand": "The Ritz-Carlton",
+      "chain": "Marriott",
+      "tag": "RITZ-CARLTON",
+      "city": "Singapore",
+      "country": "SG",
+      "lat": 1.2966,
+      "lon": 103.8547,
+      "checkIn": "2025-10-01",
+      "checkOut": "2025-10-02",
+      "nights": 1
+    },
+    {
+      "name": "The Ritz-Carlton Jakarta, Mega Kuningan",
+      "brand": "The Ritz-Carlton",
+      "chain": "Marriott",
+      "tag": "RITZ-CARLTON",
+      "city": "Jakarta",
+      "country": "ID",
+      "lat": -6.2088,
+      "lon": 106.8456,
+      "checkIn": "2025-10-06",
+      "checkOut": "2025-10-09",
+      "nights": 3
+    },
+    {
+      "name": "Park Hyatt Jakarta",
+      "brand": "Park Hyatt",
+      "chain": "Hyatt",
+      "tag": "PARK HYATT",
+      "city": "Jakarta",
+      "country": "ID",
+      "lat": -6.2088,
+      "lon": 106.8456,
+      "checkIn": "2025-10-09",
+      "checkOut": "2025-10-10",
+      "nights": 1
+    },
+    {
+      "name": "Holiday Inn Johor Bahru City Centre",
+      "brand": "Holiday Inn",
+      "chain": "IHG",
+      "tag": "HOLIDAY INN",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2025-10-18",
+      "checkOut": "2025-10-20",
+      "nights": 2
+    },
+    {
+      "name": "Sheraton Hong Kong Hotel & Towers",
+      "brand": "Sheraton",
+      "chain": "Marriott",
+      "tag": "SHERATON",
+      "city": "Hong Kong",
+      "country": "HK",
+      "lat": 22.3027,
+      "lon": 114.1772,
+      "checkIn": "2025-11-02",
+      "checkOut": "2025-11-05",
+      "nights": 3
+    },
+    {
+      "name": "The Ritz-Carlton, Guangzhou",
+      "brand": "The Ritz-Carlton",
+      "chain": "Marriott",
+      "tag": "RITZ-CARLTON",
+      "city": "Guangzhou",
+      "country": "CN",
+      "lat": 23.1291,
+      "lon": 113.3244,
+      "checkIn": "2025-11-05",
+      "checkOut": "2025-11-07",
+      "nights": 2
+    },
+    {
+      "name": "W Guangzhou",
+      "brand": "W Hotels",
+      "chain": "Marriott",
+      "tag": "W",
+      "city": "Guangzhou",
+      "country": "CN",
+      "lat": 23.1291,
+      "lon": 113.3244,
+      "checkIn": "2025-11-07",
+      "checkOut": "2025-11-10",
+      "nights": 3
+    },
+    {
+      "name": "Sheraton Johor Bahru",
+      "brand": "Sheraton",
+      "chain": "Marriott",
+      "tag": "SHERATON",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2025-11-15",
+      "checkOut": "2025-11-16",
+      "nights": 1
+    },
+    {
+      "name": "The Ritz-Carlton, Millenia Singapore",
+      "brand": "The Ritz-Carlton",
+      "chain": "Marriott",
+      "tag": "RITZ-CARLTON",
+      "city": "Singapore",
+      "country": "SG",
+      "lat": 1.2966,
+      "lon": 103.8547,
+      "checkIn": "2025-12-12",
+      "checkOut": "2025-12-14",
+      "nights": 2
+    },
+    {
+      "name": "voco Ma Belle Danang",
+      "brand": "voco",
+      "chain": "IHG",
+      "tag": "VOCO",
+      "city": "Da Nang",
+      "country": "VN",
+      "lat": 16.0544,
+      "lon": 108.2022,
+      "checkIn": "2026-03-20",
+      "checkOut": "2026-03-23",
+      "nights": 3
+    },
+    {
+      "name": "Holiday Inn Johor Bahru City Centre",
+      "brand": "Holiday Inn",
+      "chain": "IHG",
+      "tag": "HOLIDAY INN",
+      "city": "Johor Bahru",
+      "country": "MY",
+      "lat": 1.46,
+      "lon": 103.7634,
+      "checkIn": "2026-06-20",
+      "checkOut": "2026-06-21",
+      "nights": 1
+    },
+    {
+      "name": "Hilton Singapore Orchard",
+      "brand": "Hilton Hotels & Resorts",
+      "chain": "Hilton",
+      "tag": "HILTON",
+      "city": "Singapore",
+      "country": "SG",
+      "lat": 1.2966,
+      "lon": 103.8547,
+      "checkIn": "2026-06-27",
+      "checkOut": "2026-06-30",
+      "nights": 3
+    },
+    {
+      "name": "Sofitel Legend Metropole Hanoi",
+      "brand": "Sofitel",
+      "chain": "Accor",
+      "tag": "SOFITEL",
+      "city": "Hanoi",
+      "country": "VN",
+      "lat": 21.0245,
+      "lon": 105.8541,
+      "checkIn": "2026-08-08",
+      "checkOut": "2026-08-10",
+      "nights": 2
+    },
+    {
+      "name": "Hyatt Centric Delfina Santa Monica",
+      "brand": "Hyatt Centric",
+      "chain": "Hyatt",
+      "tag": "CENTRIC",
+      "city": "Santa Monica",
+      "country": "US",
+      "lat": 34.0195,
+      "lon": -118.4912,
+      "checkIn": "2026-08-28",
+      "checkOut": "2026-08-30",
+      "nights": 2
+    },
+    {
+      "name": "Hyatt House at Anaheim Resort/Convention Center",
+      "brand": "Hyatt House",
+      "chain": "Hyatt",
+      "tag": "HYATT HOUSE",
+      "city": "Anaheim",
+      "country": "US",
+      "lat": 33.8003,
+      "lon": -117.9199,
+      "checkIn": "2026-08-30",
+      "checkOut": "2026-08-31",
+      "nights": 1
+    },
+    {
+      "name": "The Georgian",
+      "brand": "The Unbound Collection by Hyatt",
+      "chain": "Hyatt",
+      "tag": "UNBOUND",
+      "city": "Santa Monica",
+      "country": "US",
+      "lat": 34.0195,
+      "lon": -118.4912,
+      "checkIn": "2026-08-31",
+      "checkOut": "2026-09-01",
+      "nights": 1
+    },
+    {
+      "name": "Inn at the Pier Pismo Beach, Curio Collection by Hilton",
+      "brand": "Curio Collection by Hilton",
+      "chain": "Hilton",
+      "tag": "CURIO",
+      "city": "Pismo Beach",
+      "country": "US",
+      "lat": 35.1428,
+      "lon": -120.6413,
+      "checkIn": "2026-09-01",
+      "checkOut": "2026-09-02",
+      "nights": 1
+    },
+    {
+      "name": "Hyatt Carmel Highlands",
+      "brand": "Hyatt Hotels",
+      "chain": "Hyatt",
+      "tag": "HYATT",
+      "city": "Carmel",
+      "country": "US",
+      "lat": 36.5115,
+      "lon": -121.9387,
+      "checkIn": "2026-09-02",
+      "checkOut": "2026-09-03",
+      "nights": 1
+    },
+    {
+      "name": "AutoCamp Yosemite",
+      "brand": "AutoCamp",
+      "chain": "Hilton",
+      "tag": "AUTOCAMP",
+      "city": "Yosemite",
+      "country": "US",
+      "lat": 37.5449,
+      "lon": -119.9227,
+      "checkIn": "2026-09-03",
+      "checkOut": "2026-09-04",
+      "nights": 1
+    },
+    {
+      "name": "The Ahwahnee",
+      "city": "Yosemite",
+      "country": "US",
+      "lat": 37.746,
+      "lon": -119.5747,
+      "checkIn": "2026-09-04",
+      "checkOut": "2026-09-05",
+      "nights": 1
+    },
+    {
+      "name": "Yosemite View Lodge",
+      "city": "Yosemite",
+      "country": "US",
+      "lat": 37.6749,
+      "lon": -119.7838,
+      "checkIn": "2026-09-05",
+      "checkOut": "2026-09-06",
+      "nights": 1
+    },
+    {
+      "name": "Hyatt Regency San Francisco",
+      "brand": "Hyatt Regency",
+      "chain": "Hyatt",
+      "tag": "REGENCY",
+      "city": "San Francisco",
+      "country": "US",
+      "lat": 37.7946,
+      "lon": -122.3954,
+      "checkIn": "2026-09-06",
+      "checkOut": "2026-09-08",
+      "nights": 2
+    },
+    {
+      "name": "Hyatt Centric Times Square New York",
+      "brand": "Hyatt Centric",
+      "chain": "Hyatt",
+      "tag": "CENTRIC",
+      "city": "New York",
+      "country": "US",
+      "lat": 40.758,
+      "lon": -73.9855,
+      "checkIn": "2026-09-08",
+      "checkOut": "2026-09-13",
+      "nights": 5
+    },
+    {
+      "name": "Alila Seminyak",
+      "brand": "Alila",
+      "chain": "Hyatt",
+      "tag": "ALILA",
+      "city": "Bali",
+      "country": "ID",
+      "lat": -8.6913,
+      "lon": 115.1682,
+      "checkIn": "2026-10-03",
+      "checkOut": "2026-10-05",
+      "nights": 2
+    },
+    {
+      "name": "Hyatt Centric City Centre Kuala Lumpur",
+      "brand": "Hyatt Centric",
+      "chain": "Hyatt",
+      "tag": "CENTRIC",
+      "city": "Kuala Lumpur",
+      "country": "MY",
+      "lat": 3.1478,
+      "lon": 101.6953,
+      "checkIn": "2026-10-31",
+      "checkOut": "2026-11-02",
+      "nights": 2
+    }
+  ],
+  "ground": [
+    {
+      "date": "2017-10-01",
+      "from": "Sydney",
+      "to": "Melbourne",
+      "km": 706,
+      "a": [
+        151.177,
+        -33.9461
+      ],
+      "b": [
+        144.8379,
+        -37.6707
+      ]
+    },
+    {
+      "date": "2019-12-30",
+      "from": "Phnom Penh",
+      "to": "Siem Reap",
+      "km": 236,
+      "a": [
+        104.8447,
+        11.5472
+      ],
+      "b": [
+        103.8121,
+        13.4107
+      ]
+    },
+    {
+      "date": "2023-12-25",
+      "from": "Fukuoka",
+      "to": "Osaka",
+      "km": 452,
+      "a": [
+        130.451,
+        33.5859
+      ],
+      "b": [
+        135.244,
+        34.4273
+      ]
+    },
+    {
+      "date": "2024-10-08",
+      "from": "Zurich",
+      "to": "Interlaken",
+      "km": 100,
+      "a": [
+        8.5481,
+        47.4581
+      ],
+      "b": [
+        7.8632,
+        46.6863
+      ]
+    },
+    {
+      "date": "2024-10-11",
+      "from": "Interlaken",
+      "to": "Paris",
+      "km": 480,
+      "a": [
+        7.8632,
+        46.6863
+      ],
+      "b": [
+        2.326,
+        48.8718
+      ]
+    },
+    {
+      "date": "2024-10-15",
+      "from": "Paris",
+      "to": "London",
+      "km": 340,
+      "a": [
+        2.326,
+        48.8718
+      ],
+      "b": [
+        -0.1137,
+        51.5033
+      ]
+    },
+    {
+      "date": "2025-11-05",
+      "from": "Hong Kong",
+      "to": "Guangzhou",
+      "km": 127,
+      "a": [
+        114.1772,
+        22.3027
+      ],
+      "b": [
+        113.3244,
+        23.1291
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "from": "Santa Monica",
+      "to": "Pismo Beach",
+      "km": 233,
+      "a": [
+        -118.4912,
+        34.0195
+      ],
+      "b": [
+        -120.6413,
+        35.1428
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "from": "Pismo Beach",
+      "to": "Carmel",
+      "km": 192,
+      "a": [
+        -120.6413,
+        35.1428
+      ],
+      "b": [
+        -121.9387,
+        36.5115
+      ]
+    },
+    {
+      "date": "2026-09-03",
+      "from": "Carmel",
+      "to": "Yosemite",
+      "km": 213,
+      "a": [
+        -121.9387,
+        36.5115
+      ],
+      "b": [
+        -119.9227,
+        37.5449
+      ]
+    },
+    {
+      "date": "2026-09-06",
+      "from": "Yosemite",
+      "to": "San Francisco",
+      "km": 230,
+      "a": [
+        -119.7838,
+        37.6749
+      ],
+      "b": [
+        -122.3954,
+        37.7946
+      ]
+    }
+  ]
+}

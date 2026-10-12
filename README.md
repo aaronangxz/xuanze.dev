@@ -20,8 +20,8 @@ You never need to touch the design or code to change content. Edit a file, push,
 | Projects / case studies | `src/content/projects/<slug>.mdx` | Front matter feeds the side panel and search. Projects with `href` link out instead of getting a page |
 | Study notes | `src/content/notes/<Group>/<Note>.md` | Title comes from the first `# Heading` |
 | LeetCode | `src/content/leetcode/<easy\|medium\|hard>/<n>. <Title>.md` | |
-| Flights | `src/content/life/flights.yaml` | `featured: true` also prints a boarding pass (max 3) |
-| Hotels | `src/content/life/stays.yaml` | `photo: /life/<file>.jpg` with the image in `public/life/` |
+| Flights and hotels | Export from Flighty and AwayBook, then `node scripts/travel-import.mjs --flights <csv> --stays <csv>` | Writes `src/data/travel/travel.json` without booking refs, gates or room numbers. City pins, brand tags and stays to skip live in `src/data/travel/config.json`; the import stops and names anything missing |
+| Runs on the map | `src/data/travel/runs.json` | Outdoor runs away from Singapore, from Strava (reduced polyline) |
 | Races | `src/content/life/races.yaml` | One bib per race; `pb: true` adds the stamp |
 | Running totals and PBs | `src/content/life/running.json` | Snapshot from Strava |
 | Polaroids, "Everything else" | `src/content/life/polaroids.yaml`, `shelf.yaml` | |

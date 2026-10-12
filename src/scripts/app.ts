@@ -222,6 +222,7 @@ const LS = $('loverlay') && (() => {
   function go() {
     const it = shown[act]; if (!it) return;
     close(true);
+    if (it.city) { dispatchEvent(new CustomEvent('xz:city', { detail: it.city })); return; }
     const el = document.querySelector(it.sel); if (!el) return;
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
     setTimeout(() => { el.classList.remove('ping'); void el.offsetWidth; el.classList.add('ping'); setTimeout(() => el.classList.remove('ping'), 2800); }, reduce ? 0 : 500);

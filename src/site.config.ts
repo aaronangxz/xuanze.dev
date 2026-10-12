@@ -64,8 +64,6 @@ export const site = {
   life: {
     headline: 'When I’m not shipping code, I’m usually <em>running</em> or <em>on a plane</em>.',
     sub: 'Trips, races and the odd detour. A slower, more personal corner of the site.',
-    /** Cities in the slow-moving strip under the Life hero. */
-    places: ['Bali', 'Yosemite', 'San Francisco', 'New York', 'Hanoi', 'Da Nang', 'Hong Kong', 'Guangzhou', 'Jakarta'],
     /** Upcoming races, soonest first. The first one that hasn't happened yet gets the big countdown; past ones hide themselves. */
     upcoming: [
       { name: 'Garmin Singapore Half Marathon', distance: '21.1 km', date: '2026-10-25' },

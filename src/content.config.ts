@@ -50,47 +50,10 @@ const leetcode = defineCollection({
   schema: z.object({ tags: z.array(z.string()).optional() }).passthrough(),
 });
 
-/* ---------- Life ---------- */
+/* ---------- Life ----------
+   Flights, stays and travel runs are not collections: see src/data/travel/ and scripts/travel-import.mjs. */
 
 const example = z.boolean().default(false);
-
-const flights = defineCollection({
-  loader: file('src/content/life/flights.yaml'),
-  schema: z.object({
-    date: z.string(), // YYYY-MM
-    from: z.string().length(3),
-    to: z.string().length(3),
-    fromCity: z.string(),
-    toCity: z.string(),
-    country: z.string(),
-    flight: z.string().default(''),
-    remark: z.string(),
-    sub: z.string().optional(),
-    /** Featured flights also get a paper boarding pass. */
-    featured: z.boolean().default(false),
-    seat: z.string().optional(),
-    why: z.string().optional(),
-    note: z.string().optional(),
-    /** Derived from Strava locations: double-check the airports, then remove. */
-    confirm: z.boolean().default(false),
-    example,
-  }),
-});
-
-const stays = defineCollection({
-  loader: file('src/content/life/stays.yaml'),
-  schema: z.object({
-    name: z.string(),
-    city: z.string(),
-    nights: z.number().optional(),
-    date: z.string(),
-    note: z.string(),
-    photo: z.string().optional(),
-    tint: z.enum(['p1', 'p2', 'p3', 'p4']).default('p1'),
-    confirm: z.boolean().default(false),
-    example,
-  }),
-});
 
 const races = defineCollection({
   loader: file('src/content/life/races.yaml'),
@@ -123,4 +86,4 @@ const polaroids = defineCollection({
   }),
 });
 
-export const collections = { writing, projects, notes, leetcode, flights, stays, races, shelf, polaroids };
+export const collections = { writing, projects, notes, leetcode, races, shelf, polaroids };

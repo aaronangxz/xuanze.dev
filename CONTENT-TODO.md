@@ -14,8 +14,7 @@ The design is done; these are the facts only you can fill in. Search the repo fo
 - [ ] Side projects: years in `period`
 
 ## Life (`src/content/life/`)
-- [ ] `flights.yaml`: trips were reconstructed from Strava locations. Check the airports, add flight numbers, then remove `confirm: true`
-- [ ] `stays.yaml`: confirm the two hotels, add more, add photos
+- [ ] Hotel logos: swap the text tags for real brand logos (tags come from `brandTags` in `src/data/travel/config.json`)
 - [ ] `polaroids.yaml`: add real photos (`photo: /life/<file>.jpg`), remove `example: true`
 - [ ] `shelf.yaml`: reading, on repeat, hawker order
 - [ ] `races.yaml`: add bib numbers if you kept them
