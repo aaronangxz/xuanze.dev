@@ -1,0 +1,27 @@
+---
+/** A small static map framed on a place or a route. */
+import { miniMap } from '../lib/travel';
+
+interface Props {
+  frame: any; w?: number; h?: number; pad?: number; fine?: boolean;
+  lines?: { coords: [number, number][]; kind?: 'flight' | 'ground' | 'up' }[];
+  pins?: { lon: number; lat: number; label?: string; main?: boolean }[];
+  label?: string;
+}
+const { frame, w = 480, h = 300, pad = 28, fine = true, lines = [], pins = [], label = 'Map' } = Astro.props;
+const m = miniMap(frame, w, h, pad, fine);
+---
+<svg class="mmap" viewBox={`0 0 ${w} ${h}`} role="img" aria-label={label}>
+  <rect width={w} height={h} class="mm-sea" />
+  <path class="mm-land" d={m.land} />
+  {lines.map((l) => <path class:list={['mm-line', l.kind ?? 'flight']} d={m.path({ type: 'LineString', coordinates: l.coords })} />)}
+  {pins.map((p) => {
+    const [x, y] = m.point(p.lon, p.lat);
+    return (
+      <g class:list={['mm-pin', p.main && 'main']} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}>
+        <circle r={p.main ? 5 : 3.5} />
+        {p.label && <text x="9" y="4">{p.label}</text>}
+      </g>
+    );
+  })}
+</svg>

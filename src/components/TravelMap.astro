@@ -27,7 +27,7 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
     <div><dt>runs abroad · {stats.runKm} km</dt><dd>{stats.runs}</dd></div>
   </dl>
 
-  <div class="tm" id="tm" data-region="world" style={`--vbx:${world.x};--vby:${world.y};--vbw:${world.w};--vbh:${world.h};--u:1`}>
+  <div class="tm" id="tm" data-region="world" data-land="lo" style={`--vbx:${world.x};--vby:${world.y};--vbw:${world.w};--vbh:${world.h};--u:1`}>
     <div class="tm-chips" role="group" aria-label="Zoom the map">
       {regions.map((r, i) => <button type="button" data-region={r.id} aria-pressed={i === 0 ? 'true' : 'false'}>{r.label}</button>)}
     </div>
@@ -79,6 +79,11 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
         })}
       </div>
 
+      <div class="tm-zoom" role="group" aria-label="Zoom">
+        <button type="button" data-z="in" aria-label="Zoom in">+</button>
+        <button type="button" data-z="out" aria-label="Zoom out">−</button>
+        <button type="button" data-z="reset" aria-label="Show everything"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div>
       <div class="tm-tip" id="tm-tip" role="status" hidden></div>
       <ul class="tm-legend" aria-hidden="true">
         <li><i class="lg-flown"></i>Flown</li><li><i class="lg-up"></i>Upcoming</li><li><i class="lg-ground"></i>Overland</li>
@@ -90,7 +95,7 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
         <span class="lab">pick a city</span>
         <p>Tap a city to see where I stayed and where I ran. The most-visited:</p>
         <div class="tm-quick">
-          {cities.filter((c) => c.country !== 'Singapore').slice(0, 6).map((c) => <button type="button" data-open={c.slug}>{c.name}</button>)}
+          {cities.filter((c) => c.country !== 'Singapore').slice(0, 6).map((c) => <button type="button" data-goto={c.slug}>{c.name}</button>)}
         </div>
       </div>
     </div>

@@ -5,7 +5,8 @@ import { site } from '../../site.config';
 import running from '../../content/life/running.json';
 import { toJsonScript } from '../../lib/launcher';
 import TravelMap from '../../components/TravelMap.astro';
-import { stats as travelStats, cities, recentFlights, upcomingFlights, allStays, airportCity, runs as travelRuns } from '../../lib/travel';
+import HotelBadge from '../../components/HotelBadge.astro';
+import { stats as travelStats, cities, recentFlights, upcomingFlights, airportCity, runs as travelRuns, hotels, collection, flightId, allFlights } from '../../lib/travel';
 
 const races = (await getCollection('races')).map((r) => ({ id: r.id, ...r.data })).sort((a, b) => a.date.localeCompare(b.date));
 const shelf = (await getCollection('shelf')).map((s) => ({ id: s.id, ...s.data }));
@@ -18,21 +19,23 @@ const niceDay = (ymd: string) => new Date(ymd + 'T00:00:00Z').toLocaleDateString
 const board = recentFlights(8);
 // Boarding passes: the next trip, the longest flight, and the most recent one (no repeats).
 const featured = [...new Map([upcomingFlights[0], travelStats.longest, board[0]].filter(Boolean).map((f) => [`${f.date}${f.flight}`, f])).values()].slice(0, 3);
-const stayYears = [...new Set(allStays.map((s) => s.checkIn.slice(0, 4)))];
-const fmtStayDate = (s: { checkIn: string; checkOut: string }) => `${niceDay(s.checkIn).replace(/ \d{4}$/, '')} – ${niceDay(s.checkOut)}`;
 const stayCities = cities.filter((c) => c.nights > 0 && c.country !== 'Singapore').map((c) => c.name);
 const tilt = [-1.6, 1.2, -0.8, 1.4];
 const PLANE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
 const hasPlaceholders = [...shelf, ...polaroids].some((x) => x.example);
 const upcoming = [...L.upcoming].sort((a, b) => a.date.localeCompare(b.date));
+const nextRace = upcoming.find((r) => r.date >= new Date().toISOString().slice(0, 10));
+const lifeSub = L.sub.replace('{km}', travelStats.km.toLocaleString('en-US')).replace('{nights}', String(travelStats.nights))
+  .replace('{next}', nextRace ? `the ${nextRace.name}` : 'another start line');
 const fmtKm = (n: number) => Math.round(n).toLocaleString('en-US');
 
 const lifeSearch = [
-  ...cities.map((c) => ({ cat: 'CITY', t: c.name, s: [c.country, c.nights ? `${c.nights} nights` : `${c.flights} flights`].join(' · '), k: `city place travel trip ${c.country} ${c.stays.map((s) => `${s.name} ${s.tag ?? ''}`).join(' ')}`, city: c.slug })),
-  ...allStays.map((s, i) => ({ cat: 'STAY', t: s.name, s: `${s.city} · ${niceDay(s.checkIn)}`, k: `hotel stay ${s.city} ${s.brand ?? ''} ${s.chain ?? ''}`, sel: `#st-${i}` })),
-  ...travelRuns.map((r) => ({ cat: 'RUN', t: r.title, s: `${r.city} · ${r.km} km · ${niceDay(r.date)}`, k: `run running strava abroad ${r.city}`, city: r.city.toLowerCase().replace(/[^a-z0-9]+/g, '-') })),
+  ...upcoming.map((r, i) => ({ top: true, cat: 'NEXT', t: r.name, s: `${niceDay(r.date)} · ${r.distance}`, k: `next race upcoming countdown ${r.note ?? ''}`, sel: `#nr-${i}` })),
+  ...cities.map((c, i) => ({ top: i < 6 && c.country !== 'Singapore', cat: 'CITY', t: c.name, s: [c.country, c.nights ? `${c.nights} nights` : `${c.flights} flights`].join(' · '), k: `city place travel trip ${c.country} ${c.stays.map((s) => `${s.name} ${s.tag ?? ''}`).join(' ')}`, city: c.slug })),
+  ...hotels.map((h, i) => ({ top: i >= hotels.length - 3 && !h.upcoming, cat: 'HOTEL', t: h.name, s: `${h.city} · ${h.visits.length > 1 ? `${h.visits.length} stays` : niceDay(h.visits[0].checkIn)}`, k: `hotel stay ${h.city} ${h.brand ?? ''} ${h.chain ?? ''}`, href: `/life/hotels/${h.slug}` })),
+  ...[...allFlights].reverse().map((f) => ({ cat: 'FLIGHT', t: `${f.fromCity} → ${f.toCity}`, s: `${f.flight} · ${niceDay(f.date)}`, k: `flight ${f.from} ${f.to} ${f.airline} ${f.flight.replace(' ', '')} ${f.aircraft ?? ''}`, href: `/life/flights/${f.id}` })),
+  ...travelRuns.map((r, i, all) => ({ top: i >= all.length - 2, cat: 'RUN', t: r.title, s: `${r.city} · ${r.km} km · ${niceDay(r.date)}`, k: `run running strava abroad ${r.city}`, city: r.city.toLowerCase().replace(/[^a-z0-9]+/g, '-') })),
   ...races.map((r) => ({ cat: 'RACE', t: r.name, s: `${r.time}${r.pb ? ' · PB' : ''}`, k: `race run ${r.label} ${r.distance} half marathon`, sel: `#r-${r.id}` })),
-  ...upcoming.map((r, i) => ({ cat: 'NEXT', t: r.name, s: `${niceDay(r.date)} · ${r.distance}`, k: `next race upcoming countdown ${r.note ?? ''}`, sel: `#nr-${i}` })),
   ...running.pbs.map((p) => ({ cat: 'PB', t: p.label, s: p.time, k: `personal best pb ${p.note}`, sel: '.pbs' })),
   ...shelf.map((s) => ({ cat: 'NOTE', t: s.label, s: s.value, k: s.value, sel: `#sh-${s.id}` })),
   { cat: 'NOTE', t: 'Polaroids', s: polaroids.map((p) => p.caption).join(' · '), k: 'photos polaroid', sel: '.polaroids' },
@@ -43,7 +46,7 @@ const lifeSearch = [
     <section class="l-hero" aria-labelledby="l-h1">
       <span class="l-kicker rise">off the clock</span>
       <h1 class="l-h1 rise" style="--d:1" id="l-h1" set:html={L.headline} />
-      <p class="l-sub rise" style="--d:2">{L.sub}</p>
+      <p class="l-sub rise" style="--d:2">{lifeSub}</p>
       <dl class="l-stats rise" style="--d:3">
         <div><dt>countries visited</dt><dd>{travelStats.countries}</dd></div>
         <div><dt>flights flown</dt><dd>{travelStats.flights}</dd></div>
@@ -69,13 +72,13 @@ const lifeSearch = [
             <span class="flaps" data-flap={f.from}></span>
             <span class="flaps" data-flap={f.to}></span>
             <span class="flaps" data-flap={f.flight.replace(' ', '').padEnd(6, ' ').slice(0, 6)}></span>
-            <span class="rmk" role="cell">{airportCity(f.to)}<small>{[f.airline, f.aircraft].filter(Boolean).join(' · ')}</small></span>
+            <a class="rmk" role="cell" href={`/life/flights/${flightId(f)}`}>{airportCity(f.to)}<small>{[f.airline, f.aircraft].filter(Boolean).join(' · ')}</small></a>
           </div>
         ))}
       </div>
       <div class="passes">
         {featured.map((f, i) => (
-          <article class="pass" style={`--r:${tilt[i]}deg`}>
+          <a class="pass" style={`--r:${tilt[i]}deg`} href={`/life/flights/${flightId(f)}`}>
             <div class="pass-main">
               <div class="pass-top"><span>{f === upcomingFlights[0] ? 'NEXT FLIGHT' : f === travelStats.longest ? 'LONGEST FLIGHT' : 'LATEST FLIGHT'}</span><span><i>●</i> {f.flight}</span></div>
               <div class="pass-route">
@@ -90,26 +93,26 @@ const lifeSearch = [
               </div>
             </div>
             <div class="pass-stub"><span>{f.airline}</span><p>{[f.aircraft, `${f.km.toLocaleString('en-US')} km`].filter(Boolean).join(' · ')}</p><div class="barcode" aria-hidden="true"></div></div>
-          </article>
+          </a>
         ))}
       </div>
     </section>
 
     <section id="l-stays" aria-labelledby="l-stays-h">
-      <div class="l-head"><span class="l-no">03</span><h2 id="l-stays-h">Stay log</h2><p>{travelStats.hotels} hotels, {travelStats.nights} nights since mid-2024.</p></div>
-      <div class="staylog">
-        {stayYears.map((y) => (
-          <div class="sl-year">
-            <h3>{y}</h3>
-            <ul>
-              {allStays.map((s, i) => s.checkIn.startsWith(y) && (
-                <li id={`st-${i}`} class:list={[s.upcoming && 'up']}>
-                  <span class="htag" data-chain={s.chain?.toLowerCase()}>{s.tag ?? 'INDEPENDENT'}</span>
-                  <div><b>{s.name}</b><small>{s.city} · {fmtStayDate(s)} · {s.nights} night{s.nights > 1 ? 's' : ''}{s.upcoming ? ' · upcoming' : ''}</small></div>
-                </li>
+      <div class="l-head"><span class="l-no">03</span><h2 id="l-stays-h">The hotel collection</h2><p>{hotels.filter((h) => !h.upcoming).length} hotels across {collection.filter((c) => c.chain !== 'Independent').length} chains, {travelStats.nights} nights since mid-2024. Tap one for photos and notes.</p></div>
+      <div class="hcoll">
+        {collection.map((c) => (
+          <section class="hc-chain" data-chain={c.chain.toLowerCase()} aria-label={c.chain}>
+            <header><h3>{c.chain}</h3><span>{c.hotels} hotel{c.hotels > 1 ? 's' : ''} · {c.nights} night{c.nights === 1 ? '' : 's'}</span></header>
+            <div class="hc-brands">
+              {c.brands.map((b) => (
+                <div class="hc-brand">
+                  <span class="hc-bname">{b.brand}</span>
+                  <div class="hc-badges">{b.hotels.map((h) => <HotelBadge hotel={h} />)}</div>
+                </div>
               ))}
-            </ul>
-          </div>
+            </div>
+          </section>
         ))}
       </div>
     </section>

@@ -71,6 +71,21 @@ const races = defineCollection({
   }),
 });
 
+/**
+ * Notes, a rating and photos for a hotel or a flight. One folder per entry:
+ *   src/content/journal/hotels/<hotel-slug>/index.md   (slug is shown at the bottom of the hotel's page)
+ *   src/content/journal/flights/<yyyy-mm-dd-flight>/index.md
+ * Photos go in the same folder and are listed in `photos`.
+ */
+const journal = defineCollection({
+  loader: glob({ pattern: '{hotels,flights}/*/index.{md,mdx}', base: './src/content/journal' }),
+  schema: ({ image }) => z.object({
+    rating: z.number().min(0).max(5).optional(),
+    title: z.string().optional(),
+    photos: z.array(z.object({ src: image(), alt: z.string().default(''), caption: z.string().optional() })).default([]),
+  }),
+});
+
 const shelf = defineCollection({
   loader: file('src/content/life/shelf.yaml'),
   schema: z.object({ label: z.string(), value: z.string(), example }),
@@ -86,4 +101,4 @@ const polaroids = defineCollection({
   }),
 });
 
-export const collections = { writing, projects, notes, leetcode, races, shelf, polaroids };
+export const collections = { writing, projects, notes, leetcode, races, shelf, polaroids, journal };

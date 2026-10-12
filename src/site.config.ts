@@ -62,8 +62,9 @@ export const site = {
   ],
 
   life: {
-    headline: 'When I’m not shipping code, I’m usually <em>running</em> or <em>on a plane</em>.',
-    sub: 'Trips, races and the odd detour. A slower, more personal corner of the site.',
+    headline: 'Somewhere between a <em>departure gate</em> and a <em>start line.</em>',
+    /** Under the headline. {km}, {nights} and {next} are filled in from the travel and race data. */
+    sub: '{km} km flown, {nights} nights in hotels, and {next} next.',
     /** Upcoming races, soonest first. The first one that hasn't happened yet gets the big countdown; past ones hide themselves. */
     upcoming: [
       { name: 'Garmin Singapore Half Marathon', distance: '21.1 km', date: '2026-10-25' },

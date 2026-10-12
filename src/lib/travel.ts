@@ -2,7 +2,7 @@
  * Everything the Life page knows about travel, computed at build time from
  * src/data/travel/travel.json (scripts/travel-import.mjs) and runs.json (Strava).
  */
-import { geoNaturalEarth1, geoPath, geoClipRectangle } from 'd3-geo';
+import { geoNaturalEarth1, geoPath, geoClipRectangle, geoBounds } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import land110 from 'world-atlas/land-110m.json';
 import land50 from 'world-atlas/land-50m.json';
@@ -149,7 +149,7 @@ const countryName = (code: string) => (config.countries as Record<string, string
 export type City = {
   slug: string; name: string; country: string; x: number; y: number;
   nights: number; flights: number; upcoming: boolean; years: string;
-  stays: { name: string; tag?: string; chain?: string; checkIn: string; checkOut: string; nights: number; upcoming: boolean }[];
+  stays: { name: string; slug: string; tag?: string; chain?: string; checkIn: string; checkOut: string; nights: number; upcoming: boolean }[];
   runs: Run[];
 };
 const cityMap = new Map<string, { pts: [number, number][]; country: string; stays: Stay[]; flights: Flight[] }>();
@@ -175,7 +175,7 @@ export const cities: City[] = [...cityMap.entries()].map(([name, c]) => {
     flights: c.flights.filter((f) => !isUpcoming(f.date)).length,
     upcoming: dates.length === 0,
     years: !y0 ? 'upcoming' : y0 === y1 ? y0 : `${y0}–${y1}`,
-    stays: c.stays.map((s) => ({ name: s.name, tag: s.tag, chain: s.chain, checkIn: s.checkIn, checkOut: s.checkOut, nights: s.nights, upcoming: isUpcoming(s.checkIn) })).reverse(),
+    stays: c.stays.map((s) => ({ name: s.name, slug: slug(s.name), tag: s.tag, chain: s.chain, checkIn: s.checkIn, checkOut: s.checkOut, nights: s.nights, upcoming: isUpcoming(s.checkIn) })).reverse(),
     runs: runs.filter((r) => r.city === name).reverse(),
   };
 }).sort((a, b) => b.nights - a.nights || b.flights - a.flights);
@@ -205,3 +205,73 @@ export const recentFlights = (n: number) => flown.slice(-n).reverse();
 export const upcomingFlights = travel.flights.filter((f) => isUpcoming(f.date));
 export const allStays = [...travel.stays].reverse().map((s) => ({ ...s, upcoming: isUpcoming(s.checkIn) }));
 export { travel };
+
+/* ---------- hotels (one per property; repeat stays are visits) and flight pages ---------- */
+
+export type Hotel = {
+  slug: string; name: string; brand?: string; tag?: string; chain?: string; city: string; country: string;
+  lat: number; lon: number; visits: (Stay & { upcoming: boolean })[]; nights: number; upcoming: boolean; years: string;
+};
+export const hotels: Hotel[] = (() => {
+  const by = new Map<string, Hotel>();
+  for (const s of travel.stays) {
+    const h = by.get(s.name) ?? { slug: slug(s.name), name: s.name, brand: s.brand, tag: s.tag, chain: s.chain, city: s.city, country: s.country, lat: s.lat, lon: s.lon, visits: [], nights: 0, upcoming: true, years: '' };
+    const up = isUpcoming(s.checkIn);
+    h.visits.push({ ...s, upcoming: up });
+    if (!up) { h.nights += s.nights; h.upcoming = false; }
+    by.set(s.name, h);
+  }
+  return [...by.values()].map((h) => {
+    const ys = [...new Set(h.visits.map((v) => v.checkIn.slice(0, 4)))].sort();
+    return { ...h, visits: h.visits.sort((a, b) => b.checkIn.localeCompare(a.checkIn)), years: ys.length > 1 ? `${ys[0]}–${ys[ys.length - 1]}` : ys[0] };
+  });
+})();
+export const hotelBySlug = Object.fromEntries(hotels.map((h) => [h.slug, h]));
+export const hotelSlug = (name: string) => slug(name);
+export const countryLabel = countryName;
+
+/** Chains in order of nights, each with its brands (most nights first). Independent hotels last. */
+export const collection = (() => {
+  const chains = new Map<string, Map<string, Hotel[]>>();
+  for (const h of hotels) {
+    const c = h.chain ?? 'Independent', b = h.brand ?? 'Independent';
+    if (!chains.has(c)) chains.set(c, new Map());
+    const brands = chains.get(c)!;
+    brands.set(b, [...(brands.get(b) ?? []), h]);
+  }
+  const nights = (hs: Hotel[]) => hs.reduce((a, h) => a + h.nights, 0);
+  return [...chains.entries()].map(([chain, brands]) => ({
+    chain,
+    hotels: [...brands.values()].flat().length,
+    nights: nights([...brands.values()].flat()),
+    brands: [...brands.entries()].map(([brand, hs]) => ({ brand, hotels: hs.sort((a, b) => b.nights - a.nights) })).sort((a, b) => nights(b.hotels) - nights(a.hotels)),
+  })).sort((a, b) => (a.chain === 'Independent' ? 1 : b.chain === 'Independent' ? -1 : b.nights - a.nights));
+})();
+
+export const flightId = (f: Flight) => `${f.date}-${f.flight.replace(/\s+/g, '').toLowerCase()}`;
+export const allFlights = travel.flights.map((f) => ({ ...f, id: flightId(f), upcoming: isUpcoming(f.date), fromCity: airports[f.from].city, toCity: airports[f.to].city }));
+export const airportInfo = (code: string) => ({ code, ...airports[code], countryName: countryName(airports[code].country) });
+
+/** Runs done in a city during a date range (inclusive), for hotel pages. */
+export const runsDuring = (city: string, from: string, to: string) => runs.filter((r) => r.city === city && r.date >= from && r.date <= to);
+
+/* ---------- small static maps for the detail pages ---------- */
+
+const landFine = feature(land50 as any, (land50 as any).objects.land) as any;
+const landCoarse = feature(landTopo, landTopo.objects.land) as any;
+/** A small map framed on some geometry: land clipped to the frame so each page carries only what it shows. */
+export function miniMap(geom: any, w: number, h: number, pad = 24, fine = true) {
+  // Centre the projection on what's shown, so no route is cut by the map's seam.
+  const [[x0], [x1]] = geoBounds(geom);
+  const mid = x0 <= x1 ? (x0 + x1) / 2 : (x0 + x1 + 360) / 2;
+  const pr = geoNaturalEarth1().rotate([-mid, 0]).fitExtent([[pad, pad], [w - pad, h - pad]], geom);
+  const clip = pr.postclip(geoClipRectangle(-2, -2, w + 2, h + 2));
+  const p = geoPath(clip).digits(1);
+  return { land: p(fine ? landFine : landCoarse) ?? '', path: (g: any) => p(g) ?? '', point: (lon: number, lat: number) => pr([lon, lat]) as [number, number] };
+}
+/** A box of `km` around a point, to frame a mini map on. */
+export const around = (lon: number, lat: number, km: number) => {
+  const dLat = km / 111, dLon = km / (111 * Math.cos((lat * Math.PI) / 180));
+  // Corner points, not a polygon: d3 reads polygon winding, and the wrong winding means "everything but the box".
+  return { type: 'MultiPoint', coordinates: [[lon - dLon, lat - dLat], [lon + dLon, lat - dLat], [lon + dLon, lat + dLat], [lon - dLon, lat + dLat]] };
+};

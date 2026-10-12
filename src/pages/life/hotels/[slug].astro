@@ -1,0 +1,76 @@
+---
+import Base from '../../../layouts/Base.astro';
+import HotelBadge from '../../../components/HotelBadge.astro';
+import MiniMap from '../../../components/MiniMap.astro';
+import JournalBlock from '../../../components/JournalBlock.astro';
+import { hotels, collection, countryLabel, runsDuring, around, type Hotel } from '../../../lib/travel';
+
+export function getStaticPaths() {
+  // Collection order, so prev/next walks the badges the way the Life page shows them.
+  const order = collection.flatMap((c) => c.brands.flatMap((b) => b.hotels));
+  return order.map((h, i) => ({ params: { slug: h.slug }, props: { hotel: h, prev: order[i - 1], next: order[i + 1] } }));
+}
+interface Props { hotel: Hotel; prev?: Hotel; next?: Hotel }
+const { hotel: h, prev, next } = Astro.props;
+
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const day = (d: string) => { const [y, m, dd] = d.split('-'); return `${+dd} ${MON[+m - 1]} ${y}`; };
+const country = countryLabel(h.country);
+const runs = h.visits.flatMap((v) => runsDuring(h.city, v.checkIn, v.checkOut));
+const neighbours = hotels.filter((o) => o.city === h.city && o.slug !== h.slug);
+const kicker = [h.chain ?? 'Independent', h.brand && h.brand !== h.name ? h.brand : null].filter(Boolean).join(' · ');
+---
+<Base title={h.name} mode="life" description={`${h.name}, ${h.city}: stays, notes and photos.`}>
+  <article class="page dpage">
+    <a class="d-back" href="/life#l-stays">← The hotel collection</a>
+    <header class="d-hero">
+      <HotelBadge hotel={h} size={150} link={false} />
+      <div>
+        <span class="l-kicker">{kicker}</span>
+        <h1 class="d-h1">{h.name}</h1>
+        <p class="d-meta">{h.city}, {country} · {h.visits.length} stay{h.visits.length > 1 ? 's' : ''}{!h.upcoming && ` · ${h.nights} night${h.nights > 1 ? 's' : ''}`} · {h.upcoming ? 'upcoming' : h.years}</p>
+      </div>
+    </header>
+
+    <div class="d-grid">
+      <div class="d-main">
+        <JournalBlock kind="hotels" slug={h.slug} empty={h.upcoming ? 'Not been yet. Notes after the stay.' : 'No notes or photos for this one yet.'} />
+        {runs.length > 0 && (
+          <section class="d-runs" aria-label="Runs during the stay">
+            <span class="lab">runs from here</span>
+            <div class="tp-runs">
+              {runs.map((r) => (
+                <figure class:list={['run', r.race && 'race']}>
+                  <svg viewBox={r.vb} aria-hidden="true"><path d={r.d} /></svg>
+                  <figcaption><b>{r.title}</b><small>{r.km} km · {day(r.date)}</small></figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+      <aside class="d-side">
+        <MiniMap frame={around(h.lon, h.lat, 450)} pins={[{ lon: h.lon, lat: h.lat, label: h.city, main: true }]} label={`${h.city} on a map`} />
+        <div class="d-card">
+          <span class="lab">stays</span>
+          <ul class="d-visits">
+            {h.visits.map((v) => (
+              <li class:list={[v.upcoming && 'up']}><b>{day(v.checkIn)}</b><span>{v.nights} night{v.nights > 1 ? 's' : ''}{v.upcoming ? ' · upcoming' : ''}</span></li>
+            ))}
+          </ul>
+        </div>
+        {neighbours.length > 0 && (
+          <div class="d-card">
+            <span class="lab">also in {h.city}</span>
+            <div class="d-neighbours">{neighbours.map((o) => <HotelBadge hotel={o} size={72} />)}</div>
+          </div>
+        )}
+      </aside>
+    </div>
+
+    <nav class="d-pager" aria-label="More hotels">
+      {prev ? <a href={`/life/hotels/${prev.slug}`}><span>Previous</span><b>{prev.name}</b></a> : <span />}
+      {next ? <a class="nx" href={`/life/hotels/${next.slug}`}><span>Next</span><b>{next.name}</b></a> : <span />}
+    </nav>
+  </article>
+</Base>

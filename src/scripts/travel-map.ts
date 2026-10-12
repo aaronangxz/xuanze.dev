@@ -32,8 +32,20 @@ function init(tm) {
     if (h <= world.h) y = Math.min(Math.max(y, world.y), world.y + world.h - h);
     return { x, y, w, h };
   }
+  // Which sharper coastline (if any) suits this view: the smallest region that holds its centre.
+  const HI = ['sea', 'europe', 'us', 'asia'];
+  function landFor(v) {
+    const cx = v.x + v.w / 2, cy = v.y + v.h / 2;
+    for (const id of HI) {
+      const r = data.regions[id];
+      if (v.w <= r.w * 1.9 && cx > r.x - r.w * 0.2 && cx < r.x + r.w * 1.2 && cy > r.y - r.h * 0.2 && cy < r.y + r.h * 1.2) return id;
+    }
+    return 'lo';
+  }
   function apply(v) {
     vb = v;
+    const land = landFor(v);
+    if (tm.dataset.land !== land) { tm.dataset.land = land; if (land !== 'lo') loadLand(); }
     svg.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
     tm.style.setProperty('--vbx', v.x); tm.style.setProperty('--vby', v.y);
     tm.style.setProperty('--vbw', v.w); tm.style.setProperty('--vbh', v.h);
@@ -71,7 +83,6 @@ function init(tm) {
   }
   tm.addEventListener('pointerenter', loadLand, { once: true });
   function setRegion(id, opts = {}) {
-    if (id !== 'world') loadLand();
     region = id;
     tm.dataset.region = id;
     tm.querySelectorAll('.tm-chips button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.region === id)));
@@ -151,6 +162,102 @@ function init(tm) {
   });
   svg.addEventListener('pointerleave', hideTip);
 
+  /* ---------- free zoom: wheel, drag, pinch, buttons ---------- */
+  const MIN_W = data.regions.sea.w / 6;
+  // Keep a free view inside the world and between the zoom limits.
+  function clamp(v) {
+    const world = data.regions.world, ar = v.w / v.h;
+    const maxW = Math.max(fitted(world).w, world.w);
+    let w = Math.min(Math.max(v.w, MIN_W), maxW), h = w / ar;
+    let x = v.x + (v.w - w) / 2, y = v.y + (v.h - h) / 2;
+    if (w >= world.w) x = world.x - (w - world.w) / 2; else x = Math.min(Math.max(x, world.x), world.x + world.w - w);
+    if (h >= world.h) y = world.y - (h - world.h) / 2; else y = Math.min(Math.max(y, world.y), world.y + world.h - h);
+    return { x, y, w, h };
+  }
+  function goFree() {
+    if (region === 'free' || region === 'city') return;
+    region = 'free';
+    tm.dataset.region = 'free';
+    tm.querySelectorAll('.tm-chips button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+  }
+  let settleT = 0;
+  const settleSoon = () => { tm.classList.add('moving'); clearTimeout(settleT); settleT = setTimeout(settle, 160); };
+  // Zoom by factor k (>1 zooms in) around a point given in stage pixels.
+  function zoomAt(k, px, py) {
+    cancelAnimationFrame(anim);
+    const fx = px / stage.clientWidth, fy = py / stage.clientHeight;
+    const w = vb.w / k, h = vb.h / k;
+    apply(clamp({ x: vb.x + (vb.w - w) * fx, y: vb.y + (vb.h - h) * fy, w, h }));
+    goFree(); settleSoon(); hideTip();
+  }
+  function panBy(dx, dy) {
+    cancelAnimationFrame(anim);
+    const s = vb.w / stage.clientWidth;
+    apply(clamp({ ...vb, x: vb.x - dx * s, y: vb.y - dy * s }));
+    goFree(); settleSoon(); hideTip();
+  }
+
+  // Wheel / trackpad. If the page was being scrolled when the map slid under the cursor, keep scrolling the page.
+  let lastPageScroll = 0;
+  addEventListener('scroll', () => { lastPageScroll = performance.now(); }, { passive: true });
+  stage.addEventListener('wheel', (ev) => {
+    if (performance.now() - lastPageScroll < 350) return;
+    const zoomOut = ev.deltaY > 0;
+    const atMax = vb.w >= Math.max(fitted(data.regions.world).w, data.regions.world.w) - 1;
+    if (zoomOut && atMax && !ev.ctrlKey) return; // fully out: let the page scroll on
+    ev.preventDefault();
+    const r = stage.getBoundingClientRect();
+    if (!ev.ctrlKey && Math.abs(ev.deltaX) > Math.abs(ev.deltaY) * 1.5) { panBy(-ev.deltaX, 0); return; }
+    const unit = ev.deltaMode === 1 ? 16 : 1;
+    zoomAt(Math.exp(-ev.deltaY * unit * (ev.ctrlKey ? 0.012 : 0.0022)), ev.clientX - r.left, ev.clientY - r.top);
+  }, { passive: false });
+
+  // Drag to pan (mouse, or one finger sideways); two fingers pinch.
+  const pts = new Map();
+  let dragMoved = 0, pinch = null;
+  stage.addEventListener('pointerdown', (ev) => {
+    if (ev.target.closest('.tm-zoom')) return;
+    pts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    dragMoved = 0;
+    if (pts.size === 2) {
+      const [a, b] = [...pts.values()];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+    }
+  });
+  stage.addEventListener('pointermove', (ev) => {
+    const p = pts.get(ev.pointerId);
+    if (!p) return;
+    const dx = ev.clientX - p.x, dy = ev.clientY - p.y;
+    p.x = ev.clientX; p.y = ev.clientY;
+    if (pts.size >= 2 && pinch) {
+      const [a, b] = [...pts.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      const r = stage.getBoundingClientRect();
+      zoomAt(d / pinch.d, mx - r.left, my - r.top);
+      panBy(mx - pinch.mx, my - pinch.my);
+      pinch = { d, mx, my };
+      dragMoved += 10;
+      return;
+    }
+    // A finger drags the map sideways only; vertical swipes belong to the page.
+    if (ev.pointerType === 'touch' && Math.abs(dy) > Math.abs(dx)) return;
+    dragMoved += Math.abs(dx) + Math.abs(dy);
+    if (dragMoved > 4) { stage.classList.add('dragging'); if (!stage.hasPointerCapture(ev.pointerId)) stage.setPointerCapture?.(ev.pointerId); panBy(dx, ev.pointerType === 'touch' ? 0 : dy); }
+  });
+  const endPtr = (ev) => { pts.delete(ev.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) stage.classList.remove('dragging'); };
+  stage.addEventListener('pointerup', endPtr);
+  stage.addEventListener('pointercancel', endPtr);
+  // A drag that ends on a city must not also open it.
+  stage.addEventListener('click', (ev) => { if (dragMoved > 4) { ev.stopPropagation(); ev.preventDefault(); dragMoved = 0; } }, true);
+  stage.addEventListener('dblclick', (ev) => { const r = stage.getBoundingClientRect(); zoomAt(2, ev.clientX - r.left, ev.clientY - r.top); });
+
+  tm.querySelector('.tm-zoom')?.addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-z]');
+    if (!b) return;
+    if (b.dataset.z === 'reset') { setRegion(small() ? 'asia' : 'world'); return; }
+    zoomAt(b.dataset.z === 'in' ? 1.8 : 1 / 1.8, stage.clientWidth / 2, stage.clientHeight / 2);
+  });
+
   /* ---------- city panel ---------- */
   function renderCity(c) {
     const head = `<div class="tp-head"><div><span class="lab">${esc(c.country)}</span><h3>${esc(c.name)}</h3></div>
@@ -158,7 +265,7 @@ function init(tm) {
       <p class="tp-sub">${[c.flights ? `${c.flights} flight${c.flights > 1 ? 's' : ''}` : '', c.nights ? `${c.nights} night${c.nights > 1 ? 's' : ''} in hotels` : '', c.runs.length ? `${c.runs.length} run${c.runs.length > 1 ? 's' : ''}` : '', c.years].filter(Boolean).join(' · ')}</p>`;
     const stays = c.stays.length ? `<ul class="tp-stays">${c.stays.map((s) => `<li class="${s.upcoming ? 'up' : ''}">
         ${s.tag ? `<span class="htag" data-chain="${esc(s.chain?.toLowerCase())}">${esc(s.tag)}</span>` : '<span class="htag indie">INDEPENDENT</span>'}
-        <div><b>${esc(s.name)}</b><small>${day(s.checkIn)} · ${s.nights} night${s.nights > 1 ? 's' : ''}${s.upcoming ? ' · upcoming' : ''}</small></div></li>`).join('')}</ul>`
+        <div><a href="/life/hotels/${esc(s.slug)}"><b>${esc(s.name)}</b></a><small>${day(s.checkIn)} · ${s.nights} night${s.nights > 1 ? 's' : ''}${s.upcoming ? ' · upcoming' : ''}</small></div></li>`).join('')}</ul>`
       : c.flights ? '<p class="tp-note">Passed through, no hotel on record.</p>' : '';
     const runs = c.runs.length ? `<div class="tp-runs">${c.runs.map((r) => `<figure class="run${r.race ? ' race' : ''}">
         <svg viewBox="${r.vb}" aria-hidden="true"><path d="${r.d}" /></svg>
@@ -196,8 +303,8 @@ function init(tm) {
     if (chip) { setRegion(chip.dataset.region); return; }
     const city = ev.target.closest('.tm-city');
     if (city) { openCity(city.dataset.city); return; }
-    const quick = ev.target.closest('[data-open]');
-    if (quick) { openCity(quick.dataset.open); stage.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }); return; }
+    const quick = ev.target.closest('[data-goto]');
+    if (quick) { openCity(quick.dataset.goto); stage.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }); return; }
     if (ev.target.closest('[data-close]')) { closeCity(); setRegion(region === 'city' ? 'world' : region); }
   });
   // Life search ("Where to?") can ask the map to show a city.
@@ -209,7 +316,7 @@ function init(tm) {
   const ro = new ResizeObserver(() => {
     if (Math.abs(stage.clientWidth - lastW) < 2) return;
     lastW = stage.clientWidth;
-    if (region === 'city' && openSlug) { apply(fitted(vb)); settle(); return; }
+    if (region === 'city' || region === 'free') { apply(clamp(fitted(vb))); settle(); return; }
     apply(fitted(data.regions[region])); settle();
   });
   // Phones open on Asia, where most of the map's ink is.

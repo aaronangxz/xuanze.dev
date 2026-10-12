@@ -203,7 +203,11 @@ const LS = $('loverlay') && (() => {
 
   function render(animate) {
     const q = lq.value.trim().toLowerCase();
-    shown = litems.filter((it) => !q || (it.t + ' ' + it.s + ' ' + it.k + ' ' + it.cat).toLowerCase().includes(q));
+    // Nothing typed: a short starter list. Typed: every match, best first (title start, title, anywhere).
+    const rank = (it) => { const t = it.t.toLowerCase(); return t.startsWith(q) ? 0 : t.includes(q) ? 1 : 2; };
+    shown = !q ? litems.filter((it) => it.top)
+      : litems.map((it, i) => ({ it, i })).filter(({ it }) => (it.t + ' ' + it.s + ' ' + it.k + ' ' + it.cat).toLowerCase().includes(q))
+        .sort((a, b) => rank(a.it) - rank(b.it) || a.i - b.i).map(({ it }) => it);
     if (act >= shown.length) act = 0;
     llist.innerHTML = shown.length
       ? shown.map((it, i) => `<li class="lopt" role="option" id="lo${i}" data-i="${i}" aria-selected="${i === act}"><span class="cat">${it.cat}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`).join('')
@@ -222,6 +226,7 @@ const LS = $('loverlay') && (() => {
   function go() {
     const it = shown[act]; if (!it) return;
     close(true);
+    if (it.href) { location.href = it.href; return; }
     if (it.city) { dispatchEvent(new CustomEvent('xz:city', { detail: it.city })); return; }
     const el = document.querySelector(it.sel); if (!el) return;
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
@@ -328,19 +333,19 @@ function slideTo(toMode, href) {
 
   const pg = document.querySelector('.page');
   const mods = pg ? visibleMods(pg) : [];
-  const step = 45, exitDur = 440;
+  // Short and tight: the stagger stops growing after five modules so a long page doesn't take longer to leave.
+  const step = 30, exitDur = 320;
   mods.forEach((m, i) => m.animate(
-    [{ transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }, { transform: `translateX(${dir * (90 + i * 80)}px)`, opacity: 0, filter: 'blur(10px)' }],
-    { duration: exitDur, delay: i * step, easing: OUT, fill: 'forwards' }));
-  navLinks().forEach((l, i) => l.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${dir * 24}px)`, opacity: 0 }], { duration: 260, delay: i * 30, easing: OUT, fill: 'forwards' }));
-  const amb = document.querySelector('.ambient'), glow = document.querySelector('.life-glow');
-  (dir < 0 ? amb : glow).animate([{ transform: 'translateX(0)' }, { transform: `translateX(${dir * 16}vw)` }], { duration: 900, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' });
+    [{ transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }, { transform: `translateX(${dir * (80 + Math.min(i, 5) * 60)}px)`, opacity: 0, filter: 'blur(8px)' }],
+    { duration: exitDur, delay: Math.min(i, 5) * step, easing: OUT, fill: 'forwards' }));
+  navLinks().forEach((l, i) => l.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${dir * 24}px)`, opacity: 0 }], { duration: 220, delay: i * 25, easing: OUT, fill: 'forwards' }));
 
-  const total = exitDur + Math.max(0, mods.length - 1) * step;
-  // Halfway through, start shifting the page colours to the other side so the reload lands on matching colours.
-  setTimeout(() => { if (toMode === 'life') root.setAttribute('data-mode', 'life'); else root.removeAttribute('data-mode'); }, total * 0.6);
+  const total = exitDur + Math.min(Math.max(0, mods.length - 1), 5) * step;
+  // The backgrounds never move (sliding them showed their edges); they crossfade as the page colours switch.
+  setTimeout(() => { if (toMode === 'life') root.setAttribute('data-mode', 'life'); else root.removeAttribute('data-mode'); }, total * 0.4);
   ss.set('xz-slide', toMode);
-  setTimeout(() => { location.href = href; }, total + 260);
+  // Start loading just before the exit ends: the old page stays on screen until the new one is ready.
+  setTimeout(() => { location.href = href; }, Math.max(0, total - 60));
 }
 
 // Arriving on the other side: swipe the new modules in from the opposite edge.
@@ -352,11 +357,9 @@ if (root.classList.contains('slide-in')) {
   if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
   const mods = pg ? visibleMods(pg) : [];
   mods.forEach((m, i) => m.animate(
-    [{ transform: `translateX(${-dir * (200 + i * 110)}px)`, opacity: 0, filter: 'blur(10px)' }, { transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }],
-    { duration: 760, delay: i * 70, easing: IN, fill: 'backwards' }));
-  navLinks().forEach((l, i) => l.animate([{ transform: `translateX(${-dir * 28}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 520, delay: 120 + i * 50, easing: IN, fill: 'backwards' }));
-  const amb = document.querySelector('.ambient'), glow = document.querySelector('.life-glow');
-  (dir < 0 ? glow : amb).animate([{ transform: `translateX(${-dir * 16}vw)` }, { transform: 'translateX(0)' }], { duration: 1300, delay: 150, easing: IN, fill: 'backwards' });
+    [{ transform: `translateX(${-dir * (160 + Math.min(i, 5) * 70)}px)`, opacity: 0, filter: 'blur(8px)' }, { transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }],
+    { duration: 560, delay: Math.min(i, 5) * 40, easing: IN, fill: 'backwards' }));
+  navLinks().forEach((l, i) => l.animate([{ transform: `translateX(${-dir * 24}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 420, delay: 60 + i * 35, easing: IN, fill: 'backwards' }));
   root.classList.add('slide-go');
 }
 window.addEventListener('pageshow', (e) => {

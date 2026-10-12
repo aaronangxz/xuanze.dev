@@ -1,0 +1,45 @@
+---
+/** Rating, notes and photos for a hotel or flight page, from src/content/journal (optional). */
+import { getEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+
+interface Props { kind: 'hotels' | 'flights'; slug: string; empty: string }
+const { kind, slug, empty } = Astro.props;
+const entry = await getEntry('journal', `${kind}/${slug}`);
+const { Content } = entry ? await render(entry) : { Content: null };
+const rating = entry?.data.rating;
+const stars = rating == null ? [] : [0, 1, 2, 3, 4].map((i) => Math.max(0, Math.min(1, rating - i)));
+const photos = entry?.data.photos ?? [];
+---
+<section class="jr" aria-label="Notes and photos">
+  {entry ? (
+    <>
+      {(rating != null || entry.data.title) && (
+        <header class="jr-head">
+          {rating != null && (
+            <div class="jr-stars" role="img" aria-label={`Rated ${rating} out of 5`}>
+              {stars.map((f) => (
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path class="bg" d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" /><path class="fg" style={`clip-path: inset(0 ${(1 - f) * 100}% 0 0)`} d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" /></svg>
+              ))}
+              <span>{rating}</span>
+            </div>
+          )}
+          {entry.data.title && <h2>{entry.data.title}</h2>}
+        </header>
+      )}
+      {Content && <div class="jr-body prose"><Content /></div>}
+      {photos.length > 0 && (
+        <div class="jr-photos">
+          {photos.map((p) => (
+            <figure>
+              <a href={p.src.src} target="_blank" rel="noopener"><Image src={p.src} alt={p.alt} widths={[480, 960]} sizes="(max-width: 700px) 100vw, 480px" /></a>
+              {p.caption && <figcaption>{p.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+    </>
+  ) : (
+    <div class="jr-empty"><span class="lab">notes</span><p>{empty}</p></div>
+  )}
+</section>

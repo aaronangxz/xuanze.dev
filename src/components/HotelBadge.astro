@@ -1,0 +1,36 @@
+---
+/** A hotel as a collectible stamp: brand on the top arc, city in the middle, years on the bottom arc, ringed in the chain's colour. */
+import type { Hotel } from '../lib/travel';
+
+interface Props { hotel: Hotel; size?: number; link?: boolean }
+const { hotel: h, size = 104, link = true } = Astro.props;
+const id = `hb-${h.slug}`;
+const brand = (h.tag ?? 'INDEPENDENT').toUpperCase();
+// City in one or two lines, sized to fit inside the inner ring.
+const words = h.city.split(' ');
+const lines = h.city.length > 8 && words.length > 1 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [h.city];
+const longest = Math.max(...lines.map((l) => l.length));
+const fs = longest <= 6 ? 15.5 : longest <= 8 ? 14 : longest <= 10 ? 12.5 : 11;
+const stays = h.visits.length;
+const Tag = link ? 'a' : 'div';
+---
+<Tag class:list={['hbadge', h.upcoming && 'up']} data-chain={h.chain?.toLowerCase() ?? 'independent'} href={link ? `/life/hotels/${h.slug}` : undefined}
+  aria-label={`${h.name}, ${h.city}. ${stays} stay${stays > 1 ? 's' : ''}${h.upcoming ? ', upcoming' : `, ${h.nights} night${h.nights > 1 ? 's' : ''}`}`}>
+  <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
+    <defs>
+      <path id={`${id}-t`} d="M 16 50 A 34 34 0 0 1 84 50" />
+      <path id={`${id}-b`} d="M 13 50 A 37 37 0 0 0 87 50" />
+      <radialGradient id={`${id}-g`} cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="#1D2A42" /><stop offset="1" stop-color="#0B1220" /></radialGradient>
+    </defs>
+    <circle class="hb-outer" cx="50" cy="50" r="47.5" fill={`url(#${id}-g)`} />
+    <circle class="hb-inner" cx="50" cy="50" r="41" fill="none" />
+    <text class="hb-arc"><textPath href={`#${id}-t`} startOffset="50%" text-anchor="middle">{brand}</textPath></text>
+    <text class="hb-arc hb-years"><textPath href={`#${id}-b`} startOffset="50%" text-anchor="middle">{h.upcoming ? 'SOON' : h.years}</textPath></text>
+    <text class="hb-city" x="50" y={lines.length > 1 ? 50 - fs * 0.15 : 50 + fs * 0.35} text-anchor="middle" font-size={fs}>
+      {lines.map((l, i) => <tspan x="50" dy={i === 0 ? 0 : fs * 1.05}>{l}</tspan>)}
+    </text>
+    {longest <= 7 && lines.length === 1 && <><circle class="hb-dot" cx="20" cy="50" r="1.6" /><circle class="hb-dot" cx="80" cy="50" r="1.6" /></>}
+  </svg>
+  {stays > 1 && <span class="hb-count">×{stays}</span>}
+  <span class="hb-name">{h.name}</span>
+</Tag>
