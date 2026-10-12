@@ -100,7 +100,6 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
       </div>
     </div>
   </div>
-  <p class="strava-credit">Flights from Flighty, stays from AwayBook, runs from <a href="https://www.strava.com">Strava</a>. Overland legs are worked out from the order of places. Map data: Natural Earth.</p>
   <script type="application/json" id="tm-data" set:html={toJsonScript(data)} />
 </section>
 

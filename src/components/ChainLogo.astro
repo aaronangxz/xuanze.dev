@@ -1,0 +1,35 @@
+---
+/**
+ * A hotel chain's logo from src/assets/chains/<chain>.svg, painted in the page's ink (currentColor).
+ * Wordmarks replace the chain's name; a mark (Marriott's M) sits beside it; no file falls back to the name.
+ */
+interface Props { chain: string; height?: number }
+const { chain, height = 26 } = Astro.props;
+const files = import.meta.glob<string>('../assets/chains/*.svg', { query: '?raw', import: 'default', eager: true });
+const key = chain.toLowerCase().replace(/[^a-z0-9]+/g, '');
+const raw = files[`../assets/chains/${key}.svg`];
+// Height multiplier per wordmark, so the five read at a similar visual weight.
+const WORDMARKS: Record<string, number> = { hilton: 1.15, hyatt: 1, ihg: 1.1, accor: 1.9 };
+const wordmark = key in WORDMARKS;
+const h = Math.round(height * (WORDMARKS[key] ?? 1.15));
+const svg = raw
+  ?.replace(/<\?xml[\s\S]*?\?>/, '')
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replace(/<title>[\s\S]*?<\/title>/g, '')
+  .replace(/<metadata[\s\S]*?<\/metadata>/g, '')
+  // Every non-white fill (gradients too) takes the ink colour; white stays (masks and knock-outs).
+  .replace(/fill(:|=")\s*#(?!fff\b|ffffff\b)[0-9a-fA-F]{3,6}/gi, (_m, sep) => `fill${sep}currentColor`)
+  .replace(/fill(:|=")\s*url\(#[^)]+\)/g, (_m, sep) => `fill${sep}currentColor`)
+  // Namespace ids so two inlined logos can't collide (e.g. both defining #a).
+  .replace(/\bid="([^"]+)"/g, `id="${key}-$1"`)
+  .replace(/url\(#([^)]+)\)/g, `url(#${key}-$1)`)
+  .replace(/href="#([^"]+)"/g, `href="#${key}-$1"`)
+  .replace(/<svg([^>]*?)\sfill="[^"]*"/, '<svg$1')
+  .replace(/<svg([^>]*?)\s(width|height)="[^"]*"/g, '<svg$1')
+  .replace(/<svg([^>]*?)\s(width|height)="[^"]*"/g, '<svg$1')
+  .replace('<svg', `<svg aria-hidden="true" focusable="false" fill="currentColor" style="height:${h}px;width:auto"`);
+---
+<span class:list={['chain-logo', !raw && 'text', wordmark && 'wm']} data-chain={key}>
+  {svg && <Fragment set:html={svg} />}
+  <span class:list={[raw && wordmark && 'sr-only']}>{chain}</span>
+</span>

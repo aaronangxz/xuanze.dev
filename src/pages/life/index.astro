@@ -7,6 +7,8 @@ import { toJsonScript } from '../../lib/launcher';
 import TravelMap from '../../components/TravelMap.astro';
 import HotelBadge from '../../components/HotelBadge.astro';
 import Flag from '../../components/Flag.astro';
+import ChainLogo from '../../components/ChainLogo.astro';
+import WALabel from '../../components/WALabel.astro';
 import { stats as travelStats, cities, recentFlights, upcomingFlights, airportCity, runs as travelRuns, hotels, collection, flightId, allFlights } from '../../lib/travel';
 
 const races = (await getCollection('races')).map((r) => ({ id: r.id, ...r.data })).sort((a, b) => a.date.localeCompare(b.date));
@@ -32,7 +34,8 @@ const paceOf = (t: string, km: number) => {
   const sec = t.split(':').map(Number).reduce((a, b) => a * 60 + b, 0) / km;
   return `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`;
 };
-const bibCat: Record<string, string> = { '5K': '5 km', '10K': '10 km', '21K': 'Half marathon', '42K': 'Marathon' };
+const bibCat: Record<string, string> = { '5K': '5 km', '10K': '10 km', '21K': 'Half Marathon', '42K': 'Full Marathon' };
+const halves = races.filter((r) => r.distance === '21K').length;
 // A barcode for the tear-off strip, stable per race.
 const barcode = (id: string) => {
   let h = 2166136261, x = 2;
@@ -43,7 +46,7 @@ const barcode = (id: string) => {
 };
 
 const lifeSearch = [
-  ...upcoming.map((r, i) => ({ top: true, cat: 'NEXT', t: r.name, s: `${niceDay(r.date)} · ${r.distance}`, k: `next race upcoming countdown ${r.note ?? ''}`, sel: `#nr-${i}` })),
+  ...upcoming.map((r, i) => ({ top: true, cat: 'NEXT', t: r.name, s: `${niceDay(r.date)} · ${r.distance}`, k: `next race upcoming countdown ${r.city} ${r.distance}`, sel: `#nr-${i}` })),
   ...cities.map((c, i) => ({ top: i < 6 && c.country !== 'Singapore', cat: 'CITY', t: c.name, s: [c.country, c.nights ? `${c.nights} nights` : `${c.flights} flights`].join(' · '), k: `city place travel trip ${c.country} ${c.stays.map((s) => `${s.name} ${s.tag ?? ''}`).join(' ')}`, city: c.slug })),
   ...hotels.map((h, i) => ({ top: i >= hotels.length - 3 && !h.upcoming, cat: 'HOTEL', t: h.name, s: `${h.city} · ${h.visits.length > 1 ? `${h.visits.length} stays` : niceDay(h.visits[0].checkIn)}`, k: `hotel stay ${h.city} ${h.brand ?? ''} ${h.chain ?? ''}`, href: `/life/hotels/${h.slug}` })),
   ...[...allFlights].reverse().map((f) => ({ cat: 'FLIGHT', t: `${f.fromCity} → ${f.toCity}`, s: `${f.flight} · ${niceDay(f.date)}`, k: `flight ${f.from} ${f.to} ${f.airline} ${f.flight.replace(' ', '')} ${f.aircraft ?? ''}`, href: `/life/flights/${f.id}` })),
@@ -63,7 +66,7 @@ const lifeSearch = [
         <div><dt>countries visited</dt><dd>{travelStats.countries}</dd></div>
         <div><dt>flights flown</dt><dd>{travelStats.flights}</dd></div>
         <div><dt>km run in {running.year}</dt><dd>{fmtKm(running.yearKm)}</dd></div>
-        <div><dt>half marathons</dt><dd>{running.halfMarathons}</dd></div>
+        <div><dt>half marathons</dt><dd>{halves}</dd></div>
       </dl>
       {hasPlaceholders && <span class="sample rise" style="--d:4">A few entries here are still placeholders</span>}
     </section>
@@ -115,7 +118,7 @@ const lifeSearch = [
       <div class="hcoll">
         {collection.map((c) => (
           <section class="hc-chain" data-chain={c.chain.toLowerCase()} aria-label={c.chain}>
-            <header><h3>{c.chain}</h3><span>{c.hotels} hotel{c.hotels > 1 ? 's' : ''} · {c.nights} night{c.nights === 1 ? '' : 's'}</span></header>
+            <header><h3><ChainLogo chain={c.chain} /></h3><span>{c.hotels} hotel{c.hotels > 1 ? 's' : ''} · {c.nights} night{c.nights === 1 ? '' : 's'}</span></header>
             <div class="hc-brands">
               {c.brands.map((b) => (
                 <div class="hc-brand">
@@ -130,39 +133,29 @@ const lifeSearch = [
     </section>
 
     <section id="l-run" aria-labelledby="l-run-h">
-      <div class="l-head"><span class="l-no">04</span><h2 id="l-run-h">Running</h2><p>Two half marathons in. One more this month, then the first full one in Shanghai.</p></div>
+      <div class="l-head"><span class="l-no">04</span><h2 id="l-run-h">Running</h2><p>{halves} half marathons in. One more this month, then the first full one in Shanghai.</p></div>
       <div class="races" aria-label="Upcoming races">
         {upcoming.map((r, i) => (
           <article class="nr race-card" id={`nr-${i}`} data-date={r.date}>
             <header class="rc-head">
-              <span class="rc-where"><Flag code={r.country} /> {r.city} · {raceDay(r.date)}</span>
+              <span class="rc-where"><Flag code={r.country} /> {r.city} · {raceDay(r.date)}<b class="rc-next">next up</b></span>
               <h3>{r.name}</h3>
-              {r.labels && <ul class="rc-labels">{r.labels.map((l) => <li class:list={[/platinum|gold|elite/i.test(l) && 'tier', /platinum/i.test(l) && 'plat', /gold/i.test(l) && 'gold']}>{l}</li>)}</ul>}
+              <div class="rc-labels"><span class="rc-dist">{r.distance}</span>{r.waLabel && <WALabel tier={r.waLabel} />}</div>
             </header>
             <div class="rc-mid">
               <div class="countdown"><b data-days>--</b><span>days to go</span></div>
               <dl class="rc-facts">
-                <div><dt>distance</dt><dd>{r.distance}</dd></div>
+                <div><dt>distance</dt><dd>{r.km}</dd></div>
                 {r.start && <div><dt>start</dt><dd>{r.start}</dd></div>}
                 {r.goal && <div><dt>goal</dt><dd>{r.goal}</dd></div>}
-                {r.note && <div><dt>note</dt><dd>{r.note}</dd></div>}
               </dl>
             </div>
-            {r.course && (
-              <div class="rc-course">
-                <span class="lab">course</span>
-                <ol class="course" style={`--n:${r.course.length}`}>
-                  {r.course.map((c, k) => <li class:list={[k === 0 && 'start', k === r.course!.length - 1 && 'finish', k === r.turn && 'turn']}><i aria-hidden="true"></i><span>{c}{k === r.turn && <small>turnaround</small>}</span></li>)}
-                </ol>
-                {r.terrain && <p class="rc-terrain"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M0 7 L8 6.4 L15 6.8 L22 5.6 L30 6.6 L40 6" /></svg>{r.terrain}</p>}
-              </div>
-            )}
           </article>
         ))}
       </div>
 
       <div class="pb-block">
-        <div class="l-sub-head"><span class="lab">personal bests</span><p>Fastest times so far. The marathon box is waiting for Shanghai.</p></div>
+        <div class="l-sub-head"><span class="lab">personal bests</span></div>
         <div class="pb-tiles">
           {running.pbs.map((p) => {
             const km = pbKm[p.label];
@@ -189,7 +182,7 @@ const lifeSearch = [
           </div>
           <div><dt>runs in {running.year}</dt><dd>{running.yearRuns}</dd></div>
           <div><dt>longest run</dt><dd>{running.longestKm} <small>km</small></dd></div>
-          <div><dt>half marathons</dt><dd>{running.halfMarathons}</dd></div>
+          <div><dt>half marathons</dt><dd>{halves}</dd></div>
           <div><dt>runs abroad</dt><dd>{travelStats.runs}</dd></div>
         </dl>
       </div>

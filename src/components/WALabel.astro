@@ -1,0 +1,9 @@
+---
+/** World Athletics label for a road race: the World Athletics logo beside the label tier. */
+interface Props { tier: 'Platinum' | 'Gold' | 'Elite' | string }
+const { tier } = Astro.props;
+---
+<span class="wa-label" data-tier={tier.toLowerCase()} title={`World Athletics ${tier} Label road race`}>
+  <img src="/logos/world-athletics.svg" alt="World Athletics" width="90" height="20" />
+  <span>{tier} Label</span>
+</span>

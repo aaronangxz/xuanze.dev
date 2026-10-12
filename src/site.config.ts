@@ -67,28 +67,15 @@ export const site = {
     /** Printed on the race bibs. */
     bibName: 'XUAN ZE',
     /**
-     * Upcoming races, soonest first. The first one that hasn't happened yet gets the big card; past ones hide themselves.
-     * `course` is the landmarks in running order (not to scale). Add `route` (an encoded polyline) and
-     * `elevation` (metres every km) once there's a GPX; until then the card shows the landmarks only.
+     * Upcoming races, soonest first. The first one that hasn't happened yet gets the "next up" card; past ones hide themselves.
+     * `waLabel` shows the World Athletics label (Platinum, Gold, Elite) when the race has one.
      */
     upcoming: [
-      {
-        name: 'Garmin Run Marathon Series Singapore', short: 'Garmin Run Singapore', city: 'Singapore', country: 'SG',
-        distance: '21.1 km', date: '2026-10-25', start: 'Marina Barrage',
-        labels: ['Half marathon', '3rd edition'],
-        course: ['Marina Barrage', 'Helix Bridge', 'Tanjong Rhu', 'East Coast Park', 'Marina Barrage'], turn: 3,
-        terrain: 'Flat, out and back along the bay and the coast',
-      },
-      {
-        name: 'Shanghai Marathon', short: 'Shanghai Marathon', city: 'Shanghai', country: 'CN',
-        distance: '42.195 km', date: '2026-12-06', start: 'The Bund', note: 'first full marathon',
-        labels: ['World Athletics Platinum Label', 'Abbott WMM candidate'],
-        course: ['The Bund', 'Nanjing Road', "Jing'an Temple", 'Huaihai Road', 'Xintiandi', 'Shanghai Stadium'],
-        terrain: 'Flat city course, about 25 m of climb end to end',
-      },
+      { name: 'Garmin Run Marathon Series Singapore', city: 'Singapore', country: 'SG', distance: 'Half Marathon', km: '21.1 km', date: '2026-10-25', start: 'Marina Barrage' },
+      { name: 'Shanghai Marathon', city: 'Shanghai', country: 'CN', distance: 'Full Marathon', km: '42.195 km', date: '2026-12-06', start: 'The Bund', waLabel: 'Platinum' },
     ] as {
-      name: string; short: string; city: string; country: 'SG' | 'CN' | string; distance: string; date: string; start?: string;
-      labels?: string[]; course?: string[]; turn?: number; terrain?: string; goal?: string; note?: string; route?: string; elevation?: number[];
+      name: string; city: string; country: string; distance: 'Half Marathon' | 'Full Marathon' | string; km: string; date: string;
+      start?: string; waLabel?: 'Platinum' | 'Gold' | 'Elite'; goal?: string;
     }[],
   },
 } as const;

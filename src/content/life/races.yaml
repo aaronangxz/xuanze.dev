@@ -16,3 +16,24 @@
   band: "#1F6F6B"
   pb: true
   strava: "17809921611"
+- id: sundown-my-2015-half
+  name: Sundown Marathon Malaysia
+  label: Johor · 21K
+  distance: 21K
+  date: "2015-09-05"
+  time: "2:58:07"
+  band: "#5B3A7A"
+- id: scsm-2019-half
+  name: Standard Chartered Singapore Marathon
+  label: Singapore · 21K
+  distance: 21K
+  date: "2019-12-08"
+  time: "2:58:24"
+  band: "#2F5D8A"
+- id: sundown-sg-2023-half
+  name: Sundown Marathon Singapore
+  label: Singapore · 21K
+  distance: 21K
+  date: "2023-05-20"
+  time: "3:27:54"
+  band: "#3B2E63"

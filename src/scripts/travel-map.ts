@@ -260,8 +260,7 @@ function init(tm) {
 
   /* ---------- city panel ---------- */
   function renderCity(c) {
-    const head = `<div class="tp-head"><div><span class="lab">${esc(c.country)}</span><h3>${esc(c.name)}</h3></div>
-      <button type="button" class="tp-x" data-close aria-label="Close">×</button></div>
+    const head = `<div class="tp-head"><div><span class="lab">${esc(c.country)}</span><h3>${esc(c.name)}</h3></div></div>
       <p class="tp-sub">${[c.flights ? `${c.flights} flight${c.flights > 1 ? 's' : ''}` : '', c.nights ? `${c.nights} night${c.nights > 1 ? 's' : ''} in hotels` : '', c.runs.length ? `${c.runs.length} run${c.runs.length > 1 ? 's' : ''}` : '', c.years].filter(Boolean).join(' · ')}</p>`;
     const stays = c.stays.length ? `<ul class="tp-stays">${c.stays.map((s) => `<li class="${s.upcoming ? 'up' : ''}">
         ${s.tag ? `<span class="htag" data-chain="${esc(s.chain?.toLowerCase())}">${esc(s.tag)}</span>` : '<span class="htag indie">INDEPENDENT</span>'}
@@ -270,23 +269,44 @@ function init(tm) {
     const runs = c.runs.length ? `<div class="tp-runs">${c.runs.map((r) => `<figure class="run${r.race ? ' race' : ''}">
         <svg viewBox="${r.vb}" aria-hidden="true"><path d="${r.d}" /></svg>
         <figcaption><b>${esc(r.title)}</b><small>${r.km} km · ${day(r.date)}</small></figcaption></figure>`).join('')}</div>` : '';
-    return `<div class="tp-a">${head}</div>`
+    return '<button type="button" class="tp-x" data-close aria-label="Close">×</button>'
+      + `<div class="tp-a">${head}</div>`
       + (stays ? `<div class="tp-b"><span class="lab">stayed</span>${stays}</div>` : '')
       + (runs ? `<div class="tp-c"><span class="lab">ran</span>${runs}</div>` : '');
   }
   let openSlug = null;
   const defaultPanel = panel.innerHTML;
+  // Swap the card's contents with an exit, a height morph and an entry, instead of a jump.
+  let swapSeq = 0;
+  function swapPanel(html, open) {
+    const seq = ++swapSeq;
+    const EASE = 'cubic-bezier(.2,.8,.2,1)';
+    const put = () => { panel.innerHTML = html; panel.classList.toggle('open', open); };
+    if (reduce) { put(); return; }
+    panel.getAnimations().forEach((a) => a.cancel());
+    const kids = [...panel.children];
+    const from = panel.offsetHeight;
+    const out = kids.map((k) => k.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px)' }], { duration: 160, easing: 'ease-in', fill: 'forwards' }));
+    Promise.all(out.map((a) => a.finished.catch(() => {}))).then(() => {
+      if (seq !== swapSeq) return;
+      put();
+      const to = panel.offsetHeight;
+      panel.classList.add('swapping');
+      panel.animate([{ height: from + 'px' }, { height: to + 'px' }], { duration: 340, easing: EASE }).finished.catch(() => {}).then(() => panel.classList.remove('swapping'));
+      [...panel.children].forEach((k, i) => k.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay: 60 + i * 50, easing: EASE, fill: 'backwards' }));
+      // The card sits under the map: bring its top into view if it opened below the fold.
+      if (open) {
+        const r = panel.getBoundingClientRect();
+        if (r.top > innerHeight - 140) scrollBy({ top: Math.min(to, 320) + r.top - innerHeight + 24, behavior: 'smooth' });
+      }
+    });
+  }
   function openCity(slug, { zoom = true } = {}) {
     const c = cityBy[slug];
     if (!c) return;
     openSlug = slug;
     cityEls.forEach((el) => el.classList.toggle('sel', el.dataset.city === slug));
-    panel.innerHTML = renderCity(c);
-    panel.classList.add('open');
-    if (!reduce) panel.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
-    // The panel sits under the map: bring its top into view if it starts below the fold.
-    const r = panel.getBoundingClientRect();
-    if (r.top > innerHeight - 140) scrollBy({ top: Math.min(r.height, 320) + r.top - innerHeight + 24, behavior: reduce ? 'auto' : 'smooth' });
+    swapPanel(renderCity(c), true);
     if (zoom) {
       // Zoom in on the city, unless it is already comfortably in view at a closer zoom.
       const k = Math.min(vb.w, data.regions.sea.w * 1.2);
@@ -299,8 +319,7 @@ function init(tm) {
   function closeCity() {
     openSlug = null;
     cityEls.forEach((el) => el.classList.remove('sel'));
-    panel.innerHTML = defaultPanel;
-    panel.classList.remove('open');
+    swapPanel(defaultPanel, false);
   }
 
   tm.addEventListener('click', (ev) => {
