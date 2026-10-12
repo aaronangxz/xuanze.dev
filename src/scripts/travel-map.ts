@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* Travel map: region zoom (tweened viewBox), label collision, route tooltips, city panel. */
+/* Travel map: region zoom (tweened viewBox), label collision, route tooltips, full-screen city view. */
 const root = document.getElementById('tm');
 if (root) init(root);
 
@@ -9,7 +9,6 @@ function init(tm) {
   const stage = document.getElementById('tm-stage');
   const overlay = document.getElementById('tm-overlay');
   const tip = document.getElementById('tm-tip');
-  const panel = document.getElementById('tm-panel');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const fmt = (n) => Number(n).toLocaleString('en-US');
@@ -258,57 +257,75 @@ function init(tm) {
     zoomAt(b.dataset.z === 'in' ? 1.8 : 1 / 1.8, stage.clientWidth / 2, stage.clientHeight / 2);
   });
 
-  /* ---------- city panel ---------- */
+  /* ---------- city view (full-screen) ---------- */
+  const view = document.getElementById('cityview');
+  const viewBody = document.getElementById('cv-body');
+  const viewCard = view.querySelector('.cv-card');
+  // Live on <body> so no transformed ancestor can trap the fixed overlay.
+  document.body.appendChild(view);
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   function renderCity(c) {
-    const head = `<div class="tp-head"><div><span class="lab">${esc(c.country)}</span><h3>${esc(c.name)}</h3></div></div>
-      <p class="tp-sub">${[c.flights ? `${c.flights} flight${c.flights > 1 ? 's' : ''}` : '', c.nights ? `${c.nights} night${c.nights > 1 ? 's' : ''} in hotels` : '', c.runs.length ? `${c.runs.length} run${c.runs.length > 1 ? 's' : ''}` : '', c.years].filter(Boolean).join(' · ')}</p>`;
-    const stays = c.stays.length ? `<ul class="tp-stays">${c.stays.map((s) => `<li class="${s.upcoming ? 'up' : ''}">
-        ${s.tag ? `<span class="htag" data-chain="${esc(s.chain?.toLowerCase())}">${esc(s.tag)}</span>` : '<span class="htag indie">INDEPENDENT</span>'}
-        <div><a href="/life/hotels/${esc(s.slug)}"><b>${esc(s.name)}</b></a><small>${day(s.checkIn)} · ${s.nights} night${s.nights > 1 ? 's' : ''}${s.upcoming ? ' · upcoming' : ''}</small></div></li>`).join('')}</ul>`
+    const stats = [
+      c.flights && [c.flights, plural(c.flights, 'flight').replace(/^\d+ /, '')],
+      c.nights && [c.nights, plural(c.nights, 'hotel night').replace(/^\d+ /, '')],
+      c.runs.length && [c.runs.length, plural(c.runs.length, 'run').replace(/^\d+ /, '')],
+      c.years && [c.years, c.years.includes('–') ? 'years' : 'year'],
+    ].filter(Boolean);
+    const head = `<header class="cv-head"><span class="lab">${esc(c.country)}</span><h3 id="cv-title">${esc(c.name)}</h3>
+      <dl class="cv-stats">${stats.map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></header>`;
+    const stays = c.stays.length ? `<ul class="cv-stays">${c.stays.map((s) => `<li class="${s.upcoming ? 'up' : ''}"><a href="/life/hotels/${esc(s.slug)}">
+        <b>${esc(s.name)}</b>
+        <span class="cv-meta">${s.tag ? `<span class="htag" data-chain="${esc(s.chain?.toLowerCase())}">${esc(s.tag)}</span>` : '<span class="htag indie">INDEPENDENT</span>'}<small>${day(s.checkIn)} · ${plural(s.nights, 'night')}${s.upcoming ? ' · upcoming' : ''}</small></span>
+        <i aria-hidden="true">→</i></a></li>`).join('')}</ul>`
       : c.flights ? '<p class="tp-note">Passed through, no hotel on record.</p>' : '';
     const runs = c.runs.length ? `<div class="tp-runs">${c.runs.map((r) => `<figure class="run${r.race ? ' race' : ''}">
         <svg viewBox="${r.vb}" aria-hidden="true"><path d="${r.d}" /></svg>
         <figcaption><b>${esc(r.title)}</b><small>${r.km} km · ${day(r.date)}</small></figcaption></figure>`).join('')}</div>` : '';
-    return '<button type="button" class="tp-x" data-close aria-label="Close">×</button>'
-      + `<div class="tp-a">${head}</div>`
-      + (stays ? `<div class="tp-b"><span class="lab">stayed</span>${stays}</div>` : '')
-      + (runs ? `<div class="tp-c"><span class="lab">ran</span>${runs}</div>` : '');
+    return head + `<div class="cv-cols${runs ? '' : ' one'}">`
+      + (stays ? `<section class="cv-col"><span class="lab">stayed</span>${stays}</section>` : '')
+      + (runs ? `<section class="cv-col"><span class="lab">ran</span>${runs}</section>` : '')
+      + '</div>';
   }
+
   let openSlug = null;
-  const defaultPanel = panel.innerHTML;
-  // Swap the card's contents with an exit, a height morph and an entry, instead of a jump.
-  let swapSeq = 0;
-  function swapPanel(html, open) {
-    const seq = ++swapSeq;
-    const EASE = 'cubic-bezier(.2,.8,.2,1)';
-    const put = () => { panel.innerHTML = html; panel.classList.toggle('open', open); };
-    if (reduce) { put(); return; }
-    panel.getAnimations().forEach((a) => a.cancel());
-    const kids = [...panel.children];
-    const from = panel.offsetHeight;
-    const out = kids.map((k) => k.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px)' }], { duration: 160, easing: 'ease-in', fill: 'forwards' }));
-    Promise.all(out.map((a) => a.finished.catch(() => {}))).then(() => {
-      if (seq !== swapSeq) return;
-      put();
-      const to = panel.offsetHeight;
-      panel.classList.add('swapping');
-      panel.animate([{ height: from + 'px' }, { height: to + 'px' }], { duration: 340, easing: EASE }).finished.catch(() => {}).then(() => panel.classList.remove('swapping'));
-      [...panel.children].forEach((k, i) => k.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay: 60 + i * 50, easing: EASE, fill: 'backwards' }));
-      // The card sits under the map: bring its top into view if it opened below the fold.
-      if (open) {
-        const r = panel.getBoundingClientRect();
-        if (r.top > innerHeight - 140) scrollBy({ top: Math.min(to, 320) + r.top - innerHeight + 24, behavior: 'smooth' });
-      }
-    });
+  let before = null;
+  let lastFocus = null;
+  let hideT = 0;
+  function showView(html) {
+    clearTimeout(hideT);
+    const wasOpen = view.classList.contains('open');
+    if (wasOpen && !reduce) {
+      // Already open (e.g. picked another city from search): cross-fade the contents.
+      viewBody.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).finished.then(() => {
+        viewBody.innerHTML = html; viewCard.scrollTop = 0;
+        viewBody.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      });
+      return;
+    }
+    viewBody.innerHTML = html; viewCard.scrollTop = 0;
+    lastFocus = document.activeElement;
+    view.hidden = false;
+    document.documentElement.classList.add('cv-lock');
+    requestAnimationFrame(() => requestAnimationFrame(() => view.classList.add('open')));
+    viewCard.focus({ preventScroll: true });
+  }
+  function hideView() {
+    if (view.hidden) return;
+    view.classList.remove('open');
+    document.documentElement.classList.remove('cv-lock');
+    hideT = setTimeout(() => { view.hidden = true; viewBody.innerHTML = ''; }, reduce ? 0 : 380);
+    lastFocus?.focus?.({ preventScroll: true });
   }
   function openCity(slug, { zoom = true } = {}) {
     const c = cityBy[slug];
     if (!c) return;
+    // Remember the view the city was opened from, so closing returns to it.
+    if (!openSlug) before = { vb: { ...vb }, region };
     openSlug = slug;
     cityEls.forEach((el) => el.classList.toggle('sel', el.dataset.city === slug));
-    swapPanel(renderCity(c), true);
+    showView(renderCity(c));
     if (zoom) {
-      // Zoom in on the city, unless it is already comfortably in view at a closer zoom.
+      // The map zooms to the city behind the blur, so closing lands on it.
       const k = Math.min(vb.w, data.regions.sea.w * 1.2);
       zoomTo({ x: c.x - k / 2, y: c.y - k / 4, w: k, h: k / 2 });
       region = 'city';
@@ -317,9 +334,15 @@ function init(tm) {
     }
   }
   function closeCity() {
+    if (!openSlug) return;
     openSlug = null;
     cityEls.forEach((el) => el.classList.remove('sel'));
-    swapPanel(defaultPanel, false);
+    hideView();
+    if (before) {
+      if (data.regions[before.region]) setRegion(before.region);
+      else { region = before.region; tm.dataset.region = region; zoomTo(before.vb); }
+      before = null;
+    }
   }
 
   tm.addEventListener('click', (ev) => {
@@ -329,10 +352,22 @@ function init(tm) {
     if (city) { openCity(city.dataset.city); return; }
     const quick = ev.target.closest('[data-goto]');
     if (quick) { openCity(quick.dataset.goto); return; }
-    if (ev.target.closest('[data-close]')) { closeCity(); setRegion(region === 'city' ? 'world' : region); }
   });
+  view.addEventListener('click', (ev) => { if (ev.target.closest('[data-close]')) closeCity(); });
+  addEventListener('keydown', (ev) => {
+    if (!openSlug) return;
+    if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); closeCity(); return; }
+    // Keep Tab inside the city view while it's open.
+    if (ev.key === 'Tab') {
+      const f = [...view.querySelectorAll('a[href], button')];
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (ev.shiftKey && (document.activeElement === first || document.activeElement === viewCard)) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+    }
+  }, true);
   // Life search ("Where to?") can ask the map to show a city.
-  addEventListener('xz:city', (ev) => { stage.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); setTimeout(() => openCity(ev.detail), reduce ? 0 : 450); });
+  addEventListener('xz:city', (ev) => { stage.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); setTimeout(() => openCity(ev.detail), reduce ? 0 : 350); });
 
   /* ---------- start ---------- */
   const small = () => stage.clientWidth < 640;

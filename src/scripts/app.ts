@@ -455,3 +455,21 @@ nrs.forEach((li) => {
   if (d === 0) li.querySelector('.countdown span').textContent = 'race day';
 });
 if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races')?.remove();
+
+/* =========================================================
+   Edge blur: show the top/bottom blur only when there is more page that way
+   ========================================================= */
+{
+  let raf = 0;
+  const edges = () => {
+    raf = 0;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    root.classList.toggle('edge-up', scrollY > 4);
+    root.classList.toggle('edge-down', scrollY < max - 4);
+  };
+  const queue = () => { if (!raf) raf = requestAnimationFrame(edges); };
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue);
+  new ResizeObserver(queue).observe(document.body);
+  edges();
+}

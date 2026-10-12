@@ -11,7 +11,7 @@ import ChainLogo from '../../components/ChainLogo.astro';
 import WALabel from '../../components/WALabel.astro';
 import { stats as travelStats, cities, recentFlights, upcomingFlights, airportCity, runs as travelRuns, hotels, collection, flightId, allFlights } from '../../lib/travel';
 
-const races = (await getCollection('races')).map((r) => ({ id: r.id, ...r.data })).sort((a, b) => a.date.localeCompare(b.date));
+const races = (await getCollection('races')).map((r) => ({ id: r.id, ...r.data })).sort((a, b) => b.date.localeCompare(a.date)); // newest first
 const shelf = (await getCollection('shelf')).map((s) => ({ id: s.id, ...s.data }));
 const polaroids = (await getCollection('polaroids')).map((p) => ({ id: p.id, ...p.data }));
 const L = site.life;
@@ -78,7 +78,7 @@ const lifeSearch = [
     <TravelMap />
 
     <section id="l-travel" aria-labelledby="l-travel-h">
-      <div class="l-head"><span class="l-no">02</span><h2 id="l-travel-h">Departures</h2><p>The last few flights, and the next one.</p></div>
+      <div class="l-head"><span class="l-no">02</span><h2 id="l-travel-h">Departures</h2></div>
       <div class="board" role="table" aria-label="Recent flights">
         <div class="board-row board-th" role="row"><span role="columnheader">Date</span><span role="columnheader">From</span><span role="columnheader">To</span><span role="columnheader">Flight</span><span role="columnheader">Remarks</span></div>
         {board.map((f) => (
@@ -114,7 +114,7 @@ const lifeSearch = [
     </section>
 
     <section id="l-stays" aria-labelledby="l-stays-h">
-      <div class="l-head"><span class="l-no">03</span><h2 id="l-stays-h">The hotel collection</h2><p>{hotels.filter((h) => !h.upcoming).length} hotels across {collection.filter((c) => c.chain !== 'Independent').length} chains, {travelStats.nights} nights since mid-2024. Tap one for photos and notes.</p></div>
+      <div class="l-head"><span class="l-no">03</span><h2 id="l-stays-h">The hotel collection</h2></div>
       <div class="hcoll">
         {collection.map((c) => (
           <section class="hc-chain" data-chain={c.chain.toLowerCase()} aria-label={c.chain}>
@@ -133,7 +133,7 @@ const lifeSearch = [
     </section>
 
     <section id="l-run" aria-labelledby="l-run-h">
-      <div class="l-head"><span class="l-no">04</span><h2 id="l-run-h">Running</h2><p>{halves} half marathons in. One more this month, then the first full one in Shanghai.</p></div>
+      <div class="l-head"><span class="l-no">04</span><h2 id="l-run-h">Running</h2></div>
       <div class="races" aria-label="Upcoming races">
         {upcoming.map((r, i) => (
           <article class="nr race-card" id={`nr-${i}`} data-date={r.date}>
@@ -187,8 +187,8 @@ const lifeSearch = [
         </dl>
       </div>
 
-      <div class="bibs-head"><span class="lab">finished</span><p>Bibs from races I've run, oldest first.</p></div>
-      <div class="bibs" aria-label="Race bibs, oldest first">
+      <div class="bibs-head"><span class="lab">finished</span></div>
+      <div class="bibs" aria-label="Race bibs, newest first">
         {races.map((r, i) => (
           <article class="bib" style={`--r:${tilt[i % 4]}deg;--band:${r.band}`} id={`r-${r.id}`}>
             <div class="bib-top"><span class="bib-ev">{r.name}</span><span class="bib-yr">{r.date.slice(0, 4)}</span></div>
@@ -208,7 +208,7 @@ const lifeSearch = [
     </section>
 
     <section id="l-misc" aria-labelledby="l-misc-h">
-      <div class="l-head"><span class="l-no">05</span><h2 id="l-misc-h">Everything else</h2><p>Small things I like.</p></div>
+      <div class="l-head"><span class="l-no">05</span><h2 id="l-misc-h">Everything else</h2></div>
       <div class="misc">
         <div class="polaroids">
           {polaroids.map((p, i) => (

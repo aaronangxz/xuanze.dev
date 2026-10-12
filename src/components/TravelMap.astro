@@ -17,7 +17,7 @@ const data = {
 const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) => s.tag).map((s) => [s.tag, s])).values()];
 ---
 <section id="l-map" class="tm-sec" aria-labelledby="l-map-h">
-  <div class="l-head"><span class="l-no">01</span><h2 id="l-map-h">Where I've been</h2><p>Every flight since {stats.since}, every hotel since 2024, and the runs in between.</p></div>
+  <div class="l-head"><span class="l-no">01</span><h2 id="l-map-h">Where I've been</h2></div>
 
   <dl class="tm-stats">
     <div><dt>flights</dt><dd>{stats.flights}</dd></div>
@@ -90,7 +90,7 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
       </ul>
     </div>
 
-    <div class="tm-panel" id="tm-panel" aria-live="polite">
+    <div class="tm-panel" id="tm-panel">
       <div class="tm-empty">
         <span class="lab">pick a city</span>
         <p>Tap a city to see where I stayed and where I ran. The most-visited:</p>
@@ -99,6 +99,15 @@ const cityTags = (c: (typeof cities)[number]) => [...new Map(c.stays.filter((s) 
         </div>
       </div>
     </div>
+  </div>
+  <div class="cityview" id="cityview" hidden>
+    <div class="cv-scrim" data-close aria-hidden="true"></div>
+    <section class="cv-card" role="dialog" aria-modal="true" aria-labelledby="cv-title" tabindex="-1">
+      <button type="button" class="cv-x" data-close aria-label="Close city view">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+      </button>
+      <div class="cv-body" id="cv-body"></div>
+    </section>
   </div>
   <script type="application/json" id="tm-data" set:html={toJsonScript(data)} />
 </section>

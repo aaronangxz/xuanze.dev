@@ -14,7 +14,7 @@ const fs = longest <= 6 ? 15.5 : longest <= 8 ? 14 : longest <= 10 ? 12.5 : 11;
 const stays = h.visits.length;
 const Tag = link ? 'a' : 'div';
 ---
-<Tag class:list={['hbadge', h.upcoming && 'up']} data-chain={h.chain?.toLowerCase() ?? 'independent'} href={link ? `/life/hotels/${h.slug}` : undefined}
+<Tag class:list={['hbadge', h.upcoming && 'up']} style={`--s:${size}px`} data-chain={h.chain?.toLowerCase() ?? 'independent'} href={link ? `/life/hotels/${h.slug}` : undefined}
   aria-label={`${h.name}, ${h.city}. ${stays} stay${stays > 1 ? 's' : ''}${h.upcoming ? ', upcoming' : `, ${h.nights} night${h.nights > 1 ? 's' : ''}`}`}>
   <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
     <defs>
