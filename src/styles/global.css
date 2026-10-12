@@ -49,7 +49,7 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 /* ---------- Home ---------- */
 .home { display: flex; flex-direction: column; gap: 28px; padding-top: 24px; }
 .home h1 { font-size: clamp(2.2rem, 4.8vw, 3.7rem); line-height: 1.04; letter-spacing: -.035em; font-weight: 600; max-width: 19ch; text-wrap: balance; }
-.home h1 span { color: var(--muted); }
+.home h1 > span { color: var(--muted); }
 .home .sub { font-size: 1.125rem; color: var(--muted); max-width: 40rem; }
 .try { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: .9375rem; }
 .try button { font: 500 .8125rem var(--mono); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line2); background: var(--win); color: var(--ink); cursor: pointer; min-height: 34px; }
@@ -102,7 +102,7 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 
 /* Overlay (launcher on inner pages) */
 .overlay { position: fixed; inset: 0; z-index: 60; background: color-mix(in srgb, var(--bg) 55%, rgba(0,0,0,.45)); display: flex; justify-content: center; align-items: flex-start; padding: calc(env(safe-area-inset-top, 0px) + 8vh) 16px 16px; }
-.overlay[hidden] { display: none !important; }
+.overlay[hidden], .more[hidden] { display: none !important; }
 .overlay .app { width: min(900px, 100%); max-height: 84vh; }
 @keyframes pop { from { transform: translateY(6px) scale(.985); opacity: .6; } }
 
@@ -270,7 +270,7 @@ body { background: var(--amb-base); }
 .list .opt[aria-selected="true"] .ic { color: var(--accent); }
 .cta { background: linear-gradient(135deg, var(--cta-a), var(--cta-b)); color: var(--cta-ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 24px -12px var(--cta-a); }
 .cta:hover { opacity: 1; filter: brightness(1.06); }
-.home h1 span { background: linear-gradient(95deg, var(--head-a) 10%, var(--head-b) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.home h1 > span { background: linear-gradient(95deg, var(--head-a) 10%, var(--head-b) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .chips span { background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); box-shadow: inset 0 0 0 1px var(--glass-line); }
 .status::before { background: radial-gradient(circle at 35% 35%, #7BE3A8, var(--ok)); }
 .overlay { background: rgba(14, 18, 34, .22); -webkit-backdrop-filter: blur(10px) saturate(130%); backdrop-filter: blur(10px) saturate(130%); }
@@ -284,7 +284,7 @@ pre { border-color: var(--glass-line); }
    Motion + scroll affordance
    ========================================================= */
 /* Hero: name, one line, a few facts */
-.home h1 span { display: block; margin-top: .3em; font-size: .56em; line-height: 1.25; font-weight: 500; letter-spacing: -.02em; max-width: 26ch; }
+.home h1 > span { display: block; margin-top: .3em; font-size: .56em; line-height: 1.25; font-weight: 500; letter-spacing: -.02em; max-width: 26ch; }
 .facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .facts li { padding: 6px 12px; border-radius: 999px; font-size: .875rem; color: var(--body); background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); box-shadow: inset 0 0 0 1px var(--glass-line), inset 0 1px 0 var(--glass-hi); }
 .facts li b { font-weight: 600; color: var(--ink); }
@@ -645,3 +645,18 @@ pre, code, kbd { font-variant-ligatures: none; font-feature-settings: "liga" 0, 
 
 /* Second list inside a widget (Experience → Education on home) */
 .widget .w-sub { margin: 16px 0 10px; padding-top: 14px; border-top: 1px solid var(--glass-line, var(--line)); font-size: .8125rem; font-weight: 600; color: var(--muted); }
+
+/* Hero: no character caps; the line breaks between clauses, and a clause wraps on its own only when it must */
+.home h1 { max-width: none; }
+.home h1 > span { max-width: none; font-size: min(.56em, 5.4vw); } /* on the narrowest phones the first clause still fits one line */
+.home h1 .clause { display: inline-block; }
+
+/* Product logos (square app icons) */
+.list .ic.logo { padding: 0; overflow: hidden; border: 0; background: none; box-shadow: none; }
+.list .ic.logo img, .plogo, .tlogo, .mlogo { display: block; border-radius: 22%; box-shadow: 0 0 0 1px var(--glass-line); }
+.list .ic.logo img { width: 30px; height: 30px; }
+.plogo { margin-bottom: 14px; }
+h1.with-logo { display: flex; align-items: center; gap: 14px; }
+.tlogo { width: 48px; height: 48px; flex: none; }
+.mini .has-logo { display: flex; align-items: center; gap: 10px; }
+.mlogo { width: 28px; height: 28px; flex: none; }

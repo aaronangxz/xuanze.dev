@@ -31,6 +31,8 @@ const projects = defineCollection({
     /** External link. Projects with an href have no case-study page and open this instead. */
     href: z.string().url().optional(),
     live: z.string().url().optional(),
+    /** Square app icon in public/, e.g. /logos/avenly.png. Shown in search, on the page and in Currently. */
+    logo: z.string().optional(),
     order: z.number().default(100),
     /** Inactive projects are listed under "Inactive" in search. */
     active: z.boolean().default(true),

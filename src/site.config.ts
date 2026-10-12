@@ -28,8 +28,8 @@ export const site = {
   /** The "Currently" card on the home page. */
   currently: [
     { title: 'TikTok', sub: 'Software Engineer in Test', meta: 'work' },
-    { title: 'Avenly', sub: 'Event platform, live', meta: 'product', href: '/projects/avenly' },
-    { title: 'Clozit', sub: 'Fashion app, in beta', meta: 'product', href: '/projects/clozit' },
+    { title: 'Avenly', sub: 'Event platform, live', meta: 'product', href: '/projects/avenly', logo: '/logos/avenly.png' },
+    { title: 'Clozit', sub: 'Fashion app, in beta', meta: 'product', href: '/projects/clozit', logo: '/logos/clozit.png' },
   ],
 
   about: {

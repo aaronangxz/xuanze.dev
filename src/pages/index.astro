@@ -3,10 +3,12 @@ import Base from '../layouts/Base.astro';
 import Launcher from '../components/Launcher.astro';
 import { site } from '../site.config';
 const yr = (s: string) => s.split(' ').pop();
+// The line breaks at its commas, never mid-clause: each clause wraps as a unit.
+const heroClauses = site.hero.line.split(/(?<=,)\s+/);
 ---
 <Base mode="work" inlineLauncher>
   <div class="page home">
-    <h1 class="rise">{site.hero.greeting} <span>{site.hero.line}</span></h1>
+    <h1 class="rise">{site.hero.greeting} <span>{heroClauses.map((c, i) => <Fragment>{i > 0 && ' '}<span class="clause">{c}</span></Fragment>)}</span></h1>
     <ul class="facts rise" style="--d:1" aria-label="At a glance">
       {site.hero.facts.map((f, i) => <li>{i === 0 ? <b>{f}</b> : f}</li>)}
     </ul>
@@ -27,7 +29,7 @@ const yr = (s: string) => s.split(' ').pop();
         <ul class="mini">
           {site.currently.map((c) => (
             <li>
-              <div><b>{c.href ? <a href={c.href}>{c.title}</a> : c.title}</b><small>{c.sub}</small></div>
+              <div class={'logo' in c ? 'has-logo' : undefined}>{'logo' in c && <img class="mlogo" src={c.logo} alt="" width="28" height="28" />}<div><b>{c.href ? <a href={c.href}>{c.title}</a> : c.title}</b><small>{c.sub}</small></div></div>
               <span>{c.meta}</span>
             </li>
           ))}

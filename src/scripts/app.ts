@@ -63,7 +63,7 @@ const L = launcher && (() => {
     if (!shown.length) html = '<li class="empty">No results. Try "go" or "redis".</li>';
     shown.forEach((it, i) => {
       if (it.g !== g) { html += `<li class="grp" role="presentation">${it.g}</li>`; g = it.g; }
-      html += `<li class="opt" role="option" id="o${i}" data-i="${i}" aria-selected="${i === active}"><span class="ic">${IC[it.i] || IC.doc}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`;
+      html += `<li class="opt" role="option" id="o${i}" data-i="${i}" aria-selected="${i === active}"><span class="ic${it.img ? ' logo' : ''}">${it.img ? `<img src="${it.img}" alt="" width="30" height="30">` : IC[it.i] || IC.doc}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`;
     });
     list.innerHTML = html;
     hl = document.createElement('li'); hl.className = 'hl'; hl.setAttribute('role', 'presentation'); hl.setAttribute('aria-hidden', 'true');

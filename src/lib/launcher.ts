@@ -13,6 +13,7 @@ export interface LauncherItem {
   href?: string;
   external?: boolean;
   copy?: boolean;
+  img?: string;         // square logo shown instead of the icon
   life?: boolean;       // switches to the Life side with the slide transition
   searchOnly?: boolean; // only listed when the query matches
   cta?: string;
@@ -42,9 +43,9 @@ export async function launcherItems(): Promise<LauncherItem[]> {
     const d = pr.data;
     const sub = d.kind === 'product' ? `Product · ${d.period}` : d.kind === 'work' ? `${d.company?.split(',')[0] ?? 'Work'} · internal tool` : d.status;
     items.push({
-      g: pgroup(d), t: d.title, s: sub, i: 'box', k: `${d.kind} ${pgroup(d)} ${d.stack.join(' ')} ${d.summary}`,
+      g: pgroup(d), t: d.title, s: sub, i: 'box', img: d.logo, k: `${d.kind} ${pgroup(d)} ${d.stack.join(' ')} ${d.summary}`,
       href: projectHref(pr), external: !!d.href, cta: d.href ? 'View on GitHub' : 'Read the case study',
-      p: preview(`${d.kind === 'side' ? 'side project' : d.kind === 'work' ? 'built at work' : 'product'} · ${d.status}`, d.title, d.summary, chips(d.stack.slice(0, 5))),
+      p: (d.logo ? `<img class="plogo" src="${esc(d.logo)}" alt="" width="44" height="44">` : '') + preview(`${d.kind === 'side' ? 'side project' : d.kind === 'work' ? 'built at work' : 'product'} · ${d.status}`, d.title, d.summary, chips(d.stack.slice(0, 5))),
     });
   }
 
