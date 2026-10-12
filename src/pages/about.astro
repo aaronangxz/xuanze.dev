@@ -21,6 +21,15 @@ const a = site.about;
             </li>
           ))}
         </ul>
+        <h2>Education</h2>
+        <ul class="jobs">
+          {site.education.map((x) => (
+            <li>
+              <span class="when">{x.from} – {x.to}</span>
+              <div><h3>{x.org}</h3><p>{x.role}</p></div>
+            </li>
+          ))}
+        </ul>
         <h2>How I work</h2>
         <ul>{a.howIWork.map((h) => <li>{h}</li>)}</ul>
       </div>

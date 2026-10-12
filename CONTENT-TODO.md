@@ -8,7 +8,7 @@ The design is done; these are the facts only you can fill in. Search the repo fo
 - [ ] `life.upcoming`: check the official race names, and add a `goal` time if you want one shown
 
 ## Case studies (`src/content/projects/`)
-- [ ] Avanly and Clozit: one-line `summary`, `period`, `role`, `stack`, and the `<Draft>` blocks. Check `live: https://avanly.io` is the right URL; add a `live` link for Clozit if it has one
+- [ ] Avenly and Clozit: written from the two repos. Check `period`, `role` and Clozit's `status`, read each `<Draft>` block, and add real numbers under "Where it's at". Check `live: https://theclozit.com` is the page you want people to land on
 - [ ] AffiliateManager (now listed as Inactive): end date in `period`, role, and every `<Draft>` block (problem, decisions, testing, results with real numbers)
 - [ ] DataHelperV2: role, period, problem and results
 - [ ] Side projects: years in `period`

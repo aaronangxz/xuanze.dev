@@ -642,3 +642,6 @@ pre, code, kbd { font-variant-ligatures: none; font-feature-settings: "liga" 0, 
 .nr + .nr .countdown { grid-column: 2; grid-row: 1 / span 2; margin: 0; flex-direction: column; align-items: flex-end; gap: 2px; }
 .nr + .nr .countdown b { font-size: 2.1rem; }
 .nr + .nr .countdown span { font-size: .75rem; }
+
+/* Second list inside a widget (Experience → Education on home) */
+.widget .w-sub { margin: 16px 0 10px; padding-top: 14px; border-top: 1px solid var(--glass-line, var(--line)); font-size: .8125rem; font-weight: 600; color: var(--muted); }

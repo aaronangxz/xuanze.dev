@@ -56,6 +56,14 @@ export async function launcherItems(): Promise<LauncherItem[]> {
     });
   }
 
+  for (const x of site.education) {
+    items.push({
+      g: 'Education', t: x.org, s: `${x.role.split(',')[0]} · ${x.from}–${x.to}`, i: 'work', k: `education school ${x.short} ${x.role}`,
+      href: '/about', cta: 'See education', searchOnly: true,
+      p: preview(`${x.from} – ${x.to}`, x.org, x.role),
+    });
+  }
+
   const all = await posts();
   for (const post of all) {
     items.push({

@@ -28,8 +28,8 @@ export const site = {
   /** The "Currently" card on the home page. */
   currently: [
     { title: 'TikTok', sub: 'Software Engineer in Test', meta: 'work' },
-    { title: 'Avanly', sub: 'Building it', meta: 'product', href: '/projects/avanly' },
-    { title: 'Clozit', sub: 'Building it', meta: 'product', href: '/projects/clozit' },
+    { title: 'Avenly', sub: 'Event platform, live', meta: 'product', href: '/projects/avenly' },
+    { title: 'Clozit', sub: 'Fashion app, in beta', meta: 'product', href: '/projects/clozit' },
   ],
 
   about: {
@@ -37,7 +37,7 @@ export const site = {
     focus: 'Backend systems, product engineering, testing',
     paragraphs: [
       'I build backend systems and the products around them, and I care about what happens to software after it ships.',
-      'I started in test engineering. At Shopee I wrote API automation for voucher services in Marketplace Promotions. At TikTok I test Data Insights products end to end and build internal tools like DataHelperV2. I finished a B.Tech in Software Engineering at NUS alongside both jobs. Outside work I build my own products: right now that’s Avanly and Clozit.',
+      'I started in test engineering. At Shopee I wrote API automation for voucher services in Marketplace Promotions. At TikTok I test Data Insights products end to end and build internal tools like DataHelperV2. I finished a B.Tech in Software Engineering at NUS alongside both jobs. Outside work I build my own products: right now that’s Avenly, an event platform, and Clozit, a fashion app.',
     ],
     howIWork: [
       'Small changes, shipped often.',
@@ -54,6 +54,9 @@ export const site = {
       detail: 'Built DataHelperV2, a mock-data injection tool for test databases. End-to-end testing of data products.' },
     { org: 'Shopee', role: 'Software QA Engineer, Marketplace Promotions (Vouchers)', from: 'Jun 2021', to: 'Sep 2022',
       detail: 'API automation for voucher services.' },
+  ],
+
+  education: [
     { org: 'National University of Singapore', short: 'NUS', role: 'B.Tech (Computing), Software Engineering', from: '2020', to: '2024' },
     { org: 'Nanyang Polytechnic', short: 'NYP', role: 'Diploma in Mechatronics Engineering', from: '2013', to: '2016' },
   ],

@@ -1,11 +1,12 @@
 ---
 title: Clozit
 kind: product
-summary: "[One line: what Clozit does and who it's for.]"
-status: In development
+summary: A fashion app for the clothes you already own. Photograph a piece and AI catalogues it, plan outfits from your wardrobe, then sell or swap what you don't wear on a curated marketplace.
+status: "[In beta on TestFlight]"
 period: "[2026] – now"
 role: "[Founder, building it end to end]"
-stack: []
+stack: [Swift, SwiftUI, Go, PostgreSQL, Claude API, Cloudflare R2, Firebase]
+live: https://theclozit.com
 order: 2
 ---
 import Draft from '../../components/Draft.astro';
@@ -13,17 +14,28 @@ import Draft from '../../components/Draft.astro';
 ## What it is
 
 <Draft>
-[Two or three sentences: the problem Clozit solves, who has it, and what using it looks like.]
+Most wardrobes are full of clothes nobody remembers owning. Clozit starts by getting your wardrobe into your phone: take a photo, and the app works out what the piece is, its brand, material and category. From there you can style outfits from what you have, and list anything you don't wear to sell or swap with other people on the app.
 </Draft>
 
-## What I'm building
+## What's in it
+
+- **Wardrobe**: photo-in, catalogue-out. Each item is analysed by AI in the background and confirmed by you before it's added.
+- **Style**: build outfits from your own pieces, plus an outfit-of-the-day widget.
+- **Marketplace**: list a piece to sell, swap or both, with offers, swap proposals and orders. Payments use PayNow.
+- **Pop-up store**: a checkout flow for buying in person at the Clozit pop-up on 28–29 Nov 2026.
+
+## How it's built
+
+The iOS app is native SwiftUI. Behind it is a Go API server and a Go worker on Railway, sharing a PostgreSQL database. Slow work, like analysing a garment photo, goes on a Postgres-native job queue (River), so there's no Redis to run. Photos live in Cloudflare R2, sign-in is Firebase, and garment analysis calls the Claude API.
+
+## Making sure it doesn't break
 
 <Draft>
-[The main pieces: the product surface, the backend, anything interesting about how it's put together.]
+Every change ships with QA evidence. A screenshot harness can render any screen from fixed sample data, with no sign-in and no backend, and a script walks every route on the iOS Simulator, builds an HTML report and posts it to the pull request. It also guards against making a real, billed AI call by mistake during a screenshot run.
 </Draft>
 
 ## Where it's at
 
 <Draft>
-[Stage, what's live, what's next.]
+[In TestFlight beta, with the pop-up in late November. Add numbers if you have them: testers, items catalogued, listings.]
 </Draft>
