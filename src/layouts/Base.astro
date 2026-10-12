@@ -49,6 +49,9 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
         try { t = localStorage.getItem('xz-theme'); } catch (e) {}
         if (!t) { var m = /(?:^|;)xz-theme=(\w+)/.exec(window.name || ''); if (m) t = m[1]; }
         if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t);
+        // Arriving from another page of the site: the page transition already eases it in, so skip the
+        // per-element rise (it started the content invisible, which read as a blank flash).
+        try { if (document.referrer && new URL(document.referrer).origin === location.origin) r.classList.add('nav-in'); } catch (e) {}
         // Pages usually continue below the fold: show the bottom edge blur from the first frame (no fade-in flash).
         r.classList.add('edge-down');
         try {

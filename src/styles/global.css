@@ -616,11 +616,12 @@ html.sliding .page { pointer-events: none; }
 /* Page transitions (View Transitions API where supported) */
 .ambient { view-transition-name: ambient; }
 .top { view-transition-name: topbar; }
-/* A soft cross-fade with a small lift; no full-page blur (expensive to draw on every click). */
-::view-transition-old(root) { animation: vt-out .18s cubic-bezier(.4,0,1,1) both; }
-::view-transition-new(root) { animation: vt-in .34s cubic-bezier(.2,.8,.2,1) .04s both; }
-@keyframes vt-out { to { opacity: 0; transform: translateY(-4px) scale(.995); } }
-@keyframes vt-in { from { opacity: 0; transform: translateY(10px) scale(.995); } }
+/* The old page stays fully opaque underneath while the new one fades and lifts in on top, so there is
+   never a moment where both are see-through (that read as a flash to blank). Normal blending, not the
+   default plus-lighter, so the overlap doesn't brighten. No full-page blur: too expensive per click. */
+::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: vt-in .3s cubic-bezier(.2,.8,.2,1) both; mix-blend-mode: normal; }
+@keyframes vt-in { from { opacity: 0; transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } .more svg { animation: none; } }
 
 /* =========================================================
@@ -631,7 +632,7 @@ html.sliding .page { pointer-events: none; }
 /* Arriving via the Work/Life slide: hold the page until the enter animation starts */
 html.slide-in .page { visibility: hidden; }
 html.slide-in.slide-go .page { visibility: visible; }
-html.slide-in .rise { animation: none !important; }
+html.slide-in .rise, html.nav-in .rise { animation: none !important; }
 html.sliding, html.sliding body { overflow-x: clip; }
 html.sliding .page { pointer-events: none; }
 
