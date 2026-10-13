@@ -192,8 +192,10 @@ const L = launcher && (() => {
   document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => {
     input.value = b.dataset.q; active = 0; expanded = false; render();
     input.focus({ preventScroll: true });
+    // Land below both the header and the soft blur band that fades out under it, not inside the blur.
     const head = document.querySelector('header.top')?.getBoundingClientRect().bottom ?? 0;
-    const y = launcher.getBoundingClientRect().top + scrollY - head - 12;
+    const blur = document.querySelector('.edge-t')?.getBoundingClientRect().height ?? 0;
+    const y = launcher.getBoundingClientRect().top + scrollY - Math.max(head + 16, blur - 24);
     if (Math.abs(y - scrollY) > 4) scrollTo({ top: Math.max(0, y), behavior: reduce ? 'auto' : 'smooth' });
   }));
 
