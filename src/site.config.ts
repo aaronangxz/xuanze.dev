@@ -6,6 +6,8 @@ export const site = {
   name: 'Ang Xuan Ze',
   shortName: 'Xuan Ze',
   url: 'https://xuanze.dev',
+  /** Google Analytics 4 measurement ID (the same property the old site used). Empty to turn analytics off. */
+  analyticsId: 'G-KP4W6YDH11' as string,
   description: 'Software engineer in Singapore. I build software in Go and TypeScript, and I make sure it doesn’t break.',
   email: 'angxze@gmail.com',
   location: 'Singapore',
