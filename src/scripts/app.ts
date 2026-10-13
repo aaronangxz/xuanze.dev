@@ -47,6 +47,13 @@ let closing = false;
 const L = launcher && (() => {
   const input = $('q'), list = $('list'), prev = $('prev'), lw = $('lw'), moreBtn = $('more'), moreN = $('more-n'), countEl = $('count');
   let shown = [], active = 0, hl = null, lastFocus = null;
+  // Phones: a plain list. A tap opens the row, and only the first rows show until "Show all" is pressed.
+  const compactMQ = window.matchMedia('(max-width: 640px)');
+  const FEW = 5;
+  let expanded = false;
+  const fullPlaceholder = input.placeholder;
+  const setPlaceholder = () => { input.placeholder = compactMQ.matches ? 'Search projects, posts, notes' : fullPlaceholder; };
+  setPlaceholder();
 
   const ctaHtml = (it) => {
     const label = (it.cta || 'Open') + (it.external ? ' ↗' : it.copy ? '' : ' →');
@@ -62,8 +69,9 @@ const L = launcher && (() => {
     let html = '', g = null;
     if (!shown.length) html = '<li class="empty">No results. Try "go" or "redis".</li>';
     shown.forEach((it, i) => {
-      if (it.g !== g) { html += `<li class="grp" role="presentation">${it.g}</li>`; g = it.g; }
-      html += `<li class="opt" role="option" id="o${i}" data-i="${i}" aria-selected="${i === active}"><span class="ic${it.img ? ' logo' : ''}">${it.img ? `<img src="${it.img}" alt="" width="30" height="30">` : IC[it.i] || IC.doc}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`;
+      const x = !q && i >= FEW ? ' x' : '';
+      if (it.g !== g) { html += `<li class="grp${x}" role="presentation">${it.g}</li>`; g = it.g; }
+      html += `<li class="opt${x}" role="option" id="o${i}" data-i="${i}" aria-selected="${i === active}"><span class="ic${it.img ? ' logo' : ''}">${it.img ? `<img src="${it.img}" alt="" width="30" height="30">` : IC[it.i] || IC.doc}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`;
     });
     list.innerHTML = html;
     hl = document.createElement('li'); hl.className = 'hl'; hl.setAttribute('role', 'presentation'); hl.setAttribute('aria-hidden', 'true');
@@ -115,6 +123,17 @@ const L = launcher && (() => {
     }
   }
   function updateScroll() {
+    if (compactMQ.matches) {
+      const q = input.value.trim();
+      const more = !q && shown.length > FEW;
+      lw.classList.toggle('short', more && !expanded);
+      lw.classList.remove('below', 'above');
+      moreBtn.hidden = !more;
+      moreBtn.classList.toggle('up', expanded);
+      moreN.textContent = expanded ? 'Show fewer' : `Show all ${shown.length}`;
+      return;
+    }
+    lw.classList.remove('short');
     const below = list.scrollHeight - list.scrollTop - list.clientHeight > 4;
     lw.classList.toggle('below', below);
     lw.classList.toggle('above', list.scrollTop > 4);
@@ -129,7 +148,7 @@ const L = launcher && (() => {
   }
   function open() {
     const it = shown[active]; if (!it) return;
-    if (it.copy) { copyEmail(prev.querySelector('[data-copy]')); return; }
+    if (it.copy) { copyEmail(compactMQ.matches ? null : prev.querySelector('[data-copy]')); return; }
     if (it.life) { slideTo('life', it.href); return; }
     if (it.external) { window.open(it.href, '_blank', 'noopener'); return; }
     location.href = it.href;
@@ -139,12 +158,19 @@ const L = launcher && (() => {
   list.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(updateScroll); }, { passive: true });
   moreBtn.addEventListener('click', () => {
     const behavior = reduce ? 'auto' : 'smooth';
+    if (compactMQ.matches) {
+      expanded = !expanded;
+      updateScroll();
+      if (expanded && !reduce) list.querySelectorAll('.x').forEach((el, i) => { if (i < 20) el.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: i * 18, easing: EASE, fill: 'backwards' }); });
+      if (!expanded) launcher.scrollIntoView({ block: 'nearest', behavior });
+      return;
+    }
     if (moreBtn.classList.contains('up')) list.scrollTo({ top: 0, behavior });
     else list.scrollBy({ top: list.clientHeight * 0.7, behavior });
   });
   moreBtn.addEventListener('mousedown', (e) => e.preventDefault());
   window.addEventListener('resize', () => { moveHL(true); updateScroll(); });
-  input.addEventListener('input', () => { active = 0; render(); });
+  input.addEventListener('input', () => { active = 0; expanded = false; render(); });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown') { e.preventDefault(); if (shown.length) select((active + 1) % shown.length); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); if (shown.length) select((active - 1 + shown.length) % shown.length); }
@@ -152,7 +178,12 @@ const L = launcher && (() => {
     else if (e.key === 'Escape') { e.preventDefault(); if (!overlay.hidden) closeOverlay(); else { input.value = ''; active = 0; render(); } }
   });
   list.addEventListener('mousedown', (e) => e.preventDefault());
-  list.addEventListener('click', (e) => { const o = e.target.closest('.opt'); if (!o) return; const i = +o.dataset.i; if (i === active) open(); else { select(i); input.focus(); } });
+  list.addEventListener('click', (e) => {
+    const o = e.target.closest('.opt'); if (!o) return; const i = +o.dataset.i;
+    if (compactMQ.matches) { active = i; open(); return; }
+    if (i === active) open(); else { select(i); input.focus(); }
+  });
+  compactMQ.addEventListener('change', () => { setPlaceholder(); render(false); });
   document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { input.value = b.dataset.q; active = 0; render(); input.focus(); }));
 
   // Focus mode on home: everything around the launcher blurs back while you search.
@@ -412,15 +443,38 @@ if (themeBtn) {
 const mbtn = $('mbtn');
 const topBar = document.querySelector<HTMLElement>('header.top');
 if (mbtn && topBar) {
-  const setMenu = (open: boolean) => {
-    topBar.classList.toggle('menu-open', open);
+  // The bar grows to the open height (and back) while the links slide in, so nothing pops.
+  let menuOpen = false, menuAnim = null;
+  const menuItems = () => [...topBar.querySelectorAll('nav a, nav .theme')].filter((el) => getComputedStyle(el).display !== 'none');
+  const setMenu = (open) => {
+    if (open === menuOpen) return;
+    menuOpen = open;
     mbtn.setAttribute('aria-expanded', String(open));
     mbtn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+    menuAnim?.cancel();
+    if (reduce) { topBar.classList.toggle('menu-open', open); return; }
+    const h0 = topBar.getBoundingClientRect().height;
+    topBar.classList.toggle('menu-open', open);
+    const h1 = topBar.getBoundingClientRect().height;
+    if (!open) topBar.classList.add('menu-open'); // keep the links laid out while the bar closes over them
+    topBar.style.overflow = 'clip';
+    menuAnim = topBar.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: open ? 320 : 240, easing: open ? EASE : 'cubic-bezier(.4,0,.2,1)' });
+    menuItems().forEach((el, i) => el.animate(open
+      ? [{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }]
+      : [{ opacity: 1 }, { opacity: 0 }],
+      open ? { duration: 260, delay: 60 + i * 35, easing: EASE, fill: 'backwards' } : { duration: 140, fill: 'forwards' }));
+    menuAnim.finished.then(() => {
+      topBar.style.overflow = '';
+      if (!open) {
+        topBar.classList.remove('menu-open'); menuItems().forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+        topBar.querySelectorAll('nav .kbtn').forEach((k) => k.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 180, easing: EASE }));
+      }
+    }, () => {});
   };
-  mbtn.addEventListener('click', () => setMenu(!topBar.classList.contains('menu-open')));
+  mbtn.addEventListener('click', () => setMenu(!menuOpen));
   topBar.querySelectorAll('nav a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
   document.addEventListener('pointerdown', (e) => { if (!topBar.contains(e.target as Node)) setMenu(false); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && topBar.classList.contains('menu-open')) { setMenu(false); mbtn.focus(); } });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menuOpen) { setMenu(false); mbtn.focus(); } });
   window.matchMedia('(max-width: 640px)').addEventListener('change', (m) => { if (!m.matches) setMenu(false); });
 }
 
