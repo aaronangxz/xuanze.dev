@@ -2,23 +2,20 @@
 title: Midasoo
 kind: product
 summary: Which card should I tap? A Singapore app that worked out the miles, points or cashback each of your cards would earn at a shop, and tracked your spending against every card's bonus caps.
-status: School project, meant to go further, hit a wall halfway
+status: Started as a school project, stalled on merchant category codes
 period: 2023 – 2025
 active: false
-role: "[Built most of the API and the mobile app, in a team of four]"
+role: One of four co-founders
 stack: [Go, Echo, PostgreSQL, sqlc, React Native, Expo, Firebase Auth, Google Cloud, OpenAI API, Python, Google Places API, React, Ant Design]
 order: 15
 ---
-import Draft from '../../components/Draft.astro';
 import ArchDiagram from '../../components/ArchDiagram.astro';
 
-> Started as a school project with a team of four, then kept going for two years. The code is private, so this covers what it did and how.
+> Started as a school project by four co-founders, then kept going for two years. The code is private, so this covers what it did and how.
 
 ## The problem
 
-<Draft>
 Singapore has dozens of miles and cashback cards, and each one pays differently depending on where you spend. A card might earn 4 miles a dollar on dining but nothing on groceries, only for contactless payments, only up to a monthly cap, and only once you pass a minimum spend in that statement cycle. People who care about rewards end up doing this arithmetic at the till, or keeping a spreadsheet.
-</Draft>
 
 ## What we built
 
@@ -85,8 +82,6 @@ Each scraped promotion's primary key is a hash of its issuer, merchant, offer, c
 
 ## Where it stopped
 
-<Draft>
-[What made it stall: e.g. keeping hundreds of card rules and promotions correct by hand as banks changed them, finding store-level category codes, or the time it took alongside full-time jobs.]
-</Draft>
+Everything above depends on one number: a shop's merchant category code (MCC), the code a card network uses to decide which spending category a purchase falls into, and therefore which rate a card pays. Banks don't publish it, the same brand can be coded differently at different branches, and the only sure way to learn it is to make a purchase there. The OpenAI guess was right often enough to look convincing and wrong often enough that a recommendation could not be trusted. An app whose whole promise is "tap this card and you'll earn the most" can't be built on a guess, so we stopped there.
 
 Around 460 commits on the API and 370 on the app between 2023 and 2025, most of them mine.

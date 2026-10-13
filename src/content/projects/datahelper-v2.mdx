@@ -9,7 +9,6 @@ role: Founder and owner. Designed, built and ran it.
 stack: [Go, Hertz, GORM, MySQL, Elasticsearch, Redis, TypeScript, React, TDesign, ECharts]
 order: 3
 ---
-import Draft from '../../components/Draft.astro';
 import ArchDiagram from '../../components/ArchDiagram.astro';
 
 > Internal tool, so there are no screenshots or source here. This covers the problem and the engineering.
@@ -89,9 +88,7 @@ Mock data lives in its own database. Test-environment services read from it only
 
 - Preparing data for one dashboard page backed by 17 tables went from 35 minutes with one-table injection to 5 minutes with module injection.
 - Data-heavy work such as launching a new region no longer starts with days of hand-built data.
+- More than 100 people have used it.
 
-<Draft>
-- Used by [N] QAs and engineers across [N] teams.
-</Draft>
 
 Built in two phases: the platform and one-table injection from October 2022, module injection from October 2023 to March 2024. Alongside it, I prepared a front-end-only mock data set, loaded through a browser extension, so PMs could demo every page without touching a database.
