@@ -469,7 +469,7 @@ html.sliding .page { pointer-events: none; }
 .flap { position: relative; width: 1.35rem; height: 1.8rem; display: inline-flex; align-items: center; justify-content: center; font: 600 1rem var(--mono); color: var(--l-flap); border-radius: 3px;
   background: linear-gradient(180deg, var(--l-flap-a) 0 49.5%, var(--l-flap-b) 50.5% 100%); box-shadow: inset 0 -1px 0 rgba(0,0,0,.55), 0 1px 0 rgba(var(--l-ink-rgb),.04); }
 .flap::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0,0,0,.65); }
-.flap.tick { animation: flip .11s ease-out; }
+.flap { contain: strict; }
 @keyframes flip { from { transform: scaleY(.55); filter: brightness(1.5); } }
 .rmk { font-size: .9375rem; }
 .rmk small { display: block; font: .6875rem var(--mono); color: var(--l-muted); letter-spacing: .06em; }
@@ -515,14 +515,18 @@ html.sliding .page { pointer-events: none; }
 .races { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; margin-bottom: 40px; }
 @media (max-width: 900px) { .races { grid-template-columns: minmax(0, 1fr); } }
 .race-card { position: relative; display: flex; flex-direction: column; gap: 18px; border-radius: 20px; padding: 24px 26px; border: 1px solid var(--l-line); background: var(--l-surface); overflow: hidden; }
-@property --rc-sweep { syntax: '<percentage>'; inherits: false; initial-value: -60%; }
-.race-card:first-child { animation: rc-glow 4.8s ease-in-out infinite; }
-.race-card:first-child::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
-  background: linear-gradient(105deg, transparent 0 calc(var(--rc-sweep) - 18%), rgba(255,255,255,.07) var(--rc-sweep), transparent calc(var(--rc-sweep) + 18%) 100%);
-  animation: rc-sheen 6s cubic-bezier(.45,0,.25,1) infinite; }
-@keyframes rc-sheen { 0% { --rc-sweep: -60%; } 55%, 100% { --rc-sweep: 160%; } }
-@keyframes rc-glow { 0%, 100% { box-shadow: 0 0 0 1px rgba(var(--l-a-rgb), .14), 0 18px 50px -30px rgba(var(--l-a-rgb), .35); } 50% { box-shadow: 0 0 0 1px rgba(var(--l-a-rgb), .32), 0 22px 70px -24px rgba(var(--l-a-rgb), .55); } }
-@media (prefers-reduced-motion: reduce) { .race-card:first-child, .race-card:first-child::after { animation: none; } }
+/* The next race pulses and shimmers. Both run on the compositor (opacity / transform only): animating the
+   box-shadow or a gradient stop repainted the card every frame, which made scrolling the Life page stutter. */
+.race-card:first-child { box-shadow: 0 0 0 1px rgba(var(--l-a-rgb), .14), 0 18px 50px -30px rgba(var(--l-a-rgb), .35); }
+.race-card:first-child::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(var(--l-a-rgb), .3), inset 0 0 46px rgba(var(--l-a-rgb), .16);
+  opacity: 0; animation: rc-glow 4.8s ease-in-out infinite; }
+.race-card:first-child::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 32%, rgba(255,255,255,.07) 50%, transparent 68%);
+  transform: translateX(-110%); animation: rc-sheen 6s cubic-bezier(.45,0,.25,1) infinite; }
+@keyframes rc-sheen { 0% { transform: translateX(-110%); } 55%, 100% { transform: translateX(110%); } }
+@keyframes rc-glow { 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .race-card:first-child::before, .race-card:first-child::after { animation: none; } }
 .race-card:first-child { background: linear-gradient(140deg, rgba(var(--l-a-rgb), .18), rgba(var(--l-b-rgb), .07) 70%); border-color: rgba(var(--l-a-rgb), .3); }
 .rc-where { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: .75rem var(--mono); color: var(--l-muted); }
 .rc-next { display: none; margin-left: auto; font: 600 .625rem var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--l-on); background: var(--l-a); padding: 4px 8px; border-radius: 999px; }
@@ -883,7 +887,10 @@ html[data-mode="life"] body { overflow-x: clip; }
 .tm.drawn .tm-r:not(.up) { animation: tm-draw 1.4s cubic-bezier(.3,.7,.2,1) both; animation-delay: calc(var(--i) * 22ms); }
 @keyframes tm-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 .tm-r.up { stroke: var(--l-b); opacity: 0; stroke-dasharray: calc(var(--u) * 5) calc(var(--u) * 5); stroke-dashoffset: 0; }
-.tm.drawn .tm-r.up { opacity: .75; transition: opacity 1s 1.2s; }
+.tm.drawn .tm-r.up { opacity: .75; animation: tm-up 1s 1.2s backwards; }
+@keyframes tm-up { from { opacity: 0; } }
+/* The draw repaints the whole map (land included) every frame, so it waits while the page is scrolling. */
+html.scrolling .tm-r { animation-play-state: paused !important; }
 .tm-r.hot { stroke: #fff; opacity: 1; }
 .tm-ground path { fill: none; stroke: rgba(var(--l-ink-rgb), .55); stroke-width: calc(var(--u) * 1.4); stroke-linecap: round; stroke-dasharray: calc(var(--u) * .1) calc(var(--u) * 4); }
 .tm-hits path { fill: none; stroke: transparent; stroke-width: calc(var(--u) * 14); pointer-events: stroke; cursor: default; }
@@ -1184,6 +1191,20 @@ html.edge-up .edge-t, html.edge-down .edge-b { opacity: 1; }
 .edge-t b { background: linear-gradient(to bottom, color-mix(in srgb, var(--edge-tint) 75%, transparent) 30%, transparent); }
 .edge-b b { background: linear-gradient(to top, color-mix(in srgb, var(--edge-tint) 55%, transparent), transparent); }
 @media print { .edge { display: none; } }
+/* iOS Safari draws its own blur under the status bar and the floating address bar, and clips and tints fixed
+   elements that touch the screen edges, so our bands there show hard cut lines. Let Safari's own edge effect do it.
+   (-webkit-touch-callout is only supported by WebKit on iOS and iPadOS.) */
+@supports (-webkit-touch-callout: none) { .edge { display: none; } }
+
+/* Phones and tablets: frosted glass is re-blurred on every frame while it scrolls over the moving background, which
+   drops frames. In-flow surfaces use the solid glass colour instead (near-identical over the soft background); the
+   sticky header and overlays keep the real blur, as there is only one of each. The Life grain, a full-screen blend
+   over everything, is off too. */
+@media (hover: none) and (pointer: coarse) {
+  .app, .window, .widget, .nextcard, .filter, .mailbox, .kbtn, .theme, .try button, .btn-s, .photo, .note, pre, .more, .facts li {
+    -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
+  .grain { display: none; }
+}
 
 /* Phones: every control gets a thumb-sized hit area, and no reading text drops under 12px */
 @media (max-width: 640px) {
@@ -1398,3 +1419,5 @@ figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display
 @keyframes mk-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mk-runin { from { transform: translateX(-62px); } to { transform: translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .mk, .mk * { animation: none !important; } }
+/* hold the pose while the page scrolls (set in app.ts): see the note there */
+html.scrolling:not(.mk-in) .mk-pane:not(.mk-in) .mk * { animation-play-state: paused !important; }
