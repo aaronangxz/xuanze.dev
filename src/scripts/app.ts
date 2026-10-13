@@ -547,22 +547,37 @@ if (board) {
     el.setAttribute('role', 'cell'); el.setAttribute('aria-label', t.trim() || 'not recorded');
     el.innerHTML = t.split('').map((c) => `<span class="flap" aria-hidden="true">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
   });
+  // One frame loop for the whole board (not a timer per letter, and no forced layout per flip), and each tile is
+  // layout-contained (CSS), so the letters can churn while the page scrolls past without stalling it.
   const run = () => {
     if (reduce) return;
+    const flaps = [];
     board.querySelectorAll('.board-row:not(.board-th)').forEach((row, ri) => {
       row.querySelectorAll('.flap').forEach((f, ci) => {
         const fin = f.textContent;
-        if (!fin.trim() || fin === ' ') return;
-        const steps = 5 + ci * 2 + ri * 2, digit = /[0-9]/.test(fin);
-        let n = 0;
-        const iv = setInterval(() => {
-          n++;
-          f.textContent = n >= steps ? fin : digit ? CH[26 + Math.floor(Math.random() * 10)] : CH[Math.floor(Math.random() * 26)];
-          f.classList.remove('tick'); void f.offsetWidth; f.classList.add('tick');
-          if (n >= steps) clearInterval(iv);
-        }, 55);
+        if (!fin.trim() || fin === '\u00a0') return;
+        flaps.push({ f, fin, steps: 5 + ci * 2 + ri * 2, digit: /[0-9]/.test(fin), n: 0 });
       });
     });
+    const STEP = 55;
+    let last = 0;
+    const frame = (t) => {
+      // hold while the page is scrolling (html.scrolling): each flip is a text change, and they cost scroll frames
+      if (root.classList.contains('scrolling')) { requestAnimationFrame(frame); return; }
+      if (t - last >= STEP) {
+        last = t;
+        let left = 0;
+        for (const x of flaps) {
+          if (x.n >= x.steps) continue;
+          x.n++;
+          x.f.firstChild.nodeValue = x.n >= x.steps ? x.fin : x.digit ? CH[26 + Math.floor(Math.random() * 10)] : CH[Math.floor(Math.random() * 26)];
+          if (x.n < x.steps) left++;
+        }
+        if (!left) return;
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
   };
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { run(); io.disconnect(); } }), { threshold: 0.3 });
@@ -584,17 +599,30 @@ if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races
    Edge blur: show the top/bottom blur only when there is more page that way
    ========================================================= */
 {
-  let raf = 0;
+  // The page height is measured only when it can change (resize, content growing), never per scroll frame:
+  // reading it forces a full layout, which is what dropped frames while scrolling.
+  let raf = 0, max = 0, up = false, down = false;
   const edges = () => {
     raf = 0;
-    const max = document.documentElement.scrollHeight - innerHeight;
-    root.classList.toggle('edge-up', scrollY > 4);
-    root.classList.toggle('edge-down', scrollY < max - 4);
+    const u = scrollY > 4, d = scrollY < max - 4;
+    if (u !== up) { up = u; root.classList.toggle('edge-up', u); }
+    if (d !== down) { down = d; root.classList.toggle('edge-down', d); }
   };
+  const measure = () => { max = document.documentElement.scrollHeight - innerHeight; queue(); };
   const queue = () => { if (!raf) raf = requestAnimationFrame(edges); };
-  addEventListener('scroll', queue, { passive: true });
-  addEventListener('resize', queue);
-  new ResizeObserver(queue).observe(document.body);
+  // While the page scrolls, the header mark holds its pose (html.scrolling): its loop animates SVG shapes,
+  // which repaints on the main thread every frame and was the biggest cost of a scroll frame on phones.
+  let still = 0, moving = false;
+  const settle = () => { moving = false; root.classList.remove('scrolling'); };
+  addEventListener('scroll', () => {
+    queue();
+    if (!moving) { moving = true; root.classList.add('scrolling'); }
+    clearTimeout(still); still = window.setTimeout(settle, 200);
+  }, { passive: true });
+  addEventListener('resize', measure);
+  new ResizeObserver(measure).observe(document.body);
+  max = document.documentElement.scrollHeight - innerHeight;
+  down = root.classList.contains('edge-down');
   edges();
   // Fade the edges only after the first frames, so arriving on a page never animates them in.
   requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('edge-ready')));
