@@ -3,21 +3,18 @@ title: Avenly
 kind: product
 summary: An event platform for hosts. Design the invitation page, then run guest lists, RSVPs, seating, budgets, check-in and a live photo wall from one place. Guests never need an account.
 status: Live
-period: "[2025] – now"
-role: "[Founder, building it end to end]"
+period: 2025 – now
+role: Founder
 stack: [Go, gRPC, Next.js, React, TypeScript, PostgreSQL, Stripe, Cloudflare R2]
 live: https://avenly.io
 logo: /logos/avenly.png
 order: 1
 ---
-import Draft from '../../components/Draft.astro';
 import ArchDiagram from '../../components/ArchDiagram.astro';
 
 ## What it is
 
-<Draft>
-Planning an event means juggling a design tool for the invitation, a spreadsheet for guests, a chat group for RSVPs and another spreadsheet for the budget. Avenly puts all of it behind one event: hosts design a public invitation page, and everything after that, from RSVPs to the seating chart to who has checked in at the door, hangs off the same guest list.
-</Draft>
+Avenly runs an event from the first invitation to the photos afterwards, all from one guest list. Hosts design the invitation page in a visual builder or start from a ready-made theme, in more than one language. The same list then drives RSVPs, the seating chart, the budget and gift records, QR check-in at the door, a live photo wall at the venue, and the gallery afterwards. Nothing is copied between tools, so nothing drifts out of date, and co-hosts or planners can join with only the parts they need.
 
 Guests reach their invitation, RSVP, entry pass and the photo wall through a magic link. There are no guest accounts and no passwords to forget.
 
@@ -66,12 +63,8 @@ The backend is Go, serving gRPC with an HTTP gateway in front of it, so one prot
 
 ## Making sure it doesn't break
 
-<Draft>
 Every RPC has to be declared public or protected in the auth interceptor. A test walks the whole service definition and fails the build if a new RPC is in neither list, so an endpoint can't ship unauthenticated by accident. Plan limits live in one table on the server and are served to the app, so a price or a limit is never hard-coded in two places. Stripe webhooks are de-duplicated by event ID, because Stripe does deliver the same event twice.
-</Draft>
 
 ## Where it's at
 
-<Draft>
-[Live at avenly.io. Add a number or two: events hosted, guests invited, Pro subscribers, or whatever you're comfortable sharing.]
-</Draft>
+Live at avenly.io. I'm building it out into a full product one feature at a time, and it has picked up its first few hosts on its own, without any marketing.

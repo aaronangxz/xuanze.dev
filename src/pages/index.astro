@@ -58,7 +58,7 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
       <section class="widget" aria-labelledby="w3">
         <h2 id="w3">Get in touch</h2>
         <div class="mailbox"><span>{site.email}</span><button class="btn-s" type="button" data-copy>Copy</button></div>
-        <div class="links"><a href={site.links.linkedin}>LinkedIn</a><a href={site.links.github}>GitHub</a><a href={site.resume}>Résumé</a></div>
+        <div class="links"><a href={site.links.linkedin}>LinkedIn</a><a href={site.links.github}>GitHub</a>{site.resume && <a href={site.resume}>Résumé</a>}</div>
       </section>
     </div>
   </div>

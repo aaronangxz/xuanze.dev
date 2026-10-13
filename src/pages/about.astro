@@ -46,7 +46,7 @@ const a = site.about;
           <div><dt>languages</dt><dd><div class="chips">{a.languages.map((l) => <span>{l}</span>)}</div></dd></div>
           <div><dt>tools</dt><dd><div class="chips">{a.tools.map((l) => <span>{l}</span>)}</div></dd></div>
           <div><dt>contact</dt><dd>{site.email} <button class="btn-s" type="button" data-copy>Copy</button></dd></div>
-          <div><dt>elsewhere</dt><dd><a href={site.links.github}>GitHub</a> · <a href={site.links.linkedin}>LinkedIn</a> · <a href={site.resume}>Résumé</a></dd></div>
+          <div><dt>elsewhere</dt><dd><a href={site.links.github}>GitHub</a> · <a href={site.links.linkedin}>LinkedIn</a>{site.resume && <> · <a href={site.resume}>Résumé</a></>}</dd></div>
         </dl>
       </Fragment>
     </DocWindow>

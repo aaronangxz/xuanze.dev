@@ -11,8 +11,8 @@ export const site = {
   email: 'angxze@gmail.com',
   location: 'Singapore',
   timezone: 'GMT+8',
-  // TODO: add your résumé as public/resume.pdf
-  resume: '/resume.pdf',
+  /** Set to '/resume.pdf' once public/resume.pdf exists; every Résumé link hides while this is empty. */
+  resume: '' as string,
   links: {
     github: 'https://github.com/aaronangxz',
     linkedin: 'https://www.linkedin.com/in/aaronangxz/',

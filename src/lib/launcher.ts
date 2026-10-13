@@ -29,11 +29,12 @@ export async function launcherItems(): Promise<LauncherItem[]> {
   items.push(
     { g: 'Start here', t: 'About me', s: 'Profile', i: 'user', k: 'about bio profile experience singapore', href: '/about', cta: 'Open profile',
       p: preview('profile', 'About me', site.about.paragraphs[0], chips(site.about.languages)) },
-    { g: 'Start here', t: 'Résumé', s: 'One page, PDF', i: 'doc', k: 'resume cv experience skills pdf', href: site.resume, external: true, cta: 'Open PDF',
-      p: preview('document · pdf', 'Résumé', 'Experience, projects and skills on one page.') },
     { g: 'Start here', t: 'Copy email address', s: 'Action', i: 'mail', k: 'email contact mail talk', copy: true, cta: 'Copy email',
       p: preview('action', site.email, 'The fastest way to reach me. I usually reply within a day.') },
   );
+  if (site.resume) items.splice(items.length - 1, 0,
+    { g: 'Start here', t: 'Résumé', s: 'One page, PDF', i: 'doc', k: 'resume cv experience skills pdf', href: site.resume, external: true, cta: 'Open PDF',
+      p: preview('document · pdf', 'Résumé', 'Experience, projects and skills on one page.') });
 
   // Same groups and order as the Projects page: products, work, side projects, then what's no longer running.
   const pgroup = projectGroup;
