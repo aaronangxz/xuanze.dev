@@ -1026,8 +1026,11 @@ html.cv-lock, html.cv-lock body { overflow: hidden; }
 
 /* Edge blur: layered backdrop blurs, each masked to a band, so the blur ramps up toward the screen edge.
    Shown only while there is more page above (top) or below (bottom). */
-.edge { --edge-tint: var(--bg); position: fixed; left: 0; right: 0; z-index: 35; pointer-events: none; opacity: 0; }
-html.edge-ready .edge { transition: opacity .35s ease; }
+/* --edge-tint is a registered colour so it can fade: on a Work/Life switch it follows the page colour
+   (body's .8s background fade) instead of snapping to the other side's colour mid-switch. */
+@property --edge-tint { syntax: '<color>'; inherits: true; initial-value: transparent; }
+.edge { --edge-tint: var(--bg); position: fixed; left: 0; right: 0; z-index: 35; pointer-events: none; opacity: 0; transition: --edge-tint .8s ease; }
+html.edge-ready .edge { transition: opacity .35s ease, --edge-tint .8s ease; }
 html[data-mode="life"] .edge { --edge-tint: var(--l-bg); }
 /* The top band reaches well past the floating nav bar, so the ramp is visible below it rather than hidden behind it. */
 .edge-t { top: 0; height: calc(env(safe-area-inset-top, 0px) + 148px); }
