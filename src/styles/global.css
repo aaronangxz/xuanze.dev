@@ -389,22 +389,22 @@ html[data-mode="life"] .mark .mk-pane[data-side="life"] { display: block; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mode { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), inset 0 1px 3px rgba(0,0,0,.4); } }
 .mode button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 .8125rem var(--sans); border: 0; background: none; color: var(--muted); padding: 6px 15px 6px 12px; border-radius: 999px; cursor: pointer; min-height: 32px; transition: color .45s, background .25s; }
 .mode .mi { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
-/* the side you're not on: its icon in colour, and a hover that leans the knob toward it */
+/* the side you're not on: its icon in colour, and a hover that leans the knob toward it (and lifts the plane) */
 .mode[data-pos="work"] [data-mode-btn="life"] { color: var(--ink); }
-.mode[data-pos="work"] [data-mode-btn="life"] .mi-sun circle { fill: #FFD25A; stroke: #E39B2F; }
-.mode[data-pos="work"] [data-mode-btn="life"] .mi-sun path { stroke: #F0A94A; }
+.mode .mi-plane { stroke-width: 1.1; }
+.mode[data-pos="work"] [data-mode-btn="life"] .mi-plane path { fill: #8FCBEB; stroke: #3F7FB0; }
 .mode[data-pos="life"] [data-mode-btn="work"] .mi rect { fill: rgba(143,203,235,.35); }
 .mode button[aria-pressed="false"]:hover { background: rgba(127,127,127,.12); }
-.mode button[aria-pressed="false"]:hover .mi-sun { transform: rotate(90deg) scale(1.12); }
-.mode button[aria-pressed="false"]:hover .mi:not(.mi-sun) { transform: translateY(-1px) scale(1.08); }
+.mode button[aria-pressed="false"]:hover .mi-plane { transform: translate(2px, -2px) rotate(-10deg) scale(1.08); }
+.mode button[aria-pressed="false"]:hover .mi:not(.mi-plane) { transform: translateY(-1px) scale(1.08); }
 .mode[data-pos="work"]:has([data-mode-btn="life"]:hover) .knob { transform: translateX(7px); }
 .mode[data-pos="life"]:has([data-mode-btn="work"]:hover) .knob { transform: translateX(calc(100% - 7px)); }
 /* once per visit, after the header's entrance: a small tug toward the other side, to show it moves */
 html.mode-hint .mode[data-pos="work"] .knob { animation: mode-tug .9s cubic-bezier(.4,0,.2,1); }
-html.mode-hint .mode[data-pos="work"] [data-mode-btn="life"] .mi-sun { animation: mode-sun .9s cubic-bezier(.4,0,.2,1); }
+html.mode-hint .mode[data-pos="work"] [data-mode-btn="life"] .mi-plane { animation: mode-plane .9s cubic-bezier(.4,0,.2,1); }
 @keyframes mode-tug { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(10px); } 45% { transform: translateX(2px); } 65% { transform: translateX(7px); } }
-@keyframes mode-sun { 0%, 100% { transform: none; } 30% { transform: rotate(60deg) scale(1.2); } 70% { transform: rotate(90deg) scale(1.05); } }
-@media (prefers-reduced-motion: reduce) { html.mode-hint .mode .knob, html.mode-hint .mode .mi-sun { animation: none; } }
+@keyframes mode-plane { 0%, 100% { transform: none; } 30% { transform: translate(3px, -3px) rotate(-12deg) scale(1.15); } 70% { transform: translate(1px, -1px) rotate(-4deg); } }
+@media (prefers-reduced-motion: reduce) { html.mode-hint .mode .knob, html.mode-hint .mode .mi-plane { animation: none; } }
 .mode button[aria-pressed="true"] { color: var(--cta-ink); }
 .mode .knob { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; pointer-events: none;
   background: linear-gradient(135deg, var(--cta-a), var(--cta-b)); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 4px 12px -6px var(--glass-shadow);
