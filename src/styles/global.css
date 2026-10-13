@@ -299,9 +299,6 @@ body { background: var(--amb-base); }
 .cta { background: linear-gradient(135deg, var(--cta-a), var(--cta-b)); color: var(--cta-ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 24px -12px var(--cta-a); }
 .cta:hover { opacity: 1; filter: brightness(1.06); }
 .home h1 > span { background: linear-gradient(95deg, var(--head-a) 10%, var(--head-b) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-/* Its own layer, always: WebKit repaints gradient-clipped text when an animated ancestor's layer comes and goes
-   (the end of the Work/Life slide), and that repaint blinked the line once on iOS. */
-.home h1 > span { transform: translateZ(0); }
 .chips span { background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); box-shadow: inset 0 0 0 1px var(--glass-line); }
 .status::before { background: radial-gradient(circle at 35% 35%, #7BE3A8, var(--ok)); }
 .overlay { background: rgba(14, 18, 34, .32); -webkit-backdrop-filter: blur(22px) saturate(120%); backdrop-filter: blur(22px) saturate(120%); }
@@ -730,6 +727,8 @@ html.slide-in:not(.slide-go) .top nav > * { opacity: 0; }
 html.slide-in .page { visibility: hidden; }
 html.slide-in.slide-go .page { visibility: visible; }
 html.slide-in .rise, html.nav-in .rise { animation: none !important; }
+/* no CSS transitions on the arriving content until its slide-in has finished (see app.ts: a WebKit quirk) */
+html.slide-in:not(.slide-done) .page, html.slide-in:not(.slide-done) .page *, html.slide-in:not(.slide-done) .top nav > * { transition: none !important; }
 html.sliding, html.sliding body { overflow-x: clip; }
 html.sliding .page { pointer-events: none; }
 
