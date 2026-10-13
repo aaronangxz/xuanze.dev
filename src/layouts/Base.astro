@@ -68,6 +68,14 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
     <div class="life-glow" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
     <div class="ambient" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+    <script is:inline>
+      // Put the blobs' drift on the wall clock, so the next page's blobs sit exactly where the last page's were
+      // and a page change never moves the background. Re-synced when a page prerendered in the background is shown.
+      (function () {
+        function sync() { var t = Date.now() % 3600000; document.querySelectorAll('.blob').forEach(function (b) { b.getAnimations().forEach(function (a) { a.currentTime = t; }); }); }
+        sync(); document.addEventListener('prerenderingchange', sync);
+      })();
+    </script>
 
     <!-- Progressive blur where the page continues above / below the viewport (toggled in app.ts). -->
     <div class="edge edge-t" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>

@@ -616,8 +616,9 @@ html.sliding .page { pointer-events: none; }
 .widget:hover { transform: translateY(-2px); }
 
 /* Page transitions (View Transitions API where supported) */
-.ambient { view-transition-name: ambient; }
-.top { view-transition-name: topbar; }
+/* Everything changes as one picture (no separately animated layers): a named layer is drawn on top of the
+   page during the fade, so the background blobs tinted the cards blue and the header lost its blur.
+   The blobs stay put across pages because their drift is synced to the clock (script after .ambient in Base.astro). */
 /* The old page stays fully opaque underneath while the new one fades and lifts in on top, so there is
    never a moment where both are see-through (that read as a flash to blank). Normal blending, not the
    default plus-lighter, so the overlap doesn't brighten. No full-page blur: too expensive per click. */
