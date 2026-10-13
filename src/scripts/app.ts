@@ -445,13 +445,18 @@ const topBar = document.querySelector<HTMLElement>('header.top');
 if (mbtn && topBar) {
   // The bar grows to the open height (and back) while the links slide in, so nothing pops.
   let menuOpen = false, menuAnim = null;
+  const allMenuItems = () => [...topBar.querySelectorAll('nav a, nav .theme, nav .kbtn')];
   const menuItems = () => [...topBar.querySelectorAll('nav a, nav .theme')].filter((el) => getComputedStyle(el).display !== 'none');
+  // Clear every leftover link animation first, visible or not: a fade-out that outlives its close would
+  // otherwise keep the links invisible the next time the menu opens.
+  const clearItemAnims = () => allMenuItems().forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
   const setMenu = (open) => {
     if (open === menuOpen) return;
     menuOpen = open;
     mbtn.setAttribute('aria-expanded', String(open));
     mbtn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
     menuAnim?.cancel();
+    clearItemAnims();
     if (reduce) { topBar.classList.toggle('menu-open', open); return; }
     const h0 = topBar.getBoundingClientRect().height;
     topBar.classList.toggle('menu-open', open);
@@ -466,7 +471,7 @@ if (mbtn && topBar) {
     menuAnim.finished.then(() => {
       topBar.style.overflow = '';
       if (!open) {
-        topBar.classList.remove('menu-open'); menuItems().forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+        clearItemAnims(); topBar.classList.remove('menu-open');
         topBar.querySelectorAll('nav .kbtn').forEach((k) => k.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 180, easing: EASE }));
       }
     }, () => {});
