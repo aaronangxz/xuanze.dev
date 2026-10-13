@@ -124,7 +124,7 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 .kbtn .kic { display: none; }
 @media (max-width: 640px) { .top nav .kbtn .kic { display: block; } }
 .doc { display: grid; grid-template-columns: minmax(0, 1fr) 17rem; }
-@media (max-width: 900px) { .doc { grid-template-columns: minmax(0, 1fr); } .inspector { order: 1; border-left: 0 !important; border-top: 1px solid var(--line); position: static !important; } }
+@media (max-width: 900px) { .inspector .photo { width: 140px; } .doc { grid-template-columns: minmax(0, 1fr); } .inspector { order: 1; border-left: 0 !important; border-top: 1px solid var(--line); position: static !important; } }
 .doc-main { padding: clamp(24px, 5vw, 56px); display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .doc-main > .k { font-family: var(--mono); font-size: .75rem; color: var(--muted); }
 .doc-main h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); line-height: 1.06; letter-spacing: -.035em; font-weight: 600; text-wrap: balance; }
@@ -167,12 +167,22 @@ code { font-family: var(--mono); font-size: .875em; }
 .posts .tags { display: block; font-family: var(--mono); font-size: .75rem; color: var(--muted); }
 .posts .d { font-family: var(--mono); font-size: .75rem; color: var(--muted); white-space: nowrap; }
 .posts .grp { padding: 16px 12px 6px; font-size: .75rem; font-weight: 600; color: var(--muted); }
+/* Every clickable row ends in an arrow: → for a page here, ↗ for another site. It nudges on hover. */
+.posts a { grid-template-columns: 30px minmax(0, 1fr) auto 14px; }
+.posts a::after, .notes-groups a::after, .mini b a::after, .links a::after, .widget h2 a::after { content: "→"; color: var(--faint); font-weight: 400; transition: transform .2s, color .2s; }
+.posts a[target="_blank"]::after, .links a[href^="http"]::after { content: "↗"; }
+.posts a:hover::after, .notes-groups a:hover::after, .mini b a:hover::after, .links a:hover::after, .widget h2 a:hover::after { color: var(--ink); transform: translateX(3px); }
+.posts a[target="_blank"]:hover::after, .links a[href^="http"]:hover::after { transform: translate(2px, -2px); }
+.mini b a::after, .links a::after, .widget h2 a::after { display: inline-block; margin-left: 5px; font-size: .9em; }
+.links a { text-decoration: none; }
+.links a:hover { text-decoration: underline; }
 .jobs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .jobs li { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 4px 20px; padding-block: 16px; border-top: 1px solid var(--line); }
 .jobs li:last-child { border-bottom: 1px solid var(--line); }
 .jobs .when { font-family: var(--mono); font-size: .75rem; color: var(--muted); padding-top: 4px; }
 .jobs h3 { font-size: 1.1rem; font-weight: 600; margin: 0; }
 .jobs p { font-size: .9375rem !important; }
+.prose .jobs { padding-left: 0; gap: 0; }
 @media (max-width: 560px) { .jobs li { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---------- Footer ---------- */
@@ -685,6 +695,7 @@ html.sliding .page { pointer-events: none; }
 .notes-groups a { display: block; padding: 5px 8px; margin-inline: -8px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: .9375rem; }
 .notes-groups a:hover { background: linear-gradient(120deg, var(--sel-a), var(--sel-b)); }
 .notes-groups .n { font-family: var(--mono); font-size: .75rem; color: var(--muted); }
+.notes-groups ul a { display: flex; align-items: baseline; gap: 6px; width: fit-content; max-width: calc(100% + 16px); }
 
 /* Life: sample-data notice and Strava credit */
 .sample { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; font: 500 .75rem var(--mono); color: var(--l-muted); padding: 6px 12px; border-radius: 999px; border: 1px dashed rgba(var(--l-ink-rgb), .25); }
@@ -954,6 +965,13 @@ a.hbadge:hover .hb-name { color: var(--l-ink); }
 .d-pager a.nx { text-align: right; }
 .d-pager span { font: .6875rem var(--mono); color: var(--l-muted); }
 .d-pager b { font-weight: 500; }
+.d-pager a span::before { content: "←"; margin-right: 6px; }
+.d-pager a.nx span::before { content: none; }
+.d-pager a.nx span::after { content: "→"; margin-left: 6px; }
+.d-pager a span::before, .d-pager a.nx span::after { display: inline-block; transition: transform .2s; }
+.d-pager a:hover span::before { transform: translateX(-3px); }
+.d-pager a.nx:hover span::after { transform: translateX(3px); }
+@media (max-width: 640px) { .d-pager { grid-template-columns: minmax(0, 1fr); gap: 10px; } .d-pager > span { display: none; } }
 
 .mmap { display: block; width: 100%; height: auto; border-radius: 18px; border: 1px solid var(--l-line); }
 .mm-sea { fill: #0D1628; }
@@ -1000,6 +1018,8 @@ a.pass:hover { transform: rotate(0deg) translateY(-4px); }
 /* Projects index */
 .projlist { max-width: 52rem; }
 .projlist a { align-items: start; }
+.projlist .plogo-s, .projlist .ic { margin-top: 1px; }
+.projlist a::after { align-self: start; margin-top: 2px; }
 .projlist .plogo-s { width: 30px; height: 30px; border-radius: 22%; box-shadow: 0 0 0 1px var(--line); }
 .projlist .sum { display: block; color: var(--body); font-size: .875rem; line-height: 1.5; margin-top: 4px; }
 
@@ -1082,7 +1102,7 @@ html.edge-up .edge-t, html.edge-down .edge-b { opacity: 1; }
   .links { gap: 6px 18px; }
   .links a { display: inline-flex; align-items: center; min-height: 40px; }
   .widget b a, .widget h2 a, .lede a, .strava-credit a, .insp dd a { padding-block: 10px; }
-  .doc-main ul li > a { display: block; padding-block: 9px; }
+  .notes-groups ul a { justify-content: space-between; align-items: center; width: auto; padding-block: 8px; min-height: 40px; }
   .tm-chips button { min-height: 40px; font-size: .8125rem; }
   .tm-quick button { min-height: 40px; padding-inline: 14px; font-size: .875rem; }
   pre { font-size: .8125rem; }
@@ -1112,6 +1132,13 @@ html.edge-up .edge-t, html.edge-down .edge-b { opacity: 1; }
   .more:hover { transform: none; }
   .more.up svg { transform: rotate(180deg); }
   .more svg { animation: none; }
+  /* project rows: logo | text | arrow; the period moves under the tags */
+  .posts a { gap: 4px 12px; padding: 12px 8px; }
+  .projlist a { grid-template-columns: 30px minmax(0, 1fr) 14px; }
+  .projlist .d { grid-column: 2; grid-row: 2; }
+  .projlist a::after { grid-column: 3; grid-row: 1; }
+  .posts { margin-inline: -8px; }
+  .posts .grp { padding-inline: 8px; }
   /* small mono labels: up to 12px on phones */
   .tm-stats dt, .run-stats dt, .rs-year small, .shelf dt, .rc-facts dt, .dp-facts dt, .pb-d, .rc-dist,
   .board-th span, .rmk small, .tm-legend li, .d-pager a span, .dp-top span { font-size: .75rem; }
