@@ -383,8 +383,28 @@ html[data-mode="life"] .mark .mk-pane[data-side="life"] { display: block; }
 
 .lead { display: flex; align-items: center; gap: 14px; }
 .mode { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px;
-  background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); box-shadow: inset 0 0 0 1px var(--glass-line), inset 0 1px 3px rgba(20,24,40,.08); }
-.mode button { position: relative; z-index: 1; font: 600 .8125rem var(--sans); border: 0; background: none; color: var(--muted); padding: 6px 16px; border-radius: 999px; cursor: pointer; min-height: 32px; transition: color .45s; }
+  /* a recessed groove, so the pair reads as one switch even on the white header */
+  background: rgba(20,24,40,.06); box-shadow: inset 0 0 0 1px rgba(20,24,40,.08), inset 0 1px 3px rgba(20,24,40,.10); }
+:root[data-theme="dark"] .mode { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), inset 0 1px 3px rgba(0,0,0,.4); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mode { background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), inset 0 1px 3px rgba(0,0,0,.4); } }
+.mode button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 600 .8125rem var(--sans); border: 0; background: none; color: var(--muted); padding: 6px 15px 6px 12px; border-radius: 999px; cursor: pointer; min-height: 32px; transition: color .45s, background .25s; }
+.mode .mi { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+/* the side you're not on: its icon in colour, and a hover that leans the knob toward it */
+.mode[data-pos="work"] [data-mode-btn="life"] { color: var(--ink); }
+.mode[data-pos="work"] [data-mode-btn="life"] .mi-sun circle { fill: #FFD25A; stroke: #E39B2F; }
+.mode[data-pos="work"] [data-mode-btn="life"] .mi-sun path { stroke: #F0A94A; }
+.mode[data-pos="life"] [data-mode-btn="work"] .mi rect { fill: rgba(143,203,235,.35); }
+.mode button[aria-pressed="false"]:hover { background: rgba(127,127,127,.12); }
+.mode button[aria-pressed="false"]:hover .mi-sun { transform: rotate(90deg) scale(1.12); }
+.mode button[aria-pressed="false"]:hover .mi:not(.mi-sun) { transform: translateY(-1px) scale(1.08); }
+.mode[data-pos="work"]:has([data-mode-btn="life"]:hover) .knob { transform: translateX(7px); }
+.mode[data-pos="life"]:has([data-mode-btn="work"]:hover) .knob { transform: translateX(calc(100% - 7px)); }
+/* once per visit, after the header's entrance: a small tug toward the other side, to show it moves */
+html.mode-hint .mode[data-pos="work"] .knob { animation: mode-tug .9s cubic-bezier(.4,0,.2,1); }
+html.mode-hint .mode[data-pos="work"] [data-mode-btn="life"] .mi-sun { animation: mode-sun .9s cubic-bezier(.4,0,.2,1); }
+@keyframes mode-tug { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(10px); } 45% { transform: translateX(2px); } 65% { transform: translateX(7px); } }
+@keyframes mode-sun { 0%, 100% { transform: none; } 30% { transform: rotate(60deg) scale(1.2); } 70% { transform: rotate(90deg) scale(1.05); } }
+@media (prefers-reduced-motion: reduce) { html.mode-hint .mode .knob, html.mode-hint .mode .mi-sun { animation: none; } }
 .mode button[aria-pressed="true"] { color: var(--cta-ink); }
 .mode .knob { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; pointer-events: none;
   background: linear-gradient(135deg, var(--cta-a), var(--cta-b)); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 4px 12px -6px var(--glass-shadow);
@@ -742,7 +762,7 @@ pre, code, kbd { font-variant-ligatures: none; font-feature-settings: "liga" 0, 
   .top nav { order: 1; margin-left: auto; gap: 8px; }
   .top nav a, .top nav .theme { display: none; }
   .top nav kbd { display: none; }
-  .mode button { padding: 6px 14px; min-height: 40px; }
+  .mode button { padding: 6px 12px 6px 10px; gap: 5px; min-height: 40px; }
   .mark { width: 40px; height: 40px; }
   .kbtn { min-height: 40px; }
   .top nav .kbtn { width: 40px; padding: 0; justify-content: center; gap: 0; }

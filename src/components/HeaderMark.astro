@@ -20,5 +20,12 @@ const LIFE = '<svg class="mk mk-life" viewBox="0 0 64 64" fill="none" stroke="#2
     var m = document.getElementById('mark'), side = r.getAttribute('data-mode') || 'work';
     if (el && m && m.getAnimations) m.getAnimations({ subtree: true }).forEach(function (a) { a.currentTime = (a.currentTime || 0) + el; });
     setTimeout(function () { r.classList.remove('mk-in'); }, Math.max(0, (side === 'life' ? 1100 : 3200) - el));
+    // First page of a visit on Work: once the entrance is done, give the Work/Life switch a small tug (once per visit).
+    try {
+      if (side === 'work' && !el && !sessionStorage.getItem('xz-hint')) {
+        sessionStorage.setItem('xz-hint', '1');
+        setTimeout(function () { r.classList.add('mode-hint'); setTimeout(function () { r.classList.remove('mode-hint'); }, 1000); }, 3400);
+      }
+    } catch (e) {}
   })();
 </script>
