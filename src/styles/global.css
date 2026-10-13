@@ -351,10 +351,11 @@ pre { border-color: var(--glass-line); }
 @media (max-width: 760px) { .split { height: auto; } .list-wrap { height: 340px; } }
 
 
-/* Monogram in place of the name in the header */
+/* Site mark (two nigiri) in place of the name in the header: always on a light tile, so its dark outline reads on both sides and in dark mode */
 .mark { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px; text-decoration: none;
-  font: 600 .8125rem var(--mono); letter-spacing: .02em; color: var(--cta-ink); background: linear-gradient(140deg, var(--cta-a), var(--cta-b));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px -8px var(--glass-shadow); transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  background: linear-gradient(140deg, #FFFFFF, #ECEFF4); box-shadow: inset 0 0 0 1px rgba(20,24,40,.08), inset 0 1px 0 #fff, 0 6px 16px -8px var(--glass-shadow);
+  transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+.mark svg { width: 80%; height: 80%; display: block; }
 .mark:hover { transform: rotate(-6deg) scale(1.04); }
 
 /* Focus mode: while searching, everything around the launcher softly blurs back */
@@ -403,7 +404,7 @@ html[data-mode="life"] .grain { opacity: .08; }
 html[data-mode="life"] .top { background: linear-gradient(140deg, var(--l-hdr1), var(--l-hdr2)); border-color: var(--l-line); box-shadow: inset 0 1px 0 rgba(var(--l-ink-rgb),.08), 0 24px 50px -26px rgba(0,0,0,.7); }
 html[data-mode="life"] .top::before { background: linear-gradient(150deg, rgba(var(--l-a-rgb),.55), rgba(var(--l-a-rgb),0) 30%, rgba(var(--l-b-rgb),0) 70%, rgba(var(--l-b-rgb),.45)); }
 html[data-mode="life"] .top::after { background: radial-gradient(520px circle at var(--mx, 20%) var(--my, -10%), rgba(var(--l-a-rgb),.10), transparent 45%); }
-html[data-mode="life"] .mark { background: linear-gradient(140deg, var(--l-a), var(--l-b)); color: var(--l-on); }
+html[data-mode="life"] .mark { box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 8px 18px -8px rgba(0,0,0,.6); }
 html[data-mode="life"] .top nav a { color: var(--l-muted); }
 html[data-mode="life"] .top nav a:hover { color: var(--l-ink); }
 html[data-mode="life"] .kbtn { background: rgba(var(--l-ink-rgb),.06); border-color: var(--l-line); color: var(--l-muted); }

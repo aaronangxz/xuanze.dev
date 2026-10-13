@@ -5,7 +5,6 @@
 export const site = {
   name: 'Ang Xuan Ze',
   shortName: 'Xuan Ze',
-  monogram: 'xz',
   url: 'https://xuanze.dev',
   description: 'Software engineer in Singapore. I build software in Go and TypeScript, and I make sure it doesn’t break.',
   email: 'angxze@gmail.com',
