@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import DocWindow from '../../components/DocWindow.astro';
+import { notesByGroup, leetcodeByLevel } from '../../lib/content';
+import { site } from '../../site.config';
+const notes = await notesByGroup();
+const lc = await leetcodeByLevel();
+const nNotes = notes.reduce((n, [, l]) => n + l.length, 0);
+const nLc = lc.reduce((n, [, l]) => n + l.length, 0);
+---
+<Base title="Notes" nav="notes" description="Study notes on system design, networking and algorithms, plus LeetCode write-ups.">
+  <div class="page">
+    <DocWindow crumbs={[{ label: 'notes' }]} wide>
+      <span class="k">{nNotes} notes · {nLc} solutions</span>
+      <h1>Notes</h1>
+      <p class="lede">Study notes on computer science and system design, kept public in case they're useful to someone else. Working notes, not polished articles.</p>
+      <div class="notes-groups">
+        {notes.map(([g, list]) => (
+          <section>
+            <h2>{g} <span class="n">{list.length}</span></h2>
+            <ul>{list.map((n) => <li><a href={n.href}>{n.title}</a></li>)}</ul>
+          </section>
+        ))}
+      </div>
+      <h2 style="margin-top:28px;font-size:1.4rem;letter-spacing:-.02em;font-weight:600">LeetCode</h2>
+      <p class="lede" style="font-size:1rem">Problems with written solutions. My profile is on <a href={site.links.leetcode}>LeetCode</a>.</p>
+      <div class="notes-groups">
+        {lc.map(([g, list]) => (
+          <section>
+            <h2 style="text-transform:capitalize">{g} <span class="n">{list.length}</span></h2>
+            <ul>{list.map((n) => <li><a href={n.href}>{n.title}</a></li>)}</ul>
+          </section>
+        ))}
+      </div>
+    </DocWindow>
+  </div>
+</Base>

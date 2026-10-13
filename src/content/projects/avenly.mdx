@@ -1,0 +1,70 @@
+---
+title: Avenly
+kind: product
+summary: An event platform for hosts. Design the invitation page, then run guest lists, RSVPs, seating, budgets, check-in and a live photo wall from one place. Guests never need an account.
+status: Live
+period: 2025 – now
+role: Founder
+stack: [Go, gRPC, Next.js, React, TypeScript, PostgreSQL, Stripe, Cloudflare R2]
+live: https://avenly.io
+logo: /logos/avenly.png
+order: 1
+---
+import ArchDiagram from '../../components/ArchDiagram.astro';
+
+## What it is
+
+Avenly runs an event from the first invitation to the photos afterwards, all from one guest list. Hosts design the invitation page in a visual builder or start from a ready-made theme, in more than one language. The same list then drives RSVPs, the seating chart, the budget and gift records, QR check-in at the door, a live photo wall at the venue, and the gallery afterwards. Nothing is copied between tools, so nothing drifts out of date, and co-hosts or planners can join with only the parts they need.
+
+Guests reach their invitation, RSVP, entry pass and the photo wall through a magic link. There are no guest accounts and no passwords to forget.
+
+## What's in it
+
+- **Invitation pages** that hosts design and publish, with RSVP built in.
+- **Guest management**: invitation groups, RSVP overrides, an activity log, and reminders over SMS, WhatsApp and email.
+- **Seating, budgets and gifts**: a seating chart with tables and aisles, budget categories and payments, and cash and gift recording per group.
+- **Event day**: QR check-in with entry passes and arrival trends, shareable schedules and itineraries.
+- **Moments and Gallery**: a live photo wall that guests upload to during the event, and a post-event gallery with albums, tagging and curated views.
+- **Collaborators** with fine-grained permissions, and Free and Pro plans on Stripe.
+
+## How it's built
+
+The backend is Go, serving gRPC with an HTTP gateway in front of it, so one proto file is the contract for roughly 150 RPCs and both the Go and TypeScript types are generated from it. Queries are plain SQL compiled to type-safe Go with sqlc, on PostgreSQL. The frontend is Next.js and React. The API runs on Railway and the frontend on Vercel.
+
+<ArchDiagram
+  caption="Avenly: one Next.js front end, one Go API, one guest list"
+  layers={[
+    { label: 'People', nodes: [
+      { id: 'guest', t: 'Guests', s: 'magic link,\nno account', k: 'client' },
+      { id: 'host', t: 'Hosts', s: 'studio, as a\nweb app (PWA)', k: 'client' },
+      { id: 'fb', t: 'Firebase Auth', s: 'host sign-in', k: 'ext' },
+    ] },
+    { label: 'Vercel', group: true, nodes: [
+      { id: 'web', t: 'Next.js front end', s: 'studio + public pages:\ninvite, moments, gallery' },
+    ] },
+    { label: 'Railway', group: true, nodes: [
+      { id: 'gw', t: 'HTTP gateway', s: 'REST, from the\nsame proto file' },
+      { id: 'rpc', t: 'gRPC services', s: 'Go · ~150 RPCs\nauth interceptor' },
+    ] },
+    { label: 'Storage and services', nodes: [
+      { id: 'stripe', t: 'Stripe', s: 'plans, checkout', k: 'ext' },
+      { id: 'pg', t: 'PostgreSQL', s: 'sqlc: SQL → typed Go', k: 'data' },
+      { id: 'r2', t: 'Cloudflare R2', s: 'photos, video, music', k: 'data' },
+      { id: 'msg', t: 'Twilio · Resend', s: 'SMS, WhatsApp, email', k: 'ext' },
+    ] },
+  ]}
+  edges={[
+    ['guest', 'web', 'magic link'], ['host', 'web'], ['host', 'fb'],
+    ['web', 'gw', 'REST + token'], ['gw', 'rpc'],
+    ['rpc', 'pg', 'SQL'], ['rpc', 'r2', 'presign'], ['rpc', 'stripe'], ['rpc', 'msg', 'reminders'],
+    { from: 'stripe', to: 'gw', label: 'webhooks', dashed: true },
+  ]}
+/>
+
+## Making sure it doesn't break
+
+Every RPC has to be declared public or protected in the auth interceptor. A test walks the whole service definition and fails the build if a new RPC is in neither list, so an endpoint can't ship unauthenticated by accident. Plan limits live in one table on the server and are served to the app, so a price or a limit is never hard-coded in two places. Stripe webhooks are de-duplicated by event ID, because Stripe does deliver the same event twice.
+
+## Where it's at
+
+Live at avenly.io. I'm building it out into a full product one feature at a time, and it has picked up its first few hosts on its own, without any marketing.

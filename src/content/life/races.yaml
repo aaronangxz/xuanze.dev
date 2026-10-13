@@ -1,0 +1,39 @@
+# Race bibs on the Life page, from your Strava history. Add `bib:` numbers if you have them.
+- id: scsm-2025-half
+  name: Standard Chartered Singapore Marathon
+  label: Singapore · 21K
+  distance: 21K
+  date: "2025-12-06"
+  time: "2:04:00"
+  band: "#2F5D8A"
+  strava: "16660605450"
+- id: danang-2026-half
+  name: Da Nang International Marathon
+  label: Da Nang · 21K
+  distance: 21K
+  date: "2026-03-22"
+  time: "2:00:11"
+  band: "#1F6F6B"
+  pb: true
+  strava: "17809921611"
+- id: sundown-my-2015-half
+  name: Sundown Marathon Malaysia
+  label: Johor · 21K
+  distance: 21K
+  date: "2015-09-05"
+  time: "2:58:07"
+  band: "#5B3A7A"
+- id: scsm-2019-half
+  name: Standard Chartered Singapore Marathon
+  label: Singapore · 21K
+  distance: 21K
+  date: "2019-12-08"
+  time: "2:58:24"
+  band: "#2F5D8A"
+- id: sundown-sg-2023-half
+  name: Sundown Marathon Singapore
+  label: Singapore · 21K
+  distance: 21K
+  date: "2023-05-20"
+  time: "3:27:54"
+  band: "#3B2E63"

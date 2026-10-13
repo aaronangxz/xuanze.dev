@@ -1,0 +1,17 @@
+{
+  "source": "Strava snapshot",
+  "updated": "2026-10-12",
+  "year": 2026,
+  "yearKm": 1669.6,
+  "yearRuns": 152,
+  "lastYearKm": 897.0,
+  "lastYearRuns": 112,
+  "longestKm": 28.0,
+  "halfMarathons": 5,
+  "pbs": [
+    { "label": "5K", "time": "26:26", "note": "Jan 2026 time trial" },
+    { "label": "10K", "time": "53:00", "note": "Jan 2026 time trial" },
+    { "label": "Half marathon", "time": "2:00:11", "note": "Da Nang, Mar 2026" },
+    { "label": "Marathon", "time": "Soon", "note": "first one in training" }
+  ]
+}

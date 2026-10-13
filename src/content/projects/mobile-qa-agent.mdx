@@ -1,0 +1,82 @@
+---
+title: Mobile QA agent
+kind: work
+summary: An AI agent that runs written test cases on iOS and Android at the same time, the way a tester would, and flags where the two apps behave differently.
+status: Under construction
+period: 2026 – now
+role: Designing and building it
+stack: [Python, Pydantic, Appium, XCUITest, UiAutomator2, Claude API, Claude Agent SDK, Jinja2]
+order: 4
+---
+import ArchDiagram from '../../components/ArchDiagram.astro';
+
+> Work in progress. This page follows what is built so far.
+
+## The problem
+
+Most mobile test cases are still written in plain language ("open the cart, remove the item, the total goes to zero") and run by hand on both iOS and Android. Automating them with scripts means maintaining selectors for two apps that change every sprint. The tools that run plain-language cases with AI usually test one platform at a time, so they miss the bug that only matters across both: the step that works on iOS and quietly does something else on Android.
+
+## What it does
+
+- **Reads the test cases as written**, from Markdown, YAML or a mind map, into one platform-neutral plan.
+- **Runs each case on iOS and Android at once, in step.** Neither platform starts step N+1 until both have finished step N, so the two runs can be compared step by step. A platform that gets stuck times out and stops; the other carries on.
+- **Works like a tester.** For each step it looks at the screen (the accessibility tree plus a screenshot), decides what to do, does it through Appium, looks again, and checks the result against the step's expected outcome.
+- **Says honestly what happened.** Every step ends as pass, fail (a real issue), or blocked, with the reason it was blocked: an ambiguous step, an element it couldn't find, an unexpected screen, a precondition that wasn't met, or something that needs a person.
+- **Flags differences between the platforms** and sorts them into expected (a known platform difference) and suspicious (probably a bug).
+- **Reports** as a self-contained HTML page and an event log: stats, issues, blockers, side-by-side screenshots of each divergence, and the token use and cost of the run.
+
+## How it fits together
+
+<ArchDiagram
+  caption="Mobile QA agent: one plan, two devices in lockstep, one report"
+  layers={[
+    { label: 'Inputs', nodes: [
+      { id: 'plan', t: 'Test cases', s: 'Markdown, YAML\nor mind map', k: 'client' },
+      { id: 'pack', t: 'Knowledge pack', s: 'flows, selectors,\nglossary, accounts', k: 'data' },
+    ] },
+    { label: 'Agent', group: true, nodes: [
+      { id: 'coord', t: 'Coordinator', s: 'runs both platforms\nin lockstep' },
+      { id: 'rep', t: 'Report', s: 'HTML + event log,\ntokens and cost', k: 'data' },
+    ] },
+    { label: 'Per platform', nodes: [
+      { id: 'ios', t: 'iOS executor', s: 'observe → act\n→ verify', k: 'job' },
+      { id: 'llm', t: 'Claude', s: 'reason, verify,\ncompare', k: 'ext' },
+      { id: 'and', t: 'Android executor', s: 'observe → act\n→ verify', k: 'job' },
+    ] },
+    { label: 'Devices', nodes: [
+      { id: 'sim', t: 'iOS simulator', s: 'Appium · XCUITest', k: 'client' },
+      { id: 'emu', t: 'Android emulator', s: 'Appium · UiAutomator2', k: 'client' },
+    ] },
+  ]}
+  edges={[
+    ['plan', 'coord', 'plan'], ['pack', 'coord', 'context'], ['coord', 'rep'],
+    ['coord', 'ios'], ['coord', 'and'], ['ios', 'llm'], ['and', 'llm'],
+    ['ios', 'sim', 'tap · type · swipe'], ['and', 'emu'],
+  ]}
+/>
+
+## Decisions worth explaining
+
+### Domain knowledge lives in packs, not in the agent
+
+Every app has its own navigation, jargon and quirks. A **knowledge pack** is a folder per app: how to get around, a glossary, known quirks, reusable flows such as logging in, stable selectors, test accounts, and rules for which platform differences are expected. The agent picks the pack by the app's bundle id. Onboarding a new app means writing a pack, not changing the agent.
+
+### Passwords never reach the model
+
+Test-account passwords are kept out of every prompt and log. The model only ever sees a placeholder in a flow step; the real value is swapped in at the moment of typing and redacted from the step's record afterwards.
+
+### Blocked is not the same as failed
+
+An agent that can't find a button and an app that is broken look the same if every problem is a failure. Separating "the app is wrong" from "I couldn't do this step, and here's why" is what makes the results worth trusting, and it tells you whether to fix the app or the test case.
+
+### Differences are judged, not diffed
+
+Comparing the text each platform showed word for word flagged every harmless difference, such as a date format. A model now compares the two outcomes and says whether they mean the same thing, and the pack's rules mark the differences that are known and expected.
+
+### Measured on recorded screens
+
+The three model roles (deciding the next action, checking a step, comparing platforms) are scored by an offline eval suite on real recorded screens, with no device needed, so a prompt change can be checked before a live run.
+
+## Where it is
+
+Running live on Android and iOS against a public demo shopping app as the reference, with 132+ unit tests that need no device or API key. Next: the cloud device farm the device layer was designed for.

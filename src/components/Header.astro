@@ -1,0 +1,31 @@
+---
+import HeaderMark from './HeaderMark.astro';
+import { site } from '../site.config';
+interface Props { mode: 'work' | 'life'; nav?: string }
+const { mode, nav } = Astro.props;
+const LENS = '<svg class="kic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>';
+const PLANE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
+---
+<header class="top">
+  <div class="lead">
+    <a class="mark" id="mark" href={mode === 'life' ? '/life' : '/'} aria-label="Home"><HeaderMark /></a>
+    <div class="mode" role="group" aria-label="Choose a side" data-pos={mode}>
+      <button type="button" data-mode-btn="work" aria-pressed={String(mode === 'work')}><svg class="mi" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3.2" width="10" height="7.2" rx="1.3"/><path d="M1.4 12.6h13.2"/></svg><span>Work</span></button>
+      <button type="button" data-mode-btn="life" aria-pressed={String(mode === 'life')}><svg class="mi mi-plane" viewBox="0 0 16 16" aria-hidden="true"><path d="M14.6 7.1c.6 0 1 .4 1 .9s-.4.9-1 .9H10l-3.4 5H5.2l1.9-5H3.6l-1.3 1.7H1.1l.8-2.6-.8-2.6h1.2l1.3 1.7h3.5l-1.9-5h1.4l3.4 5z"/></svg><span>Life</span></button>
+      <span class="knob" aria-hidden="true"></span>
+    </div>
+  </div>
+  <button class="mbtn" type="button" id="mbtn" aria-expanded="false" aria-controls="mainnav" aria-label="Menu"><span aria-hidden="true"></span></button>
+  <nav aria-label="Main" id="mainnav">
+    <a href="/projects" data-only="work" aria-current={nav === 'projects' ? 'page' : undefined}>Projects</a>
+    <a href="/writing" data-only="work" aria-current={nav === 'writing' ? 'page' : undefined}>Writing</a>
+    <a href="/notes" data-only="work" aria-current={nav === 'notes' ? 'page' : undefined}>Notes</a>
+    <a href="/about" data-only="work" aria-current={nav === 'about' ? 'page' : undefined}>About</a>
+    <a href="#l-travel" data-only="life">Travel</a>
+    <a href="#l-run" data-only="life">Running</a>
+    <a href="#l-misc" data-only="life">Other</a>
+    <button class="theme" type="button" id="theme" data-only="work" aria-label="Switch colour theme">Theme: auto</button>
+    <button class="kbtn" type="button" data-open data-only="work" aria-label="Search (press slash or Command K)"><Fragment set:html={LENS} /><span class="kt">Search</span> <kbd>/</kbd></button>
+    <button class="kbtn lbtn" type="button" data-lopen data-only="life" aria-label="Where to? Search trips, stays and races (Command K)"><Fragment set:html={PLANE} /><span class="kt">Where to?</span> <kbd>⌘K</kbd></button>
+  </nav>
+</header>

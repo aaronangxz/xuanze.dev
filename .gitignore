@@ -1,22 +1,16 @@
-# Dependencies
-/node_modules
+# build output
+dist/
+.astro/
 
-# Production
-/build
+# dependencies
+node_modules/
 
-# Generated files
-.docusaurus
-.cache-loader
-
-# Misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
+# logs
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-/.idea
+# environment
+.env
+.env.production
+
+# OS / editor
+.DS_Store

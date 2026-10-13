@@ -1,0 +1,252 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../site.config';
+import running from '../../content/life/running.json';
+import { toJsonScript } from '../../lib/launcher';
+import TravelMap from '../../components/TravelMap.astro';
+import HotelBadge from '../../components/HotelBadge.astro';
+import Flag from '../../components/Flag.astro';
+import ChainLogo from '../../components/ChainLogo.astro';
+import WALabel from '../../components/WALabel.astro';
+import { stats as travelStats, cities, recentFlights, upcomingFlights, airportCity, runs as travelRuns, hotels, collection, flightId, allFlights } from '../../lib/travel';
+
+const races = (await getCollection('races')).map((r) => ({ id: r.id, ...r.data })).sort((a, b) => b.date.localeCompare(a.date)); // newest first
+const shelf = (await getCollection('shelf')).map((s) => ({ id: s.id, ...s.data }));
+const polaroids = (await getCollection('polaroids')).map((p) => ({ id: p.id, ...p.data }));
+const L = site.life;
+
+const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const flapDate = (ym: string) => { const [y, m] = ym.split('-'); return `${MON[+m - 1]} ${y.slice(2)}`; };
+const niceDay = (ymd: string) => new Date(ymd + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const board = recentFlights(8);
+// Boarding passes: the next trip, the longest flight, and the most recent one (no repeats).
+const featured = [...new Map([upcomingFlights[0], travelStats.longest, board[0]].filter(Boolean).map((f) => [`${f.date}${f.flight}`, f])).values()].slice(0, 3);
+const stayCities = cities.filter((c) => c.nights > 0 && c.country !== 'Singapore').map((c) => c.name);
+const tilt = [-1.6, 1.2, -0.8, 1.4];
+const PLANE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
+const hasPlaceholders = [...shelf, ...polaroids].some((x) => x.example);
+const upcoming = [...L.upcoming].sort((a, b) => a.date.localeCompare(b.date));
+const fmtKm = (n: number) => Math.round(n).toLocaleString('en-US');
+const raceDay = (ymd: string) => new Date(ymd + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const pbKm: Record<string, number> = { '5K': 5, '10K': 10, 'Half marathon': 21.0975, Marathon: 42.195 };
+const paceOf = (t: string, km: number) => {
+  const sec = t.split(':').map(Number).reduce((a, b) => a * 60 + b, 0) / km;
+  return `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`;
+};
+const bibCat: Record<string, string> = { '5K': '5 km', '10K': '10 km', '21K': 'Half Marathon', '42K': 'Full Marathon' };
+const halves = races.filter((r) => r.distance === '21K').length;
+// A barcode for the tear-off strip, stable per race.
+const barcode = (id: string) => {
+  let h = 2166136261, x = 2;
+  for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  const bars: [number, number][] = [];
+  while (x < 118) { h = Math.imul(h ^ (h >>> 13), 2654435761); const w = 1 + ((h >>> 3) & 3) * 0.7; if (x + w > 118) break; bars.push([x, w]); x += w + 1 + ((h >>> 7) & 1) * 1.4; }
+  return bars;
+};
+
+// Hotel collection: each chain's card shows its most recent stays as a little pile; opening it shows every hotel.
+const chainCards = collection.map((c) => {
+  const all = c.brands.flatMap((b) => b.hotels).sort((a, b) => b.visits[0].checkIn.localeCompare(a.visits[0].checkIn));
+  return { c, all, fan: all.slice(0, 4) };
+});
+
+const lifeSearch = [
+  ...upcoming.map((r, i) => ({ top: true, cat: 'NEXT', t: r.name, s: `${niceDay(r.date)} · ${r.distance}`, k: `next race upcoming countdown ${r.city} ${r.distance}`, sel: `#nr-${i}` })),
+  ...cities.map((c, i) => ({ top: i < 6 && c.country !== 'Singapore', cat: 'CITY', t: c.name, s: [c.country, c.nights ? `${c.nights} nights` : `${c.flights} flights`].join(' · '), k: `city place travel trip ${c.country} ${c.stays.map((s) => `${s.name} ${s.tag ?? ''}`).join(' ')}`, city: c.slug })),
+  ...hotels.map((h, i) => ({ top: i >= hotels.length - 3 && !h.upcoming, cat: 'HOTEL', t: h.name, s: `${h.city} · ${h.visits.length > 1 ? `${h.visits.length} stays` : niceDay(h.visits[0].checkIn)}`, k: `hotel stay ${h.city} ${h.brand ?? ''} ${h.chain ?? ''}`, href: `/life/hotels/${h.slug}` })),
+  ...[...allFlights].reverse().map((f) => ({ cat: 'FLIGHT', t: `${f.fromCity} → ${f.toCity}`, s: `${f.flight} · ${niceDay(f.date)}`, k: `flight ${f.from} ${f.to} ${f.airline} ${f.flight.replace(' ', '')} ${f.aircraft ?? ''}`, href: `/life/flights/${f.id}` })),
+  ...travelRuns.map((r, i, all) => ({ top: i >= all.length - 2, cat: 'RUN', t: r.title, s: `${r.city} · ${r.km} km · ${niceDay(r.date)}`, k: `run running strava abroad ${r.city}`, city: r.city.toLowerCase().replace(/[^a-z0-9]+/g, '-') })),
+  ...races.map((r) => ({ cat: 'RACE', t: r.name, s: `${r.time}${r.pb ? ' · PB' : ''}`, k: `race run ${r.label} ${r.distance} half marathon`, sel: `#r-${r.id}` })),
+  ...running.pbs.map((p) => ({ cat: 'PB', t: p.label, s: p.time, k: `personal best pb ${p.note}`, sel: '.pb-block' })),
+  ...shelf.map((s) => ({ cat: 'NOTE', t: s.label, s: s.value, k: s.value, sel: `#sh-${s.id}` })),
+  { cat: 'NOTE', t: 'Polaroids', s: polaroids.map((p) => p.caption).join(' · '), k: 'photos polaroid', sel: '.polaroids' },
+];
+---
+<Base title="Life" mode="life" description="Trips, races and the odd detour. The off-the-clock side of Ang Xuan Ze.">
+  <div class="page life">
+    <section class="l-hero" aria-labelledby="l-h1">
+      <span class="l-kicker rise">off the clock</span>
+      <h1 class="l-h1 rise" style="--d:1" id="l-h1">{site.hero.greeting} <span set:html={L.tagline} /></h1>
+      <dl class="l-stats rise" style="--d:3">
+        <div><dt>countries visited</dt><dd>{travelStats.countries}</dd></div>
+        <div><dt>flights flown</dt><dd>{travelStats.flights}</dd></div>
+        <div><dt>km run in {running.year}</dt><dd>{fmtKm(running.yearKm)}</dd></div>
+        <div><dt>half marathons</dt><dd>{halves}</dd></div>
+      </dl>
+      {hasPlaceholders && <span class="sample rise" style="--d:4">A few entries here are still placeholders</span>}
+    </section>
+
+    <div class="places" aria-hidden="true"><div class="ptrack">
+      {[0, 1].map(() => <span>{stayCities.map((p, i) => <>{i % 3 === 2 ? <b>{p}</b> : p} · </>)}</span>)}
+    </div></div>
+
+    <TravelMap />
+
+    <section id="l-travel" aria-labelledby="l-travel-h">
+      <div class="l-head"><span class="l-no">02</span><h2 id="l-travel-h">Departures</h2></div>
+      <div class="board" role="table" aria-label="Recent flights">
+        <div class="board-row board-th" role="row"><span role="columnheader">Date</span><span role="columnheader">From</span><span role="columnheader">To</span><span role="columnheader">Flight</span><span role="columnheader">Remarks</span></div>
+        {board.map((f) => (
+          <div class="board-row" role="row">
+            <span class="flaps" data-flap={flapDate(f.date.slice(0, 7))}></span>
+            <span class="flaps" data-flap={f.from}></span>
+            <span class="flaps" data-flap={f.to}></span>
+            <span class="flaps" data-flap={f.flight.replace(' ', '').padEnd(6, ' ').slice(0, 6)}></span>
+            <a class="rmk" role="cell" href={`/life/flights/${flightId(f)}`}>{airportCity(f.to)}<small>{[f.airline, f.aircraft].filter(Boolean).join(' · ')}</small></a>
+          </div>
+        ))}
+      </div>
+      <div class="passes">
+        {featured.map((f, i) => (
+          <a class="pass" style={`--r:${tilt[i]}deg`} href={`/life/flights/${flightId(f)}`}>
+            <div class="pass-main">
+              <div class="pass-top"><span>{f === upcomingFlights[0] ? 'NEXT FLIGHT' : f === travelStats.longest ? 'LONGEST FLIGHT' : 'LATEST FLIGHT'}</span><span><i>●</i> {f.flight}</span></div>
+              <div class="pass-route">
+                <div><b>{f.from}</b><small>{airportCity(f.from)}</small></div>
+                <div class="route-line"><Fragment set:html={PLANE} /></div>
+                <div style="text-align:right"><b>{f.to}</b><small>{airportCity(f.to)}</small></div>
+              </div>
+              <div class="pass-meta">
+                <div><span>date</span>{niceDay(f.date)}</div>
+                {f.seat && <div><span>seat</span>{f.seat}</div>}
+                <div><span>{f.cabin ? 'cabin' : 'distance'}</span>{f.cabin ?? `${f.km.toLocaleString('en-US')} km`}</div>
+              </div>
+            </div>
+            <div class="pass-stub"><span>{f.airline}</span><p>{[f.aircraft, `${f.km.toLocaleString('en-US')} km`].filter(Boolean).join(' · ')}</p><div class="barcode" aria-hidden="true"></div></div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section id="l-stays" aria-labelledby="l-stays-h">
+      <div class="l-head"><span class="l-no">03</span><h2 id="l-stays-h">The hotel collection</h2></div>
+      <div class="hcoll">
+        {chainCards.map(({ c, all, fan }) => (
+            <details class="hc-chain" data-chain={c.chain.toLowerCase().replace(/[^a-z0-9]+/g, '')}>
+              <summary>
+                <span class="hc-logo"><ChainLogo chain={c.chain} height={22} /></span>
+                <span class="hc-stats">{c.hotels} hotel{c.hotels > 1 ? 's' : ''} · {c.nights} night{c.nights === 1 ? '' : 's'}</span>
+                <span class="hc-fan" aria-hidden="true">
+                  {fan.map((h) => <HotelBadge hotel={h} size={54} link={false} />)}
+                  {all.length > fan.length && <span class="hc-plus">+{all.length - fan.length}</span>}
+                </span>
+                <span class="hc-toggle"><span class="hc-open">See all</span><span class="hc-close">Show less</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" /></svg></span>
+              </summary>
+              <div class="hc-brands">
+                {c.brands.map((b) => (
+                  <div class="hc-brand">
+                    <span class="hc-bname">{b.brand}</span>
+                    <div class="hc-badges">{b.hotels.map((h) => <HotelBadge hotel={h} />)}</div>
+                  </div>
+                ))}
+              </div>
+            </details>
+        ))}
+      </div>
+    </section>
+
+    <section id="l-run" aria-labelledby="l-run-h">
+      <div class="l-head"><span class="l-no">04</span><h2 id="l-run-h">Running</h2></div>
+      <div class="races" aria-label="Upcoming races">
+        {upcoming.map((r, i) => (
+          <article class="nr race-card" id={`nr-${i}`} data-date={r.date}>
+            <header class="rc-head">
+              <span class="rc-where"><Flag code={r.country} /> {r.city} · {raceDay(r.date)}<b class="rc-next">next up</b></span>
+              <h3>{r.name}</h3>
+              <div class="rc-labels"><span class="rc-dist">{r.distance}</span>{r.waLabel && <WALabel tier={r.waLabel} />}</div>
+            </header>
+            <div class="rc-mid">
+              <div class="countdown"><b data-days>--</b><span>days to go</span></div>
+              <dl class="rc-facts">
+                <div><dt>distance</dt><dd>{r.km}</dd></div>
+                {r.start && <div><dt>start</dt><dd>{r.start}</dd></div>}
+                {r.goal && <div><dt>goal</dt><dd>{r.goal}</dd></div>}
+              </dl>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="pb-block">
+        <div class="l-sub-head"><span class="lab">personal bests</span></div>
+        <div class="pb-tiles">
+          {running.pbs.map((p) => {
+            const km = pbKm[p.label];
+            const pace = km && /\d/.test(p.time) ? paceOf(p.time, km) : null;
+            return (
+              <div class:list={['pb-tile', !pace && 'soon']}>
+                <span class="pb-d">{p.label}</span>
+                <b class="pb-t">{p.time}</b>
+                <span class="pb-p">{pace ? `${pace} /km` : 'Shanghai · 6 Dec 2026'}</span>
+                <small>{p.note}</small>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div class="run-stats">
+        <span class="lab">by the numbers</span>
+        <dl>
+          <div class="rs-year">
+            <dt>km in {running.year}</dt><dd>{fmtKm(running.yearKm)}</dd>
+            <span class="rs-bar" aria-hidden="true"><i style={`--w:${Math.min(100, running.lastYearKm / running.yearKm * 100).toFixed(1)}%`}></i><i class="now"></i></span>
+            <small>{fmtKm(running.lastYearKm)} km in {running.year - 1} · already {(running.yearKm / running.lastYearKm).toFixed(1)}×</small>
+          </div>
+          <div><dt>runs in {running.year}</dt><dd>{running.yearRuns}</dd></div>
+          <div><dt>longest run</dt><dd>{running.longestKm} <small>km</small></dd></div>
+          <div><dt>half marathons</dt><dd>{halves}</dd></div>
+          <div><dt>runs abroad</dt><dd>{travelStats.runs}</dd></div>
+        </dl>
+      </div>
+
+      <div class="bibs-head"><span class="lab">finished</span></div>
+      <div class="bib-wrap">
+      <div class="bib-deck" data-deck role="group" aria-roledescription="stack" aria-label="Race bibs, newest on top">
+        {races.map((r, i) => (
+          <article class="bib" style={`--r:${tilt[i % 4]}deg;--band:${r.band};--i:${i}`} id={`r-${r.id}`}>
+            <div class="bib-top"><span class="bib-ev">{r.name}</span><span class="bib-yr">{r.date.slice(0, 4)}</span></div>
+            <div class="bib-cat"><span>{bibCat[r.distance] ?? r.distance}</span><span>{r.label.split(' · ')[0]}</span></div>
+            <div class="bib-no" data-long={String((r.bib ?? r.distance).length > 5)}>{r.bib ?? r.distance}</div>
+            <div class="bib-name">{site.life.bibName}</div>
+            <div class="bib-tear">
+              <svg class="bib-code" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">{barcode(r.id).map(([x, w]) => <rect x={x} width={w} height="22" />)}</svg>
+              <span>{niceDay(r.date)}</span>
+            </div>
+            <span class="bib-stamp" aria-label={`Finished in ${r.time}`}><small>finisher</small>{r.time}</span>
+            {r.pb && <span class="pb">PB</span>}
+          </article>
+        ))}
+      </div>
+      <div class="deck-ctl">
+        <button type="button" data-deck-prev aria-label="Previous bib"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" /></svg></button>
+        <span class="deck-n" data-deck-n aria-live="polite">1 / {races.length}</span>
+        <button type="button" data-deck-next aria-label="Next bib"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5" /></svg></button>
+        <span class="deck-hint"><span class="h-fine">Hover to fan out, click to flip</span><span class="h-touch">Swipe or tap to flip</span></span>
+      </div>
+      </div>
+      <p class="strava-credit">Running data from <a href="https://www.strava.com">Strava</a> · updated {niceDay(running.updated)}</p>
+    </section>
+
+    <section id="l-misc" aria-labelledby="l-misc-h">
+      <div class="l-head"><span class="l-no">05</span><h2 id="l-misc-h">Everything else</h2></div>
+      <div class="misc">
+        <div class="polaroids">
+          {polaroids.map((p, i) => (
+            <figure class="polaroid" style={`--r:${[-6, 3, -2][i % 3]}deg`}>
+              <div class="ph" style={p.photo ? `background:url('${p.photo}') center/cover` : `--a:var(--l-${p.tint});--b:var(--l-p4)`}></div>
+              <figcaption>{p.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <dl class="shelf">
+          {shelf.map((s) => <div id={`sh-${s.id}`}><dt>{s.label}</dt><dd>{s.value}</dd></div>)}
+        </dl>
+      </div>
+    </section>
+
+    <footer class="l-foot"><p>That's the other side of me.</p><button class="l-back" type="button" data-mode-btn="work">Back to work</button></footer>
+  </div>
+  <script type="application/json" id="life-data" set:html={toJsonScript(lifeSearch)} />
+</Base>

@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import DocWindow from '../../components/DocWindow.astro';
+import { posts, fmtDayMonth } from '../../lib/content';
+const all = await posts();
+const byYear = new Map<number, typeof all>();
+for (const p of all) {
+  const y = p.data.date.getUTCFullYear();
+  if (!byYear.has(y)) byYear.set(y, []);
+  byYear.get(y)!.push(p);
+}
+const initial = (tags: string[]) => (tags.find((t) => t !== 'projects') ?? 'post').slice(0, 1).toUpperCase();
+---
+<Base title="Writing" nav="writing" description="Notes on things I've built and bugs I've fixed.">
+  <div class="page">
+    <DocWindow crumbs={[{ label: 'writing' }]} wide>
+      <span class="k">{all.length} posts</span>
+      <h1>Writing</h1>
+      <p class="lede">Notes on things I've built and bugs I've fixed. Mostly Go, databases and caching.</p>
+      <div class="filter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input id="pf" type="text" placeholder="Filter posts" aria-label="Filter posts" autocomplete="off" />
+      </div>
+      <ul class="posts" id="posts">
+        {[...byYear.entries()].map(([y, list]) => (
+          <>
+            <li class="grp">{y}</li>
+            {list.map((p) => (
+              <li>
+                <a href={`/writing/${p.id}`} data-k={p.data.tags.join(' ')}>
+                  <span class="ic" aria-hidden="true">{initial(p.data.tags)}</span>
+                  <span><span class="t">{p.data.title}</span><span class="tags">{p.data.tags.join(' · ')}</span></span>
+                  <span class="d">{fmtDayMonth(p.data.date)}</span>
+                </a>
+              </li>
+            ))}
+          </>
+        ))}
+      </ul>
+    </DocWindow>
+  </div>
+</Base>

@@ -1,0 +1,63 @@
+---
+import Base from '../../../layouts/Base.astro';
+import MiniMap from '../../../components/MiniMap.astro';
+import JournalBlock from '../../../components/JournalBlock.astro';
+import { allFlights, airportInfo } from '../../../lib/travel';
+
+type F = (typeof allFlights)[number];
+export function getStaticPaths() {
+  return allFlights.map((f, i) => ({ params: { id: f.id }, props: { f, prev: allFlights[i - 1], next: allFlights[i + 1] } }));
+}
+interface Props { f: F; prev?: F; next?: F }
+const { f, prev, next } = Astro.props;
+
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const day = (d: string) => { const [y, m, dd] = d.split('-'); return `${+dd} ${MON[+m - 1]} ${y}`; };
+const A = airportInfo(f.from), B = airportInfo(f.to);
+const sameRoute = allFlights.filter((o) => o.id !== f.id && [o.from, o.to].sort().join() === [f.from, f.to].sort().join());
+const facts = [
+  ['date', day(f.date)], ['flight', f.flight], ['airline', f.airline], ['aircraft', f.aircraft], ['cabin', f.cabin], ['seat', f.seat],
+  ['distance', `${f.km.toLocaleString('en-US')} km`],
+].filter(([, v]) => v) as [string, string][];
+---
+<Base title={`${f.fromCity} to ${f.toCity}, ${day(f.date)}`} mode="life" description={`${f.flight} from ${f.fromCity} to ${f.toCity} on ${day(f.date)}.`}>
+  <article class="page dpage">
+    <a class="d-back" href="/life#l-map">← Where I've been</a>
+    <header class="d-pass">
+      <div class="dp-top"><span>{f.upcoming ? 'UPCOMING FLIGHT' : 'FLIGHT LOG'}</span><span><i>●</i> {f.flight}</span></div>
+      <div class="dp-route">
+        <div><b>{f.from}</b><small>{f.fromCity}, {A.countryName}</small></div>
+        <div class="route-line"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg></div>
+        <div style="text-align:right"><b>{f.to}</b><small>{f.toCity}, {B.countryName}</small></div>
+      </div>
+      <h1 class="sr-only">{f.fromCity} to {f.toCity}, {day(f.date)}</h1>
+      <dl class="dp-facts">{facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+    </header>
+
+    <div class="d-grid">
+      <div class="d-main">
+        <JournalBlock kind="flights" slug={f.id} empty={f.upcoming ? 'Not flown yet.' : 'No notes or photos for this flight yet.'} />
+      </div>
+      <aside class="d-side">
+        <MiniMap
+          frame={{ type: 'LineString', coordinates: [[A.lon, A.lat], [B.lon, B.lat]] }} fine={f.km < 2500} pad={40}
+          lines={[{ coords: [[A.lon, A.lat], [B.lon, B.lat]], kind: f.upcoming ? 'up' : 'flight' }]}
+          pins={[{ lon: A.lon, lat: A.lat, label: f.from, main: true }, { lon: B.lon, lat: B.lat, label: f.to, main: true }]}
+          label={`Route from ${f.fromCity} to ${f.toCity}`} />
+        {sameRoute.length > 0 && (
+          <div class="d-card">
+            <span class="lab">same route</span>
+            <ul class="d-visits">
+              {sameRoute.map((o) => <li class:list={[o.upcoming && 'up']}><a href={`/life/flights/${o.id}`}><b>{day(o.date)}</b><span>{o.from} → {o.to} · {o.flight}</span></a></li>)}
+            </ul>
+          </div>
+        )}
+      </aside>
+    </div>
+
+    <nav class="d-pager" aria-label="More flights">
+      {prev ? <a href={`/life/flights/${prev.id}`}><span>Previous flight</span><b>{prev.fromCity} → {prev.toCity}</b></a> : <span />}
+      {next ? <a class="nx" href={`/life/flights/${next.id}`}><span>Next flight</span><b>{next.fromCity} → {next.toCity}</b></a> : <span />}
+    </nav>
+  </article>
+</Base>

@@ -1,39 +1,27 @@
 {
-  "name": "leetcode-notes",
-  "version": "0.0.0",
+  "name": "xuanze-dev",
   "private": true,
+  "type": "module",
+  "version": "2.0.0",
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
-    "clear": "docusaurus clear",
-    "serve": "docusaurus serve",
-    "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.3.0",
-    "@docusaurus/plugin-google-analytics": "^2.3.0",
-    "@docusaurus/plugin-google-gtag": "^2.3.0",
-    "@docusaurus/preset-classic": "^2.3.0",
-    "@mdx-js/react": "^1.6.22",
-    "clsx": "^1.1.1",
-    "prism-react-renderer": "^1.2.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "@astrojs/mdx": "8.0.2",
+    "@astrojs/rss": "4.0.19",
+    "astro": "7.3.3",
+    "d3-geo": "^3.1.1",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
   },
-  "browserslist": {
-    "production": [
-      ">0.5%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "^3.1.1",
+    "@types/topojson-client": "^3.1.5"
   }
 }

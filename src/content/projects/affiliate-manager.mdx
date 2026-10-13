@@ -1,0 +1,74 @@
+---
+title: AffiliateManager
+kind: product
+summary: Booking, payments and commission tracking for a business that sells through affiliates. A public booking site, plus portals for the owner and every affiliate, on one Go API.
+status: Built for a client, stopped halfway
+period: "2023"
+active: false
+role: Sole engineer
+stack: [Go, TypeScript, Next.js, React, Ant Design, TDesign, MySQL, Redis]
+order: 14
+---
+import ArchDiagram from '../../components/ArchDiagram.astro';
+
+## The problem
+
+The client sold services through independent affiliates. Bookings arrived over chat, payments were checked by hand, and commissions were worked out in a spreadsheet at the end of each month. Nobody, the affiliates included, could easily see where a sale came from or what they were owed.
+
+## What I built
+
+Three front ends on one Go API:
+
+- **Booking site.** Customers pick a slot, pay and get a confirmation. Built with Next.js.
+- **Owner portal.** Leads, bookings, affiliates and payouts in one place.
+- **Affiliate portal.** Each affiliate sees their own leads, sales and earnings.
+
+## How it fits together
+
+<ArchDiagram
+  caption="AffiliateManager: three front ends on one Go API"
+  layers={[
+    { label: 'People', nodes: [
+      { id: 'cust', t: 'Customers', s: 'book and pay', k: 'client' },
+      { id: 'owner', t: 'Owner', s: 'runs the business', k: 'client' },
+      { id: 'aff', t: 'Affiliates', s: 'their own sales', k: 'client' },
+    ] },
+    { label: 'Front ends', nodes: [
+      { id: 'site', t: 'Booking site', s: 'Next.js' },
+      { id: 'op', t: 'Owner portal', s: 'React' },
+      { id: 'ap', t: 'Affiliate portal', s: 'React' },
+    ] },
+    { label: 'Backend', group: true, nodes: [
+      { id: 'api', t: 'API', s: 'Go: bookings, leads,\ncommissions, payouts' },
+    ] },
+    { label: 'Storage and services', nodes: [
+      { id: 'db', t: 'MySQL', s: 'orders, leads,\ncommissions', k: 'data' },
+      { id: 'redis', t: 'Redis', s: 'sessions,\nresponse cache', k: 'data' },
+      { id: 'pay', t: 'Payment provider', s: 'checkout, payment\nwebhooks', k: 'ext' },
+    ] },
+  ]}
+  edges={[
+    ['cust', 'site'], ['owner', 'op'], ['aff', 'ap'],
+    ['site', 'api', 'REST'], ['op', 'api'], ['ap', 'api'],
+    ['api', 'db'], ['api', 'redis'], ['api', 'pay', 'checkout'],
+  ]}
+/>
+
+## Decisions worth explaining
+
+### Attribution is stored on the order
+
+The referral code is captured at booking and saved with the order, together with the commission rate at that moment. Changing an affiliate's rate later never rewrites past earnings.
+
+### Payment webhooks are idempotent
+
+Each provider event ID is recorded in the same transaction that marks an order paid, so a retried webhook is a no-op instead of a double booking.
+
+### Every cache key gets an expiry
+
+Early on I cached API responses in Redis with no TTL and ended up with thousands of stale keys next to session tokens. [I wrote up the cleanup](/writing/delete-redis-keys-that-matches-pattern).
+
+## Testing
+
+This is where the QA background shows. Every order state transition has an API test, the payment flow runs against the provider's sandbox in CI, and a nightly job reconciles paid orders with the provider's records.
+

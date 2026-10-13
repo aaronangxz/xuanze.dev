@@ -1,0 +1,19 @@
+---
+/** The search launcher. Items are built at build time (see src/lib/launcher.ts) and rendered by src/scripts/app.ts. */
+---
+<div class="app" id="launcher">
+  <div class="search">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+    <input id="q" type="text" autocomplete="off" placeholder="Search projects, posts, notes, or actions" aria-label="Search the site" aria-controls="list" />
+    <button class="sclear" id="qclear" type="button" aria-label="Clear search" hidden><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    <kbd>esc</kbd>
+  </div>
+  <div class="split">
+    <div class="list-wrap" id="lw">
+      <ul class="list" id="list" role="listbox" aria-label="Results"></ul>
+      <button class="more" id="more" type="button" hidden><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg><span id="more-n"></span></button>
+    </div>
+    <div class="prev" id="prev" aria-live="polite"></div>
+  </div>
+  <div class="lfoot"><span><kbd>↑</kbd> <kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> open</span><span><kbd>esc</kbd> clear</span><span><kbd>⌘K</kbd> search from any page</span><span class="count" id="count"></span></div>
+</div>
