@@ -351,12 +351,11 @@ pre { border-color: var(--glass-line); }
 @media (max-width: 760px) { .split { height: auto; } .list-wrap { height: 340px; } }
 
 
-/* Site mark (two nigiri) in place of the name in the header: always on a light tile, so its dark outline reads on both sides and in dark mode */
-.mark { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px; text-decoration: none;
-  background: linear-gradient(140deg, #FFFFFF, #ECEFF4); box-shadow: inset 0 0 0 1px rgba(20,24,40,.08), inset 0 1px 0 #fff, 0 6px 16px -8px var(--glass-shadow);
-  transition: transform .25s cubic-bezier(.2,.8,.2,1); }
-.mark svg { width: 80%; height: 80%; display: block; }
-.mark:hover { transform: rotate(-6deg) scale(1.04); }
+/* Header mark: a tiny looping scene (HeaderMark.astro) in place of the name */
+.mark { display: block; width: 36px; height: 36px; border-radius: 11px; overflow: hidden; text-decoration: none;
+  box-shadow: 0 0 0 1px rgba(20,24,40,.10), 0 6px 16px -8px var(--glass-shadow); transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+.mark svg { width: 100%; height: 100%; display: block; }
+.mark:hover { transform: scale(1.06); }
 
 /* Focus mode: while searching, everything around the launcher softly blurs back */
 .home .facts, .home .try, .home .widgets, .home h1 { transition: filter .45s cubic-bezier(.2,.8,.2,1), opacity .45s cubic-bezier(.2,.8,.2,1); }
@@ -404,7 +403,7 @@ html[data-mode="life"] .grain { opacity: .08; }
 html[data-mode="life"] .top { background: linear-gradient(140deg, var(--l-hdr1), var(--l-hdr2)); border-color: var(--l-line); box-shadow: inset 0 1px 0 rgba(var(--l-ink-rgb),.08), 0 24px 50px -26px rgba(0,0,0,.7); }
 html[data-mode="life"] .top::before { background: linear-gradient(150deg, rgba(var(--l-a-rgb),.55), rgba(var(--l-a-rgb),0) 30%, rgba(var(--l-b-rgb),0) 70%, rgba(var(--l-b-rgb),.45)); }
 html[data-mode="life"] .top::after { background: radial-gradient(520px circle at var(--mx, 20%) var(--my, -10%), rgba(var(--l-a-rgb),.10), transparent 45%); }
-html[data-mode="life"] .mark { box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 8px 18px -8px rgba(0,0,0,.6); }
+html[data-mode="life"] .mark { box-shadow: 0 0 0 1px rgba(255,255,255,.14), 0 8px 18px -8px rgba(0,0,0,.6); }
 html[data-mode="life"] .top nav a { color: var(--l-muted); }
 html[data-mode="life"] .top nav a:hover { color: var(--l-ink); }
 html[data-mode="life"] .kbtn { background: rgba(var(--l-ink-rgb),.06); border-color: var(--l-line); color: var(--l-muted); }
@@ -1218,3 +1217,104 @@ figure.arch p.arch-hint { display: none; margin: 6px 0 0; text-align: center; fo
 figure.arch ul.arch-key { display: flex; flex-direction: row; margin: 10px 0 0; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 8px; font: .6875rem var(--mono); color: var(--muted); list-style: none; padding: 0; }
 figure.arch ul.arch-key li { margin: 0; font-size: .6875rem; line-height: 1.4; display: inline-flex; align-items: center; gap: 6px; }
 figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
+
+/* ===== Header mark scenes (HeaderMark.astro) ===== */
+/* Day/night: --d is 1 in light mode, 0 in dark; everything below derives from it and cross-fades on toggle. */
+.mk { --d: 1; --wall: #F4EADB; --floor: #E2CBA8; --frame: #FFFFFF; --winsky: #A8DBF6; --sky: #A9DCF5;
+  --hill: #9ED39B; --canopy: #5DB16E; --track: #E3876B; --lane: #FFF4E6; --cloud: #FFFFFF; }
+:root[data-theme="dark"] .mk { --d: 0; --wall: #252A47; --floor: #322D49; --frame: #3E4570; --winsky: #101842; --sky: #141C44;
+  --hill: #27395B; --canopy: #2E5552; --track: #8E4B42; --lane: #CDB6AF; --cloud: #3B4475; }
+.mk .wall { fill: var(--wall); } .mk .floor { fill: var(--floor); } .mk .frame { fill: var(--frame); } .mk .bars { stroke: var(--frame); }
+.mk .winsky { fill: var(--winsky); } .mk .sky { fill: var(--sky); } .mk .hill { fill: var(--hill); } .mk .canopy { fill: var(--canopy); }
+.mk .track { fill: var(--track); } .mk .lane { stroke: var(--lane); } .mk .cloud { fill: var(--cloud); }
+.mk .wall, .mk .floor, .mk .frame, .mk .bars, .mk .winsky, .mk .sky, .mk .hill, .mk .canopy, .mk .track, .mk .lane, .mk .cloud { transition: fill .9s ease, stroke .9s ease; }
+.mk .day { opacity: var(--d); transition: opacity .9s ease; }
+.mk .night { opacity: calc(1 - var(--d)); transition: opacity .9s ease; }
+.mk .beam { opacity: calc((1 - var(--d)) * .9); }
+.mk .postglow { opacity: calc((1 - var(--d)) * .55); }
+.mk .sunset { opacity: var(--d); transform: translateY(calc((1 - var(--d)) * 16px)); transition: opacity .9s ease, transform .9s ease; }
+.mk .moonrise { opacity: calc(1 - var(--d)); transform: translateY(calc(var(--d) * 16px)); transition: opacity .9s ease, transform .9s ease; }
+.mk .shadow { opacity: .16; }
+.mk g, .mk path, .mk circle, .mk rect { transform-box: view-box; transform-origin: 0 0; }
+/* resting poses */
+.mk-work .fig { transform: translate(20px, 44px); }
+.mk-work .th { transform: rotate(-90deg); } .mk-work .sh { transform: rotate(90deg); }
+.mk-work .ua { transform: rotate(-72deg); } .mk-work .fa { transform: rotate(-14deg); }
+.mk-work .lid { transform: rotate(104deg); }
+.mk-work .spark { transform: scale(0); }
+.mk-life .up { transform: rotate(12deg); }
+.mk-life .th.f { transform: rotate(-52deg); } .mk-life .sh.f { transform: rotate(38deg); }
+.mk-life .th.b { transform: rotate(34deg); }  .mk-life .sh.b { transform: rotate(82deg); }
+.mk-life .ua.f { transform: rotate(38deg); }  .mk-life .fa.f { transform: rotate(-95deg); }
+.mk-life .ua.b { transform: rotate(-42deg); } .mk-life .fa.b { transform: rotate(-80deg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mk { --d: 0; --wall: #252A47; --floor: #322D49; --frame: #3E4570; --winsky: #101842; --sky: #141C44; --hill: #27395B; --canopy: #2E5552; --track: #8E4B42; --lane: #CDB6AF; --cloud: #3B4475; } }
+
+/* ---------- loops (always on; each starts from the resting pose) ---------- */
+.mk .drift { animation: mk-scroll64 14s linear infinite; }
+.mk .drift-slow { animation: mk-scroll64 20s linear infinite; }
+.mk .tw { animation: mk-twinkle 2.4s ease-in-out infinite; }
+.mk .t2 { animation-delay: -.8s; } .mk .t3 { animation-delay: -1.6s; }
+.mk .rays { animation: mk-spin 12s linear infinite; }
+.mk-work .fa.f { animation: mk-type .3s ease-in-out infinite alternate; }
+.mk-work .fa.b { animation: mk-type .3s ease-in-out -.3s infinite alternate; }
+.mk-work .up { animation: mk-nod 3.2s ease-in-out infinite; }
+.mk-work .glow { animation: mk-flicker 1.6s steps(4) infinite; }
+.mk-work .steam { animation: mk-steam 2.4s ease-out infinite; } .mk-work .steam.s2 { animation-delay: -1.2s; }
+.mk-work .spark { animation: mk-idea 4.8s ease-in-out 1.2s infinite; }
+.mk-life .fig { animation: mk-bob .4s ease-in-out infinite; }
+.mk-life .th.f { animation: mk-runA .4s ease-in-out infinite; } .mk-life .th.b { animation: mk-runB .4s ease-in-out infinite; }
+.mk-life .sh.f { animation: mk-runKA .4s ease-in-out infinite; } .mk-life .sh.b { animation: mk-runKB .4s ease-in-out infinite; }
+.mk-life .ua.f { animation: mk-armF .4s ease-in-out infinite; } .mk-life .ua.b { animation: mk-armB .4s ease-in-out infinite; }
+.mk-life .tails { animation: mk-flap .2s ease-in-out infinite alternate; }
+.mk-life .far { animation: mk-scroll64 9s linear infinite; }
+.mk-life .mid { animation: mk-scroll64 2s linear infinite; }
+.mk-life .lane { animation: mk-lane .3125s linear infinite; }
+.mk-life .birdfly { animation: mk-bird 9s linear infinite; }
+.mk-life .wing { animation: mk-wing .35s ease-in-out infinite alternate; }
+/* ---------- entrance (html.mk-arrive: set on arrival by Base.astro, removed when done) ---------- */
+.mk-arrive .mk-work .fig { animation: mk-walkin-w 1s cubic-bezier(.3,.6,.4,1) both, mk-sit .35s ease-out 1s forwards; }
+.mk-arrive .mk-work .th.f { animation: mk-swingA .5s ease-in-out 2, mk-sit-th .35s ease-out 1s forwards; }
+.mk-arrive .mk-work .th.b { animation: mk-swingB .5s ease-in-out 2, mk-sit-th .35s ease-out 1s forwards; }
+.mk-arrive .mk-work .sh { animation: mk-knee .25s ease-in-out 4, mk-sit-sh .35s ease-out 1s forwards; }
+.mk-arrive .mk-work .ua.f { animation: mk-swingB .5s ease-in-out 2, mk-reach .65s ease-out 1s forwards; }
+.mk-arrive .mk-work .ua.b { animation: mk-swingA .5s ease-in-out 2, mk-reach .65s ease-out 1s forwards; }
+.mk-arrive .mk-work .fa { animation: mk-elbow 1s linear, mk-reach-fa .65s ease-out 1s forwards; }
+.mk-arrive .mk-work .up { animation: none; }
+.mk-arrive .mk-work .lid { animation: mk-lid .5s cubic-bezier(.3,1.4,.5,1) 1.5s backwards; }
+.mk-arrive .mk-work .glow { animation: mk-fade .3s ease-out 1.9s backwards; }
+.mk-arrive .mk-work .spark { animation: mk-idea 1.2s ease-in-out 1.9s backwards; }
+.mk-arrive .mk-life .fig { animation: mk-runin .9s cubic-bezier(.2,.7,.3,1) both; }
+
+@keyframes mk-steam { 0% { opacity: 0; transform: translateY(1.5px); } 35% { opacity: 1; } 100% { opacity: 0; transform: translateY(-4px); } }
+@keyframes mk-scroll64 { from { transform: translateX(0); } to { transform: translateX(-64px); } }
+@keyframes mk-twinkle { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.6); } }
+@keyframes mk-spin { to { transform: rotate(360deg); } }
+@keyframes mk-type { from { transform: rotate(-14deg); } to { transform: rotate(-4deg); } }
+@keyframes mk-nod { 0%,100% { transform: rotate(0deg); } 30% { transform: rotate(2.5deg); } 60% { transform: rotate(-1deg); } }
+@keyframes mk-flicker { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes mk-idea { 0%,62%,100% { transform: scale(0) rotate(0deg); } 72% { transform: scale(1.15) rotate(20deg); } 84% { transform: scale(1) rotate(45deg); } 94% { transform: scale(0) rotate(90deg); } }
+@keyframes mk-bob { 0%,100% { transform: translate(0, 0); } 50% { transform: translate(0, -1.8px); } }
+@keyframes mk-runA { 0%,100% { transform: rotate(-52deg); } 50% { transform: rotate(34deg); } }
+@keyframes mk-runB { 0%,100% { transform: rotate(34deg); } 50% { transform: rotate(-52deg); } }
+@keyframes mk-runKA { 0%,100% { transform: rotate(38deg); } 50% { transform: rotate(82deg); } }
+@keyframes mk-runKB { 0%,100% { transform: rotate(82deg); } 50% { transform: rotate(38deg); } }
+@keyframes mk-armF { 0%,100% { transform: rotate(38deg); } 50% { transform: rotate(-42deg); } }
+@keyframes mk-armB { 0%,100% { transform: rotate(-42deg); } 50% { transform: rotate(38deg); } }
+@keyframes mk-flap { from { transform: rotate(-8deg); } to { transform: rotate(10deg); } }
+@keyframes mk-lane { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 10; } }
+@keyframes mk-bird { from { transform: translateX(0); } to { transform: translateX(-90px); } }
+@keyframes mk-wing { from { transform: scaleY(1); } to { transform: scaleY(-.6); } }
+@keyframes mk-walkin-w { from { transform: translate(-22px, 38px); } to { transform: translate(20px, 38px); } }
+@keyframes mk-sit { from { transform: translate(20px, 38px); } to { transform: translate(20px, 44px); } }
+@keyframes mk-swingA { 0%,100% { transform: rotate(-24deg); } 50% { transform: rotate(24deg); } }
+@keyframes mk-swingB { 0%,100% { transform: rotate(24deg); } 50% { transform: rotate(-24deg); } }
+@keyframes mk-knee { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(18deg); } }
+@keyframes mk-elbow { from, to { transform: rotate(-16deg); } }
+@keyframes mk-sit-th { from { transform: rotate(0deg); } to { transform: rotate(-90deg); } }
+@keyframes mk-sit-sh { from { transform: rotate(0deg); } to { transform: rotate(90deg); } }
+@keyframes mk-reach { 0%, 45% { transform: rotate(0deg); } 100% { transform: rotate(-72deg); } }
+@keyframes mk-reach-fa { from { transform: rotate(-16deg); } to { transform: rotate(-14deg); } }
+@keyframes mk-lid { from { transform: rotate(0deg); } to { transform: rotate(104deg); } }
+@keyframes mk-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mk-runin { from { transform: translateX(-62px); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .mk, .mk * { animation: none !important; } }
