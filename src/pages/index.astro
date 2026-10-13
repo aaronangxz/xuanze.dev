@@ -49,7 +49,7 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
         <ul class="mini">
           {site.education.map((x) => (
             <li>
-              <div><b>{x.short}</b><small>{x.role.split(',')[0]}</small></div>
+              <div><b>{x.org}</b><small>{x.role.split(',')[0]}</small></div>
               <span>{x.from}–{x.to}</span>
             </li>
           ))}
