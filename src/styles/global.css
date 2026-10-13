@@ -191,6 +191,9 @@ code { font-family: var(--mono); font-size: .875em; }
 .jobs p { font-size: .9375rem !important; }
 .prose .jobs { padding-left: 0; gap: 0; }
 @media (max-width: 560px) { .jobs li { grid-template-columns: minmax(0, 1fr); } }
+.jobs ul.hl { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.jobs ul.hl li { display: block; position: relative; padding: 0 0 0 16px; border: 0; font-size: .875rem; line-height: 1.5; color: var(--muted); }
+.jobs ul.hl li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--line2); }
 
 /* ---------- Footer ---------- */
 .foot { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line2); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: .875rem; }
@@ -1183,3 +1186,34 @@ html.edge-up .edge-t, html.edge-down .edge-b { opacity: 1; }
   .polaroid { max-width: 35%; margin-left: -10px; padding: 8px 8px 12px; }
   .polaroid figcaption { font-size: .8125rem; margin-top: 8px; }
 }
+
+/* ---------- Architecture diagrams (components/ArchDiagram.astro) ---------- */
+.arch { margin: 6px 0 4px; }
+.arch-svg { display: block; width: 100%; max-width: 100%; height: auto; margin-inline: auto; overflow: visible; }
+.arch-scroll { overflow-x: auto; scrollbar-width: thin; }
+figure.arch p.arch-hint { display: none; margin: 6px 0 0; text-align: center; font: .6875rem var(--mono); color: var(--faint); }
+@media (max-width: 640px) {
+  .arch-scroll { margin-inline: -8px; padding-inline: 8px; }
+  .arch-svg { width: var(--w); max-width: none; }
+  figure.arch p.arch-hint { display: block; font-size: .6875rem; line-height: 1.4; }
+}
+.arch figcaption { margin-top: 10px; text-align: center; font: .75rem var(--mono); color: var(--muted); }
+.arch-grp { fill: color-mix(in srgb, var(--ink) 2.5%, transparent); stroke: var(--line2); stroke-dasharray: 4 4; }
+.arch-glabel { paint-order: stroke; stroke: var(--win); stroke-width: 5px; stroke-linejoin: round; font: 600 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; fill: var(--muted); }
+.arch-box { fill: var(--win); stroke: var(--line2); }
+.arch-t { font: 600 12.5px var(--sans); fill: var(--ink); }
+.arch-s { font: 400 10.5px var(--sans); fill: var(--muted); }
+.arch-mark { fill: var(--muted); }
+.arch-node.k-client .arch-mark { fill: #5B8DEF; }
+.arch-node.k-svc .arch-mark { fill: var(--ink); }
+.arch-node.k-job .arch-mark { fill: #9B7BE0; }
+.arch-node.k-data .arch-mark { fill: #2FA88A; }
+.arch-node.k-ext .arch-mark { fill: #D9963B; }
+.arch-edge { fill: none; stroke: color-mix(in srgb, var(--muted) 75%, transparent); stroke-width: 1.3; }
+.arch-edge.dashed { stroke-dasharray: 5 4; }
+.arch-head { fill: color-mix(in srgb, var(--muted) 85%, transparent); }
+.arch-lbl rect { fill: var(--win); stroke: var(--line); }
+.arch-lbl text { font: 500 9.5px var(--mono); fill: var(--muted); }
+figure.arch ul.arch-key { display: flex; flex-direction: row; margin: 10px 0 0; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin-top: 8px; font: .6875rem var(--mono); color: var(--muted); list-style: none; padding: 0; }
+figure.arch ul.arch-key li { margin: 0; font-size: .6875rem; line-height: 1.4; display: inline-flex; align-items: center; gap: 6px; }
+figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }

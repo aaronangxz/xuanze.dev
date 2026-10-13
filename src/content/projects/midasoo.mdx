@@ -1,0 +1,92 @@
+---
+title: Midasoo
+kind: product
+summary: Which card should I tap? A Singapore app that worked out the miles, points or cashback each of your cards would earn at a shop, and tracked your spending against every card's bonus caps.
+status: School project, meant to go further, hit a wall halfway
+period: 2023 – 2025
+active: false
+role: "[Built most of the API and the mobile app, in a team of four]"
+stack: [Go, Echo, PostgreSQL, sqlc, React Native, Expo, Firebase Auth, Google Cloud, OpenAI API, Python, Google Places API, React, Ant Design]
+order: 15
+---
+import Draft from '../../components/Draft.astro';
+import ArchDiagram from '../../components/ArchDiagram.astro';
+
+> Started as a school project with a team of four, then kept going for two years. The code is private, so this covers what it did and how.
+
+## The problem
+
+<Draft>
+Singapore has dozens of miles and cashback cards, and each one pays differently depending on where you spend. A card might earn 4 miles a dollar on dining but nothing on groceries, only for contactless payments, only up to a monthly cap, and only once you pass a minimum spend in that statement cycle. People who care about rewards end up doing this arithmetic at the till, or keeping a spreadsheet.
+</Draft>
+
+## What we built
+
+Five pieces:
+
+- **Mobile app** (React Native, Expo). Shops near you on a map, trending merchants, search, and a page per shop that ranks your own cards by what they would earn there. A wallet for your cards (with statement date and whether it's linked to Amaze), a spending tab with history and trends, and favourites. Sign-in with Firebase.
+- **API** (Go, Echo, PostgreSQL) on Google App Engine. Card recommendations for a shop, transaction logging with the rewards each one earned, progress against each card's caps, promotion search, and user-submitted corrections.
+- **Promotion scrapers.** Nightly jobs that read the card promotions published by Citi, Amex and KrisPlus, so a shop's page could show the deals running there.
+- **Merchant data pipeline** (Python). Builds the shop list from Singapore's business register on data.gov.sg: keeps live companies in consumer-facing industry codes, splits them by size, and looks up store locations with the Google Places API.
+- **Admin panel** (React, Ant Design), started late on. Browse cards, merchants, stores and promotions from the live API; the review queue for user corrections was still on mock data.
+
+## How it fits together
+
+<ArchDiagram
+  caption="Midasoo: the app, the API and the jobs that kept its data fresh"
+  layers={[
+    { label: 'Apps', nodes: [
+      { id: 'admin', t: 'Admin panel', s: 'React · Ant Design', k: 'client' },
+      { id: 'app', t: 'Mobile app', s: 'React Native · Expo', k: 'client' },
+      { id: 'fb', t: 'Firebase Auth', s: 'sign-in', k: 'ext' },
+    ] },
+    { label: 'Google Cloud', group: true, nodes: [
+      { id: 'sched', t: 'Cloud Scheduler', s: 'nightly jobs', k: 'job' },
+      { id: 'api', t: 'API', s: 'Go · Echo\non App Engine' },
+      { id: 'rules', t: 'Rule engine', s: 'card formulas →\nrewards per purchase' },
+    ] },
+    { label: 'Storage and services', nodes: [
+      { id: 'pg', t: 'PostgreSQL', s: 'cards, shops,\ntransactions', k: 'data' },
+      { id: 'ai', t: 'OpenAI', s: 'category for\nunknown shops', k: 'ext' },
+      { id: 'banks', t: 'Card issuers', s: 'Citi · Amex · KrisPlus\npromotion pages', k: 'ext' },
+    ] },
+    { label: 'Merchant data', nodes: [
+      { id: 'gov', t: 'data.gov.sg', s: 'business register', k: 'ext' },
+      { id: 'pipe', t: 'Python pipeline', s: 'companies → shops', k: 'job' },
+      { id: 'places', t: 'Google Places', s: 'store locations', k: 'ext' },
+    ] },
+  ]}
+  edges={[
+    ['admin', 'api'], ['app', 'api', 'REST'], ['app', 'fb'],
+    ['sched', 'api'], ['api', 'rules'],
+    ['api', 'pg', 'SQL'], ['api', 'ai', 'classify'],
+    { from: 'api', to: 'banks', label: 'scrape', dashed: true },
+    ['gov', 'pipe'], ['pipe', 'places'], ['pipe', 'pg', 'load'],
+  ]}
+/>
+
+## Decisions worth explaining
+
+### Card rules are data, not code
+
+Every card is a row: base and bonus rates, a formula for each (for example `round(floor(spend_amount*base_rpd))`), the merchant categories it includes or excludes, the bonus cap and minimum spend, whether bonuses count by calendar or statement month, which payment methods qualify, and the points-to-miles rate. The API evaluates the formula with the purchase amount and the user's spend so far this cycle. Adding a card, or fixing one when a bank changes its terms, is a data edit instead of a release. It replaced a first version that had one fixed calculation for cashback cards and one for miles cards, which could not express caps, minimum spends or payment-method rules per card.
+
+### Unknown shops get a category from OpenAI
+
+Rewards depend on a shop's merchant category code, which nobody publishes. When a shop without one is opened, the API asks OpenAI using the shop's name and its Google Maps place types and saves the answer; a one-off job did the same in bulk for the existing list. Users could send corrections from the app, stored for review with who approved them and why, rather than going live.
+
+### Rewards are checked again after they post
+
+Banks credit bonus points days or weeks after a purchase. Each logged transaction stores the date its rewards should be final, and a nightly job reconciles everything due that day. Every scheduled run is recorded in the database and posted to a Discord channel, success or failure, so a broken scraper was noticed the next morning.
+
+### Promotions are de-duplicated by content
+
+Each scraped promotion's primary key is a hash of its issuer, merchant, offer, category, link and image, so re-running a scraper updates nothing that hasn't changed and never creates duplicates.
+
+## Where it stopped
+
+<Draft>
+[What made it stall: e.g. keeping hundreds of card rules and promotions correct by hand as banks changed them, finding store-level category codes, or the time it took alongside full-time jobs.]
+</Draft>
+
+Around 460 commits on the API and 370 on the app between 2023 and 2025, most of them mine.

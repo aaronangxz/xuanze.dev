@@ -2,34 +2,96 @@
 title: DataHelperV2
 kind: work
 company: TikTok, E-commerce Data Insights
-summary: Mock-data injection for test databases, built for TikTok's E-commerce Data Insights team. Runs queries against any table without knowing its schema, and logs every change.
+summary: A test-data platform for e-commerce analytics dashboards. It generates realistic data from a table's schema, fills every table behind a dashboard module in one go, and keeps a reviewed record of every injection.
 status: Internal tool
-period: "[2022 – 2023]"
-role: "[Designed and built it]"
-stack: [Go, Hertz, GORM, TypeScript, React, TDesign, MySQL]
+period: 2022 – 2024
+role: Founder and owner. Designed, built and ran it.
+stack: [Go, Hertz, GORM, MySQL, Elasticsearch, Redis, TypeScript, React, TDesign, ECharts]
 order: 3
 ---
 import Draft from '../../components/Draft.astro';
+import ArchDiagram from '../../components/ArchDiagram.astro';
 
 > Internal tool, so there are no screenshots or source here. This covers the problem and the engineering.
 
 ## The problem
 
-<Draft>
-Data Insights dashboards only mean something when the tables behind them hold realistic data. Testing them meant engineers writing one-off SQL against shared test databases: slow, easy to get wrong, and with no record of who changed what.
-</Draft>
+Analytics dashboards only mean something when the tables behind them hold realistic data, and test environments mostly don't. There were two ways to get it: build rows by hand in a spreadsheet and run a script from the command line, or use an older data tool. Both got slower with every table a page reads from, and one dashboard page can read from more than a dozen.
 
 ## What I built
 
-- A web UI for running queries against test databases, with results shown as a table whichever table was queried.
-- An audit log of every injection.
+I started DataHelperV2 soon after joining the team in October 2022 and owned it end to end: the design, the front end, the back end, and getting other teams to use it.
 
-## The interesting part
+- **Injection, one table at a time.** Pick a table, set a rule for each field, preview the rows, inject.
+- **Module injection.** Pick a dashboard module, a region, a test account and a month, and every table behind that module is filled in one go.
+- **Elasticsearch** injection and queries, for modules that read from search indices.
+- **SQL queries** against the test databases, with export.
+- **Lineage search.** From a dashboard query's ID to the chain of tables behind it.
+- **Review.** Every injection is recorded, can be commented on and approved, and can be deleted again.
+- **Projects** to group injections by feature, and a pool of test accounts per region.
 
-The backend couldn't know the schema of the hundreds of tables people might query, so it couldn't scan results into structs. It reads column names at runtime and scans each row into a slice of `interface{}` values. [Full write-up](/writing/how-to-read-from-sql-tables-with-unknown-fields).
+## How it fits together
+
+<ArchDiagram
+  caption="DataHelperV2: one API between testers and every test data store"
+  layers={[
+    { label: 'People', nodes: [
+      { id: 'qa', t: 'QA and engineers', s: 'need data for\na dashboard', k: 'client' },
+      { id: 'web', t: 'Web app', s: 'React · TDesign', k: 'client' },
+      { id: 'rev', t: 'Reviewers', s: 'approve, comment,\nroll back', k: 'client' },
+    ] },
+    { label: 'DataHelperV2 and what it reads', nodes: [
+      { id: 'cat', t: 'Schema source', s: 'table schemas,\nlineage', k: 'ext' },
+      { id: 'api', t: 'API', s: 'Go · Hertz · GORM\ngenerator, review log' },
+      { id: 'cfg', t: 'Config', s: 'module → tables,\nfixed fields', k: 'ext' },
+    ] },
+    { label: 'Data stores', nodes: [
+      { id: 'samp', t: 'Sampling DB', s: 'hand-built\nsample rows', k: 'data' },
+      { id: 'test', t: 'Test MySQL', s: 'one-table\ninjection', k: 'data' },
+      { id: 'mock', t: 'Mock DB', s: 'whole-module\ninjection', k: 'data' },
+      { id: 'es', t: 'Elasticsearch', s: 'test indices', k: 'data' },
+    ] },
+    { label: 'Test environment', nodes: [
+      { id: 'dash', t: 'Dashboards', s: 'read mock data\nonly when asked', k: 'svc' },
+    ] },
+  ]}
+  edges={[
+    ['qa', 'web'], ['rev', 'web'], ['web', 'api', 'REST'],
+    ['api', 'cat'], ['api', 'cfg'],
+    ['api', 'samp', 'samples'], ['api', 'test'], ['api', 'mock', 'module'], ['api', 'es'],
+    { from: 'mock', to: 'dash', label: 'on request', dashed: true },
+  ]}
+/>
+
+## Decisions worth explaining
+
+### Rules per field, not rows by hand
+
+Each field takes a fixed value, a random range such as `[100, 5000]` (with an optional number of decimal places), or an IF rule that depends on another field in the same row, so generated rows stay consistent with each other. Lists of values combine into every combination a test needs, so a few lines of input cover the cases.
+
+### Reading tables it doesn't know
+
+The backend can't know the schema of every table people point it at, so it can't scan results into fixed structs. It reads column names at runtime and scans each row into a slice of `interface{}` values. [Full write-up](/writing/how-to-read-from-sql-tables-with-unknown-fields).
+
+### A module is all or nothing
+
+Module injection fills a module's tables in parallel, with the number of workers set in config, and keeps a map of which tables have succeeded. If any one fails, it deletes everything that run injected, so a dashboard never shows half a module. Asking again for the same module, region, account and dates returns the earlier injection instead of making duplicates.
+
+### Realistic data, grown from samples
+
+Each table has a small set of hand-built sample rows in a separate sampling database. Module injection grows a month of data from them, varying values within a set factor so day-on-day and week-on-week comparisons still look real, and checks the samples against the table's schema first.
+
+### Dashboards see mock data only when asked
+
+Mock data lives in its own database. Test-environment services read from it only when a request asks for mock data, so a tester sees a full dashboard and everyone else's environment is untouched.
 
 ## Results
 
+- Preparing data for one dashboard page backed by 17 tables went from 35 minutes with one-table injection to 5 minutes with module injection.
+- Data-heavy work such as launching a new region no longer starts with days of hand-built data.
+
 <Draft>
-Used by [N] engineers and QAs. Setting up dashboard test data went from [X hours] to [Y minutes].
+- Used by [N] QAs and engineers across [N] teams.
 </Draft>
+
+Built in two phases: the platform and one-table injection from October 2022, module injection from October 2023 to March 2024. Alongside it, I prepared a front-end-only mock data set, loaded through a browser extension, so PMs could demo every page without touching a database.

@@ -5,12 +5,13 @@ summary: A fashion app for the clothes you already own. Photograph a piece and A
 status: "[In beta on TestFlight]"
 period: "[2026] – now"
 role: "[Founder, building it end to end]"
-stack: [Swift, SwiftUI, Go, PostgreSQL, Claude API, Cloudflare R2, Firebase]
+stack: [Swift, SwiftUI, Go, gin, River, PostgreSQL, Gemini, Google Cloud Vision, Cloudflare R2, Firebase]
 live: https://theclozit.com
 logo: /logos/clozit.png
 order: 2
 ---
 import Draft from '../../components/Draft.astro';
+import ArchDiagram from '../../components/ArchDiagram.astro';
 
 ## What it is
 
@@ -27,7 +28,35 @@ Most wardrobes are full of clothes nobody remembers owning. Clozit starts by get
 
 ## How it's built
 
-The iOS app is native SwiftUI. Behind it is a Go API server and a Go worker on Railway, sharing a PostgreSQL database. Slow work, like analysing a garment photo, goes on a Postgres-native job queue (River), so there's no Redis to run. Photos live in Cloudflare R2, sign-in is Firebase, and garment analysis calls the Claude API.
+The iOS app is native SwiftUI. Behind it is a Go API server and a Go worker on Railway, sharing a PostgreSQL database. Slow work, like analysing a garment photo, goes on a Postgres-native job queue (River), so there's no Redis to run. Photos live in Cloudflare R2 and go there straight from the phone, sign-in and push notifications are Firebase, and garment analysis runs through a configurable model provider (Gemini in production, with Claude and OpenAI as alternatives) plus Google Cloud Vision for web detection.
+
+<ArchDiagram
+  caption="Clozit: native apps, one Go API, slow work on a Postgres job queue"
+  layers={[
+    { label: 'Apps', nodes: [
+      { id: 'fb', t: 'Firebase', s: 'sign-in · push', k: 'ext' },
+      { id: 'ios', t: 'iOS app', s: 'SwiftUI', k: 'client' },
+      { id: 'android', t: 'Android app', s: 'Compose · in progress', k: 'client' },
+      { id: 'admin', t: 'Admin portal', s: 'ops, pop-up store', k: 'client' },
+    ] },
+    { label: 'Railway', group: true, nodes: [
+      { id: 'api', t: 'API server', s: 'Go · gin' },
+      { id: 'worker', t: 'Worker', s: 'Go · River jobs', k: 'job' },
+    ] },
+    { label: 'Data and services', nodes: [
+      { id: 'tg', t: 'Telegram', s: 'ops chat: payments\nto approve', k: 'ext' },
+      { id: 'r2', t: 'Cloudflare R2', s: 'garment photos', k: 'data' },
+      { id: 'pg', t: 'PostgreSQL', s: 'data + job queue', k: 'data' },
+      { id: 'ai', t: 'AI providers', s: 'Gemini, Claude or\nOpenAI · Cloud Vision', k: 'ext' },
+    ] },
+  ]}
+  edges={[
+    ['ios', 'fb'], ['ios', 'api', 'REST + token'], ['android', 'api'], ['admin', 'api', '/ops'],
+    ['api', 'worker'], { from: 'api', to: 'fb', label: 'push', dashed: true },
+    { from: 'api', to: 'tg', label: 'cards', dashed: true }, ['api', 'r2', 'presign'], ['api', 'pg', 'SQL'],
+    ['worker', 'pg', 'jobs'], ['worker', 'ai', 'analyse'],
+  ]}
+/>
 
 ## Making sure it doesn't break
 

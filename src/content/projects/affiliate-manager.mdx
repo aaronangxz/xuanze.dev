@@ -10,6 +10,7 @@ stack: [Go, TypeScript, Next.js, React, Ant Design, TDesign, MySQL, Redis]
 order: 14
 ---
 import Draft from '../../components/Draft.astro';
+import ArchDiagram from '../../components/ArchDiagram.astro';
 
 ## The problem
 
@@ -27,13 +28,34 @@ Three front ends on one Go API:
 
 ## How it fits together
 
-```text
-customer  ──▶ booking site  (Next.js) ──┐
-owner     ──▶ owner portal  (React)   ──┼──▶ API (Go) ──┬──▶ MySQL  orders, leads, commissions
-affiliate ──▶ affiliate portal        ──┘       ▲       └──▶ Redis  sessions, response cache
-                                                │
-                             payment provider ──┘ webhooks
-```
+<ArchDiagram
+  caption="AffiliateManager: three front ends on one Go API"
+  layers={[
+    { label: 'People', nodes: [
+      { id: 'cust', t: 'Customers', s: 'book and pay', k: 'client' },
+      { id: 'owner', t: 'Owner', s: 'runs the business', k: 'client' },
+      { id: 'aff', t: 'Affiliates', s: 'their own sales', k: 'client' },
+    ] },
+    { label: 'Front ends', nodes: [
+      { id: 'site', t: 'Booking site', s: 'Next.js' },
+      { id: 'op', t: 'Owner portal', s: 'React' },
+      { id: 'ap', t: 'Affiliate portal', s: 'React' },
+    ] },
+    { label: 'Backend', group: true, nodes: [
+      { id: 'api', t: 'API', s: 'Go: bookings, leads,\ncommissions, payouts' },
+    ] },
+    { label: 'Storage and services', nodes: [
+      { id: 'db', t: 'MySQL', s: 'orders, leads,\ncommissions', k: 'data' },
+      { id: 'redis', t: 'Redis', s: 'sessions,\nresponse cache', k: 'data' },
+      { id: 'pay', t: 'Payment provider', s: 'checkout, payment\nwebhooks', k: 'ext' },
+    ] },
+  ]}
+  edges={[
+    ['cust', 'site'], ['owner', 'op'], ['aff', 'ap'],
+    ['site', 'api', 'REST'], ['op', 'api'], ['ap', 'api'],
+    ['api', 'db'], ['api', 'redis'], ['api', 'pay', 'checkout'],
+  ]}
+/>
 
 ## Decisions worth explaining
 

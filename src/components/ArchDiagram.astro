@@ -1,0 +1,179 @@
+---
+/**
+ * A system diagram drawn from a small description: layers of boxes (top to bottom) and the arrows
+ * between them. Laid out at build time, drawn as SVG in the site's own colours (light and dark), and
+ * drawn twice: four boxes per row on wider screens, two on phones, so text is never shrunk to fit.
+ *
+ *   <ArchDiagram
+ *     layers={[
+ *       { label: 'People', nodes: [{ id: 'host', t: 'Hosts', s: 'studio', k: 'client' }] },
+ *       { label: 'Railway', group: true, nodes: [{ id: 'api', t: 'API', s: 'Go' }] },
+ *     ]}
+ *     edges={[['host', 'api', 'REST'], { from: 'x', to: 'y', label: 'webhook', dashed: true }]}
+ *     caption="How it fits together" />
+ *
+ * k: client | svc | job | data | ext (colour of the box's marker). s: a sub-line; '\n' for two lines.
+ */
+type Kind = 'client' | 'svc' | 'job' | 'data' | 'ext';
+type Node = { id: string; t: string; s?: string; k?: Kind };
+type Layer = { label?: string; group?: boolean; nodes: Node[] };
+type EdgeIn = [string, string, string?] | { from: string; to: string; label?: string; dashed?: boolean };
+interface Props { layers: Layer[]; edges: EdgeIn[]; caption?: string; label?: string }
+const { layers, edges: edgesIn, caption, label } = Astro.props;
+
+const edges = edgesIn.map((e) => (Array.isArray(e) ? { from: e[0], to: e[1], label: e[2], dashed: false } : { dashed: false, ...e }));
+
+type Box = Node & { x: number; y: number; w: number; h: number; lines: string[] };
+type Opts = { per: number; W: number; gx: number; pad: number };
+
+function layout({ per, W, gx, pad }: Opts) {
+  const GP = 12, LINE = 12, LAYER = 52, LABEL = 24;
+  const hOf = (n: Node) => 34 + (n.s ? n.s.split('\n').length * 14 : 0) - (n.s ? 0 : 6);
+  const rows = layers.map((l) => { const r: Node[][] = []; for (let i = 0; i < l.nodes.length; i += per) r.push(l.nodes.slice(i, i + per)); return r; });
+  const inner = Math.max(...rows.flat().map((r) => r.length * W + (r.length - 1) * gx));
+  const contentW = inner + GP * 2;
+  const width = contentW + pad * 2;
+  const boxes: Record<string, Box> = {};
+  const groups: { x: number; y: number; w: number; h: number; label?: string; group?: boolean; lx?: number }[] = [];
+  let y = pad;
+  layers.forEach((l, li) => {
+    const top = y;
+    y += l.label ? LABEL : GP;
+    rows[li].forEach((r) => {
+      const lh = Math.max(...r.map(hOf));
+      const rw = r.length * W + (r.length - 1) * gx;
+      let x = pad + GP + (inner - rw) / 2;
+      r.forEach((n) => { boxes[n.id] = { ...n, x, y, w: W, h: lh, lines: n.s ? n.s.split('\n') : [] }; x += W + gx; });
+      y += lh + LINE;
+    });
+    y += GP - LINE;
+    groups.push({ x: pad, y: top, w: contentW, h: y - top, label: l.label, group: l.group });
+    y += LAYER;
+  });
+  const height = y - LAYER + pad;
+
+  // Ports: arrows leave the bottom of a box and enter the top of the next one, spread across the edge
+  // so several arrows from one box don't stack on a single point. Side ports for boxes on one row.
+  type P = { x: number; y: number; dir: 'down' | 'up' | 'right' | 'left' };
+  const plan = edges.map((e) => {
+    const a = boxes[e.from], b = boxes[e.to];
+    if (!a || !b) throw new Error(`ArchDiagram: unknown node in edge ${e.from} → ${e.to}`);
+    const dir: P['dir'] = b.y >= a.y + a.h - 1 ? 'down' : b.y + b.h <= a.y + 1 ? 'up' : b.x > a.x ? 'right' : 'left';
+    return { e, a, b, dir };
+  });
+  // Every arrow end on the top or bottom side of a box gets its own slot along that side, ordered by
+  // where the other end of the arrow is, so arrows in and out of one side never share a point.
+  const slots = new Map<string, { p: (typeof plan)[number]; end: 'src' | 'dst' }[]>();
+  plan.forEach((p) => {
+    if (p.dir === 'down') { slots.set('b' + p.a.id, [...(slots.get('b' + p.a.id) ?? []), { p, end: 'src' }]); slots.set('t' + p.b.id, [...(slots.get('t' + p.b.id) ?? []), { p, end: 'dst' }]); }
+    if (p.dir === 'up') { slots.set('t' + p.a.id, [...(slots.get('t' + p.a.id) ?? []), { p, end: 'src' }]); slots.set('b' + p.b.id, [...(slots.get('b' + p.b.id) ?? []), { p, end: 'dst' }]); }
+  });
+  const srcX = new Map<(typeof plan)[number], number>(), dstX = new Map<(typeof plan)[number], number>();
+  slots.forEach((list) => {
+    const far = (x: { p: (typeof plan)[number]; end: string }) => { const o = x.end === 'src' ? x.p.b : x.p.a; return o.x + o.w / 2; };
+    list.sort((u, v) => far(u) - far(v));
+    list.forEach((x, i) => { const bx = x.end === 'src' ? x.p.a : x.p.b; (x.end === 'src' ? srcX : dstX).set(x.p, bx.x + (bx.w * (i + 1)) / (list.length + 1)); });
+  });
+
+  const geo = plan.map((p) => {
+    const { a, b, dir } = p;
+    let x1: number, y1: number, x2: number, y2: number, d: string;
+    let at = (t: number) => ({ x: x1 + (x2 - x1) * t, y: y1 + (y2 - y1) * t });
+    if (dir === 'down' || dir === 'up') {
+      x1 = srcX.get(p)!; x2 = dstX.get(p)!;
+      y1 = dir === 'down' ? a.y + a.h : a.y; y2 = dir === 'down' ? b.y - 3 : b.y + b.h + 3;
+      const k = Math.max(18, Math.abs(y2 - y1) * 0.45) * (dir === 'down' ? 1 : -1);
+      const c1 = y1 + k, c2 = y2 - k;
+      d = `M${x1},${y1} C${x1},${c1} ${x2},${c2} ${x2},${y2}`;
+      at = (t) => { const u = 1 - t; return { x: (u * u * u + 3 * u * u * t) * x1 + (3 * u * t * t + t * t * t) * x2, y: u * u * u * y1 + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t * t * t * y2 }; };
+    } else {
+      y1 = a.y + a.h / 2; y2 = b.y + b.h / 2;
+      x1 = dir === 'right' ? a.x + a.w : a.x; x2 = dir === 'right' ? b.x - 3 : b.x + b.w + 3;
+      d = `M${x1},${y1} L${x2},${y2}`;
+    }
+    const pts = Array.from({ length: 41 }, (_, i) => at(i / 40));
+    return { p, d, at, pts };
+  });
+  type R = { x: number; y: number; w: number; h: number };
+  const hit = (r: R, o: R, m: number) => r.x < o.x + o.w + m && o.x < r.x + r.w + m && r.y < o.y + o.h + m && o.y < r.y + r.h + m;
+  const inR = (q: { x: number; y: number }, r: R, m: number) => q.x > r.x - m && q.x < r.x + r.w + m && q.y > r.y - m && q.y < r.y + r.h + m;
+  const all = Object.values(boxes);
+  const placed: R[] = [];
+  // A label sits on its own arrow, at the first point along it that is clear of boxes, other labels
+  // and other arrows; the least crowded point when none is.
+  const paths = geo.map((g, gi) => {
+    const { p: { e, dir }, d, at } = g;
+    // Arrows between neighbours on one row are short: no room for a label there.
+    const label = dir === 'down' || dir === 'up' ? e.label : undefined;
+    const lw = label ? label.length * 5.7 + 12 : 0;
+    let { x: lx, y: ly } = at(0.5);
+    if (label) {
+      let best = Infinity;
+      for (const t of [0.5, 0.42, 0.58, 0.35, 0.65, 0.28, 0.72, 0.22, 0.78]) {
+        const q = at(t), r = { x: q.x - lw / 2, y: q.y - 8, w: lw, h: 16 };
+        const cost = placed.filter((o) => hit(r, o, 4)).length * 100 + all.filter((o) => hit(r, o, 2)).length * 100 +
+          geo.reduce((n, o, oi) => n + (oi === gi ? 0 : o.pts.filter((pt) => inR(pt, r, 3)).length), 0) + Math.abs(t - 0.5);
+        if (cost < best) { best = cost; lx = q.x; ly = q.y; }
+        if (cost < 1) break;
+      }
+      placed.push({ x: lx - lw / 2, y: ly - 8, w: lw, h: 16 });
+    }
+    return { d, dashed: e.dashed, label, lx, ly, lw };
+  });
+  // Layer names go top-left, or slide right to the first spot no arrow passes through.
+  groups.forEach((g) => {
+    if (!g.label) return;
+    const w = g.label.length * 7.4 + 8;
+    const n = (r: R) => geo.reduce((s, o) => s + o.pts.filter((pt) => inR(pt, r, 3)).length, 0) + placed.filter((o) => hit(r, o, 3)).length * 50;
+    let best = Infinity;
+    for (let x = g.x + 8; x <= g.x + g.w - 8 - w; x += 6) {
+      const c = n({ x, y: g.y + 3, w, h: 18 }) * 1000 + (x - g.x);
+      if (c < best) { best = c; g.lx = x + 4; }
+    }
+  });
+  return { width, height, boxes: Object.values(boxes), groups, paths };
+}
+
+// One layout at full size. Phones scroll it sideways rather than shrinking the text.
+const L = layout({ per: 4, W: 130, gx: 24, pad: 4 });
+const uid = 'ad' + Math.random().toString(36).slice(2, 8);
+// Legend: only the kinds this diagram uses.
+const KIND: Record<Kind, [string, string]> = { client: ['people & apps', '#5B8DEF'], svc: ['services', 'var(--ink)'], job: ['background jobs', '#9B7BE0'], data: ['storage', '#2FA88A'], ext: ['outside services', '#D9963B'] };
+const used = new Set(layers.flatMap((l) => l.nodes.map((n) => n.k ?? 'svc')));
+const kinds = (Object.keys(KIND) as Kind[]).filter((k) => used.has(k)).map((k) => [k, ...KIND[k]] as const);
+---
+<figure class="arch" aria-label={label ?? caption ?? 'System diagram'}>
+  <div class="arch-scroll">
+    <svg class="arch-svg" viewBox={`0 0 ${L.width} ${L.height}`} width={L.width} style={`--w:${L.width}px`} role="img">
+      <defs>
+        <marker id={`${uid}a`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="arch-head" d="M0,1 L9,5 L0,9 z" />
+        </marker>
+      </defs>
+      {L.groups.map((g: any) => g.group && <rect class="arch-grp" x={g.x} y={g.y} width={g.w} height={g.h} rx="12" />)}
+      {L.paths.map((p: any) => (
+        <path class={`arch-edge${p.dashed ? ' dashed' : ''}`} d={p.d} marker-end={`url(#${uid}a)`} />
+      ))}
+      {L.boxes.map((b: any) => (
+        <g class={`arch-node k-${b.k ?? 'svc'}`}>
+          <rect class="arch-box" x={b.x} y={b.y} width={b.w} height={b.h} rx="9" />
+          <rect class="arch-mark" x={b.x + 9} y={b.y + 11} width="6" height="6" rx="1.5" />
+          <text class="arch-t" x={b.x + 21} y={b.y + 18}>{b.t}</text>
+          {b.lines.map((s: string, i: number) => <text class="arch-s" x={b.x + 10} y={b.y + 34 + i * 14}>{s}</text>)}
+        </g>
+      ))}
+      {L.groups.map((g: any) => g.label && <text class="arch-glabel" x={g.lx ?? g.x + 12} y={g.y + 15}>{g.label}</text>)}
+      {L.paths.filter((p: any) => p.label).map((p: any) => (
+        <g class="arch-lbl">
+          <rect x={p.lx - p.lw / 2} y={p.ly - 8} width={p.lw} height="16" rx="8" />
+          <text x={p.lx} y={p.ly + 3.5} text-anchor="middle">{p.label}</text>
+        </g>
+      ))}
+    </svg>
+  </div>
+  <ul class="arch-key" aria-hidden="true">
+    {kinds.map(([k, t, c]) => <li><i style={`background:${c}`} />{t}</li>)}
+  </ul>
+  {caption && <figcaption>{caption}</figcaption>}
+  <p class="arch-hint" aria-hidden="true">Swipe sideways to see all of it</p>
+</figure>

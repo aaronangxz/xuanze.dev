@@ -51,7 +51,13 @@ export const site = {
 
   experience: [
     { org: 'TikTok', role: 'Software Engineer in Test, Global E-commerce Data Insights', from: 'Oct 2022', to: 'now',
-      detail: 'Built DataHelperV2, a mock-data injection tool for test databases. End-to-end testing of data products.' },
+      detail: 'Main QA owner for the creator and partner analytics products. Designed and built DataHelperV2, a test-data platform.',
+      highlights: [
+        'Owned product stability for the team: cut alert noise and got critical alerts answered faster.',
+        'Brought production issues down quarter after quarter through more automation and earlier testing.',
+        'Led stress testing ahead of peak shopping events, and the testing for a database migration that let a service take far more traffic.',
+        'Built a tool that made sharing and reading logs across teams simpler, and introduced a pre-test checklist and QA handover docs.',
+      ] },
     { org: 'Shopee', role: 'Software QA Engineer, Marketplace Promotions (Vouchers)', from: 'Jun 2021', to: 'Sep 2022',
       detail: 'API automation for voucher services.' },
   ],

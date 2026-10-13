@@ -17,7 +17,10 @@ const a = site.about;
           {site.experience.map((x) => (
             <li>
               <span class="when">{x.from} – {x.to}</span>
-              <div><h3>{x.org}</h3><p>{x.role}{'detail' in x && x.detail ? `. ${x.detail}` : ''}</p></div>
+              <div>
+                <h3>{x.org}</h3><p>{x.role}{'detail' in x && x.detail ? `. ${x.detail}` : ''}</p>
+                {'highlights' in x && x.highlights && <ul class="hl">{x.highlights.map((h) => <li>{h}</li>)}</ul>}
+              </div>
             </li>
           ))}
         </ul>
