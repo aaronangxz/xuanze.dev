@@ -615,24 +615,14 @@ html.sliding .page { pointer-events: none; }
 .widget, .nextcard { transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
 .widget:hover { transform: translateY(-2px); }
 
-/* Page transitions (View Transitions API where supported) */
-/* Everything changes as one picture (no separately animated layers): a named layer is drawn on top of the
-   page during the fade, so the background blobs tinted the cards blue and the header lost its blur.
-   The blobs stay put across pages because their drift is synced to the clock (script after .ambient in Base.astro). */
-/* The old page stays fully opaque underneath while the new one fades and lifts in on top, so there is
-   never a moment where both are see-through (that read as a flash to blank). Normal blending, not the
-   default plus-lighter, so the overlap doesn't brighten. No full-page blur: too expensive per click. */
-::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
-::view-transition-new(root) { animation: vt-in .2s cubic-bezier(.4,0,.2,1) both; mix-blend-mode: normal; }
-/* Opacity only. Any movement here shifts the new page's copy of the header and background off the old one,
-   so everything that is identical on both pages (the header above all) ghosts and blinks mid-fade. */
-@keyframes vt-in { from { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } .more svg { animation: none; } }
+/* Page changes are a plain swap, no cross-document View Transition: Arc blinks the whole page while
+   running one. The next page is fetched on hover, so the swap is near-instant, and the header and
+   background are identical on every page, so only the content changes. */
+@media (prefers-reduced-motion: reduce) { .more svg { animation: none; } }
 
 /* =========================================================
    Site additions (beyond the mockup)
    ========================================================= */
-@view-transition { navigation: auto; }
 
 /* Arriving via the Work/Life slide: hold the page until the enter animation starts */
 html.slide-in .page { visibility: hidden; }

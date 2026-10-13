@@ -33,14 +33,26 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content={mode === 'life' ? '#0B1220' : '#E8E9EC'} />
+    <meta name="color-scheme" content="light dark" />
+    {mode === 'life'
+      ? <meta name="theme-color" content="#0B1220" />
+      : <><meta name="theme-color" media="(prefers-color-scheme: light)" content="#E8E9EC" /><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0C0E" /></>}
+    <!-- The page colour itself, before any stylesheet: whatever the browser paints first is already the site's
+         background, never a white or black blank. -->
+    <style is:inline>
+      html { background: #E8E9EC; }
+      @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) { background: #0B0C0E; } }
+      html[data-theme="dark"] { background: #0B0C0E; }
+      html[data-mode="life"] { background: #0B1220; }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" />
     <link rel="prefetch" href={mode === 'life' ? '/' : '/life'} />
-    <!-- Chrome/Edge: render the next page in the background once a link is hovered or pressed, so the click is instant.
+    <!-- Chromium: fetch the next page as soon as a link is hovered or pressed, so the click loads from memory.
+         Prefetch, not prerender: swapping in a prerendered page made Arc blink the whole window.
          The Work/Life switch is excluded: it runs its own animation and must load fresh. -->
-    <script type="speculationrules" is:inline set:html={JSON.stringify({ prerender: [{ source: 'document', where: { and: [{ href_matches: '/*' }, { not: { selector_matches: '[data-life-link], [data-mode-btn], [download], a[href$=".pdf"], a[href$=".xml"]' } }] }, eagerness: 'moderate' }] })} />
+    <script type="speculationrules" is:inline set:html={JSON.stringify({ prefetch: [{ source: 'document', where: { and: [{ href_matches: '/*' }, { not: { selector_matches: '[data-life-link], [data-mode-btn], [download], a[href$=".pdf"], a[href$=".xml"]' } }] }, eagerness: 'moderate' }] })} />
     <script is:inline>
       (function () {
         var r = document.documentElement;
@@ -58,9 +70,6 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
           var s = sessionStorage.getItem('xz-slide');
           if (s) { sessionStorage.removeItem('xz-slide'); r.classList.add('slide-in'); r.setAttribute('data-slide', s); }
         } catch (e) {}
-        // The Work/Life switch runs its own animation, so skip the default cross-page fade for it.
-        addEventListener('pagereveal', function (e) { if (r.classList.contains('slide-in') && e.viewTransition) e.viewTransition.skipTransition(); });
-        addEventListener('pageswap', function (e) { if (window.__xzSliding && e.viewTransition) e.viewTransition.skipTransition(); });
       })();
     </script>
   </head>
@@ -70,10 +79,10 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
     <div class="ambient" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
     <script is:inline>
       // Put the blobs' drift on the wall clock, so the next page's blobs sit exactly where the last page's were
-      // and a page change never moves the background. Re-synced when a page prerendered in the background is shown.
+      // and a page change never moves the background.
       (function () {
-        function sync() { var t = Date.now() % 3600000; document.querySelectorAll('.blob').forEach(function (b) { b.getAnimations().forEach(function (a) { a.currentTime = t; }); }); }
-        sync(); document.addEventListener('prerenderingchange', sync);
+        var t = Date.now() % 3600000;
+        document.querySelectorAll('.blob').forEach(function (b) { b.getAnimations().forEach(function (a) { a.currentTime = t; }); });
       })();
     </script>
 
