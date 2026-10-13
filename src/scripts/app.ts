@@ -277,6 +277,7 @@ const LS = $('loverlay') && (() => {
     if (it.href) { location.href = it.href; return; }
     if (it.city) { dispatchEvent(new CustomEvent('xz:city', { detail: it.city })); return; }
     const el = document.querySelector(it.sel); if (!el) return;
+    el.dispatchEvent(new CustomEvent('deck:show', { bubbles: true })); // a bib in the stack comes to the top first
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
     setTimeout(() => { el.classList.remove('ping'); void el.offsetWidth; el.classList.add('ping'); setTimeout(() => el.classList.remove('ping'), 2800); }, reduce ? 0 : 500);
   }
@@ -629,3 +630,70 @@ if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races
   const warm = () => document.querySelectorAll('.top nav a[href]').forEach((a) => prefetch({ target: a }));
   if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 2500 }); else setTimeout(warm, 1200);
 }
+
+/* =========================================================
+   Race bibs: a stack, newest on top
+   ========================================================= */
+document.querySelectorAll<HTMLElement>('[data-deck]').forEach((deck) => {
+  const cards = [...deck.querySelectorAll<HTMLElement>('.bib')];
+  if (!cards.length) return;
+  const wrap = deck.parentElement!;
+  const n = wrap.querySelector<HTMLElement>('[data-deck-n]');
+  let order = cards.map((_, i) => i); // order[0] is the bib on top
+  const clearDrag = (c: HTMLElement) => { c.style.removeProperty('--dx'); c.style.removeProperty('--dr'); };
+  let busy = false;
+  const layout = () => {
+    order.forEach((ci, pos) => {
+      const c = cards[ci];
+      c.style.setProperty('--i', String(pos));
+      c.classList.toggle('deep', pos > 3);
+      c.setAttribute('aria-hidden', String(pos !== 0));
+    });
+    if (n) n.textContent = `${order[0] + 1} / ${cards.length}`;
+  };
+  // Next: the top bib flies off to the left and goes to the back. Back: the last one flies in on top.
+  const next = () => {
+    if (busy || cards.length < 2) return; busy = true;
+    const top = cards[order[0]];
+    if (reduce) { order.push(order.shift()!); layout(); busy = false; return; }
+    top.classList.add('fly');
+    setTimeout(() => { order.push(order.shift()!); top.classList.remove('fly'); clearDrag(top); layout(); busy = false; }, 280);
+  };
+  const prev = () => {
+    if (busy || cards.length < 2) return; busy = true;
+    const c = cards[order[order.length - 1]];
+    order.unshift(order.pop()!);
+    if (reduce) { layout(); busy = false; return; }
+    c.classList.add('fly-from'); layout();
+    requestAnimationFrame(() => requestAnimationFrame(() => { c.classList.remove('fly-from'); setTimeout(() => { busy = false; }, 200); }));
+  };
+  const show = (card: HTMLElement) => { const ci = cards.indexOf(card); if (ci < 0) return; while (order[0] !== ci) order.push(order.shift()!); layout(); };
+  wrap.querySelector('[data-deck-next]')?.addEventListener('click', next);
+  wrap.querySelector('[data-deck-prev]')?.addEventListener('click', prev);
+  deck.addEventListener('deck:show', (e) => show(e.target as HTMLElement));
+  deck.tabIndex = 0;
+  deck.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  // Drag the top bib sideways: far enough flips it, otherwise it springs back. A tap flips it too.
+  let x0 = 0, dx = 0, down = false, id = -1;
+  deck.addEventListener('pointerdown', (e) => { if (busy) return; down = true; id = e.pointerId; x0 = e.clientX; dx = 0; });
+  deck.addEventListener('pointermove', (e) => {
+    if (!down || e.pointerId !== id) return;
+    dx = e.clientX - x0;
+    if (Math.abs(dx) > 6) { if (!deck.classList.contains('dragging')) { deck.classList.add('dragging'); try { deck.setPointerCapture(id); } catch {} } const t = cards[order[0]]; t.style.setProperty('--dx', dx + 'px'); t.style.setProperty('--dr', (dx * 0.04).toFixed(2) + 'deg'); }
+  });
+  const end = (e: PointerEvent) => {
+    if (!down || e.pointerId !== id) return; down = false;
+    const top = cards[order[0]];
+    deck.classList.remove('dragging');
+    if (Math.abs(dx) <= 6) { clearDrag(top); next(); return; }
+    if (dx < -70) next();
+    else if (dx > 70) { clearDrag(top); prev(); }
+    else clearDrag(top);
+  };
+  deck.addEventListener('pointerup', end);
+  deck.addEventListener('pointercancel', (e) => { if (e.pointerId === id) { down = false; deck.classList.remove('dragging'); clearDrag(cards[order[0]]); } });
+  layout();
+});

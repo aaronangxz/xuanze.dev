@@ -1,17 +1,16 @@
 ---
 /**
  * A hotel chain's logo from src/assets/chains/<chain>.svg, painted in the page's ink (currentColor).
- * Wordmarks replace the chain's name; a mark (Marriott's M) sits beside it; no file falls back to the name.
+ * The logo stands alone (the name is kept for screen readers); a chain with no file shows its name instead.
  */
 interface Props { chain: string; height?: number }
 const { chain, height = 26 } = Astro.props;
 const files = import.meta.glob<string>('../assets/chains/*.svg', { query: '?raw', import: 'default', eager: true });
 const key = chain.toLowerCase().replace(/[^a-z0-9]+/g, '');
 const raw = files[`../assets/chains/${key}.svg`];
-// Height multiplier per wordmark, so the five read at a similar visual weight.
-const WORDMARKS: Record<string, number> = { hilton: 1.15, hyatt: 1, ihg: 1.1, accor: 1.9 };
-const wordmark = key in WORDMARKS;
-const h = Math.round(height * (WORDMARKS[key] ?? 1.15));
+// Height multiplier per logo, so they read at a similar visual weight (a square mark needs more height than a long wordmark).
+const SIZE: Record<string, number> = { marriott: 1.3, hilton: 1.15, hyatt: 1, ihg: 1.1, accor: 1.9, wyndham: 1.25, fourseasons: 2.1, panpacific: 2.3 };
+const h = Math.round(height * (SIZE[key] ?? 1.15));
 const svg = raw
   ?.replace(/<\?xml[\s\S]*?\?>/, '')
   .replace(/<!--[\s\S]*?-->/g, '')
@@ -29,7 +28,7 @@ const svg = raw
   .replace(/<svg([^>]*?)\s(width|height)="[^"]*"/g, '<svg$1')
   .replace('<svg', `<svg aria-hidden="true" focusable="false" fill="currentColor" style="height:${h}px;width:auto"`);
 ---
-<span class:list={['chain-logo', !raw && 'text', wordmark && 'wm']} data-chain={key}>
+<span class:list={['chain-logo', !raw && 'text']} data-chain={key}>
   {svg && <Fragment set:html={svg} />}
-  <span class:list={[raw && wordmark && 'sr-only']}>{chain}</span>
+  <span class:list={[raw && 'sr-only']}>{chain}</span>
 </span>

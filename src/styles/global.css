@@ -572,12 +572,30 @@ html.sliding .page { pointer-events: none; }
 .rs-year small { order: 4; font: .6875rem var(--mono); color: var(--l-muted); }
 
 /* Bibs: Tyvek, a coloured band, four pin holes and a tear-off timing strip. */
-.bibs { display: flex; flex-wrap: wrap; gap: 30px 26px; padding: 14px 8px 30px; }
-/* Phones: one row you swipe through, with no visible scrollbar. */
-@media (max-width: 640px) {
-  .bibs { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
-  .bibs::-webkit-scrollbar { display: none; }
+/* Race bibs: a stack with the newest on top. Hover fans it out; a click, tap, swipe or the arrows flip to the next
+   one (the top bib goes to the back). --i is each bib's place in the stack (0 = top), set by app.ts. */
+.bib-wrap { display: flex; flex-direction: column; gap: 26px; padding: 14px 8px 8px; }
+.bib-deck { display: grid; width: 19.5rem; max-width: 100%; touch-action: pan-y; cursor: pointer; -webkit-user-select: none; user-select: none; }
+.bib-deck .bib { grid-area: 1 / 1; width: 19.5rem; max-width: 100%; z-index: calc(20 - var(--i));
+  transform: translate(calc(var(--i) * 15px + var(--dx, 0px)), calc(var(--i) * 9px)) rotate(calc(var(--r) * .6 + var(--i) * 2.5deg + var(--dr, 0deg))) scale(calc(1 - var(--i) * .02));
+  transition: transform .55s cubic-bezier(.2,.8,.2,1), opacity .35s ease; }
+.bib-deck .bib.deep { opacity: 0; }
+.bib-deck .bib:hover { transform: translate(calc(var(--i) * 15px + var(--dx, 0px)), calc(var(--i) * 9px)) rotate(calc(var(--r) * .6 + var(--i) * 2.5deg)) scale(calc(1 - var(--i) * .02)); }
+.bib-deck.dragging .bib { transition: none; }
+.bib-deck .bib.fly { transform: translate(-125%, -12px) rotate(-16deg) !important; opacity: 0; }
+.bib-deck .bib.fly-from { transform: translate(-125%, -12px) rotate(-16deg) !important; opacity: 0; transition: none !important; }
+@media (hover: hover) and (pointer: fine) {
+  .bib-deck:hover .bib:not(.deep) { transform: translate(calc(var(--i) * 74px), calc(var(--i) * -6px - 6px)) rotate(calc(var(--i) * 4deg - 2deg)) scale(calc(1 - var(--i) * .02)); }
+  .deck-hint .h-touch { display: none; }
 }
+@media not ((hover: hover) and (pointer: fine)) { .deck-hint .h-fine { display: none; } }
+.deck-ctl { display: flex; align-items: center; gap: 10px; }
+.deck-ctl button { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer; color: var(--l-ink); background: rgba(var(--l-ink-rgb), .07); box-shadow: inset 0 0 0 1px var(--l-line); }
+.deck-ctl button:hover { background: rgba(var(--l-ink-rgb), .14); }
+.deck-ctl svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.deck-n { font: 600 .8125rem var(--mono); color: var(--l-ink); min-width: 3.5em; text-align: center; font-variant-numeric: tabular-nums; }
+.deck-hint { margin-left: 6px; font: .75rem var(--mono); color: var(--l-muted); }
+@media (prefers-reduced-motion: reduce) { .bib-deck .bib { transition: none; } }
 .bib { --tyvek: #F6F5F0; position: relative; flex: 0 0 19.5rem; scroll-snap-align: start; display: flex; flex-direction: column; color: #12161D; border-radius: 6px; transform: rotate(var(--r, 0deg)); transition: transform .45s cubic-bezier(.2,.8,.2,1);
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .05' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23f)'/%3E%3C/svg%3E"),
@@ -932,19 +950,47 @@ html[data-mode="life"] body { overflow-x: clip; }
 .tp-runs figcaption small { color: var(--l-muted); font: .625rem var(--mono); }
 
 /* Life · hotel collection (badges) */
-.hcoll { display: flex; flex-direction: column; gap: 34px; }
+/* One card per chain: its logo, counts and a little pile of its latest stays; open it to see every hotel. */
+.hcoll { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; align-items: start; }
 .hc-chain { --chain: #8B97A8; }
 .hc-chain[data-chain="marriott"], .hbadge[data-chain="marriott"] { --chain: #C8956B; }
 .hc-chain[data-chain="hyatt"], .hbadge[data-chain="hyatt"] { --chain: #5FA8E0; }
 .hc-chain[data-chain="hilton"], .hbadge[data-chain="hilton"] { --chain: #7FA4F2; }
 .hc-chain[data-chain="ihg"], .hbadge[data-chain="ihg"] { --chain: #6CC59A; }
 .hc-chain[data-chain="accor"], .hbadge[data-chain="accor"] { --chain: #D8B45A; }
-.hc-chain header { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--l-line); }
-.hc-chain h3 { font-family: var(--serif); font-weight: 400; font-size: 1.9rem; line-height: 1; color: var(--l-ink); }
+.hc-chain[data-chain="wyndham"], .hbadge[data-chain="wyndham"] { --chain: #4E9BE0; }
+.hc-chain[data-chain="fourseasons"], .hbadge[data-chain="fourseasons"] { --chain: #B9C3CF; }
+.hc-chain[data-chain="panpacific"], .hbadge[data-chain="panpacific"] { --chain: #C9A13B; }
+.hc-chain { border-radius: 16px; background: linear-gradient(160deg, rgba(var(--l-ink-rgb), .055), rgba(var(--l-ink-rgb), .02)); box-shadow: inset 0 0 0 1px var(--l-line);
+  transition: box-shadow .25s; }
+.hc-chain:hover, .hc-chain[open] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chain) 45%, transparent); }
+.hc-chain[open] { grid-column: 1 / -1; }
+.hc-chain summary { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "logo fan" "meta meta"; align-items: center; gap: 12px 14px; padding: 16px 18px 14px; cursor: pointer; border-radius: 16px; }
+.hc-chain summary::-webkit-details-marker { display: none; }
+.hc-chain summary:focus-visible { outline: 2px solid var(--l-a); outline-offset: 2px; }
+.hc-logo { grid-area: logo; display: flex; align-items: center; min-height: 52px; min-width: 0; }
+.hc-logo .chain-logo { max-width: 100%; } .hc-logo svg { max-width: 100%; }
+.hc-logo .chain-logo { font-family: var(--serif); font-size: 1.5rem; line-height: 1; color: var(--l-ink); }
+.hc-stats { grid-area: meta; font: .75rem var(--mono); color: var(--l-muted); }
+.hc-toggle { grid-area: meta; justify-self: end; display: inline-flex; align-items: center; gap: 4px; font: 600 .75rem var(--sans); color: color-mix(in srgb, var(--chain) 80%, var(--l-ink)); }
+.hc-toggle svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s; }
+.hc-chain[open] .hc-toggle svg { transform: rotate(180deg); }
+.hc-close, .hc-chain[open] .hc-open { display: none; }
+.hc-chain[open] .hc-close { display: inline; }
+.hc-fan { grid-area: fan; display: flex; align-items: center; padding-right: 4px; }
+.hc-fan .hbadge { width: auto; margin-left: -26px; transition: margin .35s cubic-bezier(.2,.8,.2,1), transform .35s cubic-bezier(.2,.8,.2,1); }
+.hc-fan .hbadge:first-child { margin-left: 0; }
+.hc-fan .hbadge:nth-child(odd) { transform: rotate(-5deg); } .hc-fan .hbadge:nth-child(even) { transform: rotate(4deg) translateY(2px); }
+.hc-fan .hbadge svg { filter: drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
+.hc-fan .hb-name, .hc-fan .hb-count { display: none; }
+.hc-chain summary:hover .hc-fan .hbadge:not(:first-child) { margin-left: -14px; }
+.hc-plus { margin-left: 8px; min-width: 34px; padding: 4px 8px; border-radius: 999px; text-align: center; font: 600 .75rem var(--mono); color: var(--l-ink); background: rgba(var(--l-ink-rgb), .08); box-shadow: inset 0 0 0 1px var(--l-line); }
+.hc-chain[open] .hc-fan { visibility: hidden; }
+.hc-chain[open] .hc-brands { padding: 6px 18px 22px; }
+@media (max-width: 520px) { .hc-fan .hbadge svg { width: 46px; height: 46px; } .hc-fan .hbadge { margin-left: -22px; } .hc-plus { min-width: 30px; padding: 3px 6px; } }
 .chain-logo { display: inline-flex; align-items: center; gap: 12px; }
 .chain-logo svg { flex: none; display: block; color: var(--l-ink); overflow: visible; }
 .chain-logo.text::before { content: ""; width: 9px; height: 9px; border-radius: 3px; background: var(--chain); }
-.hc-chain header > span { font: .75rem var(--mono); color: var(--l-muted); }
 .hc-brands { display: flex; flex-wrap: wrap; gap: 22px 34px; }
 .hc-brand { display: flex; flex-direction: column; gap: 10px; }
 .hc-bname { font: 500 .6875rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--l-muted); }

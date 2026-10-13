@@ -45,6 +45,12 @@ const barcode = (id: string) => {
   return bars;
 };
 
+// Hotel collection: each chain's card shows its most recent stays as a little pile; opening it shows every hotel.
+const chainCards = collection.map((c) => {
+  const all = c.brands.flatMap((b) => b.hotels).sort((a, b) => b.visits[0].checkIn.localeCompare(a.visits[0].checkIn));
+  return { c, all, fan: all.slice(0, 4) };
+});
+
 const lifeSearch = [
   ...upcoming.map((r, i) => ({ top: true, cat: 'NEXT', t: r.name, s: `${niceDay(r.date)} · ${r.distance}`, k: `next race upcoming countdown ${r.city} ${r.distance}`, sel: `#nr-${i}` })),
   ...cities.map((c, i) => ({ top: i < 6 && c.country !== 'Singapore', cat: 'CITY', t: c.name, s: [c.country, c.nights ? `${c.nights} nights` : `${c.flights} flights`].join(' · '), k: `city place travel trip ${c.country} ${c.stays.map((s) => `${s.name} ${s.tag ?? ''}`).join(' ')}`, city: c.slug })),
@@ -116,18 +122,26 @@ const lifeSearch = [
     <section id="l-stays" aria-labelledby="l-stays-h">
       <div class="l-head"><span class="l-no">03</span><h2 id="l-stays-h">The hotel collection</h2></div>
       <div class="hcoll">
-        {collection.map((c) => (
-          <section class="hc-chain" data-chain={c.chain.toLowerCase()} aria-label={c.chain}>
-            <header><h3><ChainLogo chain={c.chain} /></h3><span>{c.hotels} hotel{c.hotels > 1 ? 's' : ''} · {c.nights} night{c.nights === 1 ? '' : 's'}</span></header>
-            <div class="hc-brands">
-              {c.brands.map((b) => (
-                <div class="hc-brand">
-                  <span class="hc-bname">{b.brand}</span>
-                  <div class="hc-badges">{b.hotels.map((h) => <HotelBadge hotel={h} />)}</div>
-                </div>
-              ))}
-            </div>
-          </section>
+        {chainCards.map(({ c, all, fan }) => (
+            <details class="hc-chain" data-chain={c.chain.toLowerCase().replace(/[^a-z0-9]+/g, '')}>
+              <summary>
+                <span class="hc-logo"><ChainLogo chain={c.chain} height={22} /></span>
+                <span class="hc-stats">{c.hotels} hotel{c.hotels > 1 ? 's' : ''} · {c.nights} night{c.nights === 1 ? '' : 's'}</span>
+                <span class="hc-fan" aria-hidden="true">
+                  {fan.map((h) => <HotelBadge hotel={h} size={54} link={false} />)}
+                  {all.length > fan.length && <span class="hc-plus">+{all.length - fan.length}</span>}
+                </span>
+                <span class="hc-toggle"><span class="hc-open">See all</span><span class="hc-close">Show less</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" /></svg></span>
+              </summary>
+              <div class="hc-brands">
+                {c.brands.map((b) => (
+                  <div class="hc-brand">
+                    <span class="hc-bname">{b.brand}</span>
+                    <div class="hc-badges">{b.hotels.map((h) => <HotelBadge hotel={h} />)}</div>
+                  </div>
+                ))}
+              </div>
+            </details>
         ))}
       </div>
     </section>
@@ -188,9 +202,10 @@ const lifeSearch = [
       </div>
 
       <div class="bibs-head"><span class="lab">finished</span></div>
-      <div class="bibs" aria-label="Race bibs, newest first">
+      <div class="bib-wrap">
+      <div class="bib-deck" data-deck role="group" aria-roledescription="stack" aria-label="Race bibs, newest on top">
         {races.map((r, i) => (
-          <article class="bib" style={`--r:${tilt[i % 4]}deg;--band:${r.band}`} id={`r-${r.id}`}>
+          <article class="bib" style={`--r:${tilt[i % 4]}deg;--band:${r.band};--i:${i}`} id={`r-${r.id}`}>
             <div class="bib-top"><span class="bib-ev">{r.name}</span><span class="bib-yr">{r.date.slice(0, 4)}</span></div>
             <div class="bib-cat"><span>{bibCat[r.distance] ?? r.distance}</span><span>{r.label.split(' · ')[0]}</span></div>
             <div class="bib-no" data-long={String((r.bib ?? r.distance).length > 5)}>{r.bib ?? r.distance}</div>
@@ -203,6 +218,13 @@ const lifeSearch = [
             {r.pb && <span class="pb">PB</span>}
           </article>
         ))}
+      </div>
+      <div class="deck-ctl">
+        <button type="button" data-deck-prev aria-label="Previous bib"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5" /></svg></button>
+        <span class="deck-n" data-deck-n aria-live="polite">1 / {races.length}</span>
+        <button type="button" data-deck-next aria-label="Next bib"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5" /></svg></button>
+        <span class="deck-hint"><span class="h-fine">Hover to fan out, click to flip</span><span class="h-touch">Swipe or tap to flip</span></span>
+      </div>
       </div>
       <p class="strava-credit">Running data from <a href="https://www.strava.com">Strava</a> · updated {niceDay(running.updated)}</p>
     </section>
