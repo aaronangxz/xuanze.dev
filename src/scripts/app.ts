@@ -367,6 +367,10 @@ function visibleMods(pg) {
   }
   return list.filter((el) => { const r = el.getBoundingClientRect(); return r.height > 0 && r.bottom > 0 && r.top < innerHeight; });
 }
+// Phones and tablets slide the modules without the motion blur: a blur on a moving layer is costly there, and
+// on iOS the blur ending made WebKit repaint the hero's gradient text, which blinked once on arrival.
+const slideBlur = !matchMedia('(pointer: coarse)').matches;
+const blurred = (px) => (slideBlur ? { filter: `blur(${px}px)` } : {});
 const navLinks = () => [...document.querySelectorAll('.top nav > *')].filter((el) => el.offsetParent !== null);
 let sliding = false;
 
@@ -388,7 +392,7 @@ function slideTo(toMode, href) {
   // Short and tight: the stagger stops growing after five modules so a long page doesn't take longer to leave.
   const step = 30, exitDur = 320;
   const exits = mods.map((m, i) => m.animate(
-    [{ transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }, { transform: `translateX(${dir * (80 + Math.min(i, 5) * 60)}px)`, opacity: 0, filter: 'blur(8px)' }],
+    [{ transform: 'translateX(0)', opacity: 1, ...blurred(0) }, { transform: `translateX(${dir * (80 + Math.min(i, 5) * 60)}px)`, opacity: 0, ...blurred(8) }],
     { duration: exitDur, delay: Math.min(i, 5) * step, easing: OUT, fill: 'forwards' }));
   navLinks().forEach((l, i) => exits.push(l.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${dir * 24}px)`, opacity: 0 }], { duration: 220, delay: i * 25, easing: OUT, fill: 'forwards' })));
 
@@ -441,7 +445,7 @@ if (root.classList.contains('slide-in')) {
   }
   const mods = pg ? visibleMods(pg) : [];
   mods.forEach((m, i) => m.animate(
-    [{ transform: `translateX(${-dir * (160 + Math.min(i, 5) * 70)}px)`, opacity: 0, filter: 'blur(8px)' }, { transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }],
+    [{ transform: `translateX(${-dir * (160 + Math.min(i, 5) * 70)}px)`, opacity: 0, ...blurred(8) }, { transform: 'translateX(0)', opacity: 1, ...blurred(0) }],
     { duration: 560, delay: Math.min(i, 5) * 40, easing: IN, fill: 'backwards' }));
   navLinks().forEach((l, i) => l.animate([{ transform: `translateX(${-dir * 24}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 420, delay: 60 + i * 35, easing: IN, fill: 'backwards' }));
   root.classList.add('slide-go');
