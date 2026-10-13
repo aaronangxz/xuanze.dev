@@ -1250,10 +1250,13 @@ figure.arch ul.arch-key li { margin: 0; font-size: .6875rem; line-height: 1.4; d
 figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
 
 /* ===== Header mark scenes (HeaderMark.astro) ===== */
+/* Work follows light/dark (day/night); Life is always night, like its pages. */
 /* Day/night: --d is 1 in light mode, 0 in dark; everything below derives from it and cross-fades on toggle. */
 .mk { --d: 1; --wall: #F4EADB; --floor: #E2CBA8; --frame: #FFFFFF; --winsky: #A8DBF6; --sky: #A9DCF5;
   --hill: #9ED39B; --canopy: #5DB16E; --track: #E3876B; --lane: #FFF4E6; --cloud: #FFFFFF; }
 :root[data-theme="dark"] .mk { --d: 0; --wall: #252A47; --floor: #322D49; --frame: #3E4570; --winsky: #101842; --sky: #141C44;
+  --hill: #27395B; --canopy: #2E5552; --track: #8E4B42; --lane: #CDB6AF; --cloud: #3B4475; }
+.mk.mk-life { --d: 0; --wall: #252A47; --floor: #322D49; --frame: #3E4570; --winsky: #101842; --sky: #141C44;
   --hill: #27395B; --canopy: #2E5552; --track: #8E4B42; --lane: #CDB6AF; --cloud: #3B4475; }
 .mk .wall { fill: var(--wall); } .mk .floor { fill: var(--floor); } .mk .frame { fill: var(--frame); } .mk .bars { stroke: var(--frame); }
 .mk .winsky { fill: var(--winsky); } .mk .sky { fill: var(--sky); } .mk .hill { fill: var(--hill); } .mk .canopy { fill: var(--canopy); }
