@@ -68,8 +68,7 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
           var side = r.getAttribute('data-mode') || 'work';
           if (sessionStorage.getItem('xz-mark') !== side) {
             sessionStorage.setItem('xz-mark', side);
-            r.classList.add('mk-arrive');
-            addEventListener('DOMContentLoaded', function () { setTimeout(function () { r.classList.remove('mk-arrive'); }, side === 'life' ? 1100 : 3200); });
+            r.classList.add('mk-in');
           }
         } catch (e) {}
         // The Work/Life switch runs its own animation, so skip the default cross-page fade for it.

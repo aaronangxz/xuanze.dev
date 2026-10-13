@@ -8,7 +8,7 @@ const PLANE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColo
 ---
 <header class="top">
   <div class="lead">
-    <a class="mark" id="mark" href={mode === 'life' ? '/life' : '/'} aria-label="Home"><HeaderMark mode={mode} /></a>
+    <a class="mark" id="mark" href={mode === 'life' ? '/life' : '/'} aria-label="Home"><HeaderMark /></a>
     <div class="mode" role="group" aria-label="Choose a side" data-pos={mode}>
       <button type="button" data-mode-btn="work" aria-pressed={String(mode === 'work')}>Work</button>
       <button type="button" data-mode-btn="life" aria-pressed={String(mode === 'life')}>Life</button>

@@ -391,6 +391,20 @@ function slideTo(toMode, href) {
     { duration: exitDur, delay: Math.min(i, 5) * step, easing: OUT, fill: 'forwards' }));
   navLinks().forEach((l, i) => exits.push(l.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${dir * 24}px)`, opacity: 0 }], { duration: 220, delay: i * 25, easing: OUT, fill: 'forwards' })));
 
+  // The header mark pans from this side's scene to the other's, and the other side's entrance starts during the
+  // pan; the next page continues it from the same moment (HeaderMark.astro), so the mark never jumps.
+  const mark = document.getElementById('mark');
+  const curPane = mark?.querySelector<HTMLElement>(`.mk-pane[data-side="${mode}"]`);
+  const nxtPane = mark?.querySelector<HTMLElement>(`.mk-pane[data-side="${toMode}"]`);
+  if (mark && curPane && nxtPane) {
+    root.classList.remove('mk-in');
+    nxtPane.classList.add('mk-in');
+    mark.classList.add('mk-panning');
+    ss.set('xz-mark-t', String(Date.now()));
+    const PAN = 'cubic-bezier(.65,0,.35,1)';
+    curPane.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${dir * 100}%)` }], { duration: 560, easing: PAN, fill: 'forwards' });
+    nxtPane.animate([{ transform: `translateX(${-dir * 100}%)` }, { transform: 'translateX(0)' }], { duration: 560, easing: PAN, fill: 'both' });
+  }
   const total = exitDur + Math.min(Math.max(0, mods.length - 1), 5) * step;
   ss.set('xz-slide', toMode);
   // Once the content is out, change the whole look in one cross-fade (background, glow, header, toggle, edges
