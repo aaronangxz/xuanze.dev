@@ -76,6 +76,28 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
         addEventListener('pageswap', function (e) { if (window.__xzSliding && e.viewTransition) e.viewTransition.skipTransition(); });
       })();
     </script>
+    {site.analyticsId && (
+      <script is:inline define:vars={{ gaId: site.analyticsId, gaHost: new URL(site.url).hostname, gaSide: mode }}>
+        // Google Analytics: on the live site only (local builds and previews are not visits), and only once the page
+        // is actually shown, so a page Chrome prerenders ahead of a click is not counted unless it is opened.
+        // Every page view carries site_side (work / life).
+        (function () {
+          if (location.hostname !== gaHost && location.hostname !== 'www.' + gaHost) return;
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () { dataLayer.push(arguments); };
+          function start() {
+            gtag('js', new Date());
+            gtag('config', gaId, { site_side: gaSide });
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+            document.head.appendChild(s);
+          }
+          if (document.prerendering) document.addEventListener('prerenderingchange', start, { once: true });
+          else start();
+        })();
+      </script>
+    )}
   </head>
   <body>
     <div class="life-glow" aria-hidden="true"></div>
