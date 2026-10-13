@@ -627,6 +627,15 @@ html.sliding .page { pointer-events: none; }
 /* Opacity only. Any movement here shifts the new page's copy of the header and background off the old one,
    so everything that is identical on both pages (the header above all) ghosts and blinks mid-fade. */
 @keyframes vt-in { from { opacity: 0; } }
+/* Work/Life switch: the colour change is one slow cross-fade of the whole (emptied) page. Inside it every
+   property snaps, so the fade is the only motion and nothing eases on its own schedule. */
+html.mode-vt::view-transition-new(root) { animation: mode-in .5s cubic-bezier(.45,0,.55,1) both; }
+@keyframes mode-in { from { opacity: 0; } }
+html.mode-vt *, html.mode-vt *::before, html.mode-vt *::after { transition: none !important; }
+/* the toggle knob finishes its move while the content leaves, before the colour fade starts */
+html.sliding .mode .knob { transition-duration: .42s, .42s; }
+/* arriving side: the menu links stay hidden until their slide-in starts (no one-frame flash of them) */
+html.slide-in:not(.slide-go) .top nav > * { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } .more svg { animation: none; } }
 
 /* =========================================================

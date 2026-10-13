@@ -339,17 +339,29 @@ function slideTo(toMode, href) {
   const mods = pg ? visibleMods(pg) : [];
   // Short and tight: the stagger stops growing after five modules so a long page doesn't take longer to leave.
   const step = 30, exitDur = 320;
-  mods.forEach((m, i) => m.animate(
+  const exits = mods.map((m, i) => m.animate(
     [{ transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' }, { transform: `translateX(${dir * (80 + Math.min(i, 5) * 60)}px)`, opacity: 0, filter: 'blur(8px)' }],
     { duration: exitDur, delay: Math.min(i, 5) * step, easing: OUT, fill: 'forwards' }));
-  navLinks().forEach((l, i) => l.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${dir * 24}px)`, opacity: 0 }], { duration: 220, delay: i * 25, easing: OUT, fill: 'forwards' }));
+  navLinks().forEach((l, i) => exits.push(l.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${dir * 24}px)`, opacity: 0 }], { duration: 220, delay: i * 25, easing: OUT, fill: 'forwards' })));
 
   const total = exitDur + Math.min(Math.max(0, mods.length - 1), 5) * step;
-  // The backgrounds never move (sliding them showed their edges); they crossfade as the page colours switch.
-  setTimeout(() => { if (toMode === 'life') root.setAttribute('data-mode', 'life'); else root.removeAttribute('data-mode'); }, total * 0.4);
   ss.set('xz-slide', toMode);
-  // Start loading just before the exit ends: the old page stays on screen until the new one is ready.
-  setTimeout(() => { location.href = href; }, Math.max(0, total - 60));
+  // Once the content is out, change the whole look in one cross-fade (background, glow, header, toggle, edges
+  // together; nothing switches on its own), and only then load the other side, which arrives already in its
+  // final colours, so nothing is left to jump.
+  const flip = () => { if (toMode === 'life') root.setAttribute('data-mode', 'life'); else root.removeAttribute('data-mode'); };
+  const go = () => { location.href = href; };
+  let started = false;
+  const fade = () => {
+    if (started) return; started = true;
+    if (!document.startViewTransition) { flip(); setTimeout(go, 650); return; }
+    root.classList.add('mode-vt');
+    const vt = document.startViewTransition(flip);
+    vt.finished.finally(go);
+  };
+  // Wait for the content to have actually left (a busy page can run the exit late), with a timer as a backstop.
+  Promise.all(exits.map((a) => a.finished)).then(fade, fade);
+  setTimeout(fade, total + 400);
 }
 
 // Arriving on the other side: swipe the new modules in from the opposite edge.
