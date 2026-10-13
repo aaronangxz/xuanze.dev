@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 import { site } from '../site.config';
-import { posts, projects, projectHref, fmtMonth, noteTitle, noteGroup } from './content';
+import { posts, projects, projectHref, projectGroup, PROJECT_GROUPS, fmtMonth, noteTitle, noteGroup } from './content';
 
 /** One row in the ⌘K launcher. `p` is the preview pane HTML; the action button is added on the client. */
 export interface LauncherItem {
@@ -35,16 +35,17 @@ export async function launcherItems(): Promise<LauncherItem[]> {
       p: preview('action', site.email, 'The fastest way to reach me. I usually reply within a day.') },
   );
 
-  // Products in progress first, then everything else, then what's no longer running.
-  const pgroup = (d: { kind: string; active: boolean }) => (!d.active ? 'Inactive' : d.kind === 'product' ? 'Building now' : 'Projects');
-  const rank = { 'Building now': 0, Projects: 1, Inactive: 2 } as const;
-  const prs = (await projects()).sort((a, b) => rank[pgroup(a.data)] - rank[pgroup(b.data)] || a.data.order - b.data.order);
+  // Same groups and order as the Projects page: products, work, side projects, then what's no longer running.
+  const pgroup = projectGroup;
+  const rank = (d: Parameters<typeof projectGroup>[0]) => PROJECT_GROUPS.indexOf(projectGroup(d));
+  const prs = (await projects()).sort((a, b) => rank(a.data) - rank(b.data) || a.data.order - b.data.order);
   for (const pr of prs) {
     const d = pr.data;
-    const sub = d.kind === 'product' ? `Product · ${d.period}` : d.kind === 'work' ? `${d.company?.split(',')[0] ?? 'Work'} · internal tool` : d.status;
+    const sub = !d.active ? d.status : d.kind === 'product' ? `Product · ${d.period}` : d.kind === 'work' ? `${d.company?.split(',')[0] ?? 'Work'} · ${d.status}` : d.status;
+    const href = projectHref(pr);
     items.push({
       g: pgroup(d), t: d.title, s: sub, i: 'box', img: d.logo, k: `${d.kind} ${pgroup(d)} ${d.stack.join(' ')} ${d.summary}`,
-      href: projectHref(pr), external: !!d.href, cta: d.href ? 'View on GitHub' : 'Read the case study',
+      href: href ?? '/projects', external: !!d.href, cta: d.href ? 'View on GitHub' : href ? 'Read the case study' : 'See all projects',
       p: (d.logo ? `<img class="plogo" src="${esc(d.logo)}" alt="" width="44" height="44">` : '') + preview(`${d.kind === 'side' ? 'side project' : d.kind === 'work' ? 'built at work' : 'product'} · ${d.status}`, d.title, d.summary, chips(d.stack.slice(0, 5))),
     });
   }

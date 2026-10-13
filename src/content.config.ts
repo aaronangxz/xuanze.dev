@@ -34,8 +34,10 @@ const projects = defineCollection({
     /** Square app icon in public/, e.g. /logos/avenly.png. Shown in search, on the page and in Currently. */
     logo: z.string().optional(),
     order: z.number().default(100),
-    /** Inactive projects are listed under "Inactive" in search. */
+    /** Inactive projects are listed under "Inactive", quieter, on the Projects page and in search. */
     active: z.boolean().default(true),
+    /** false: no case-study page (and no href), so the project is listed but not a link. */
+    page: z.boolean().default(true),
     draft: z.boolean().default(false),
   }),
 });

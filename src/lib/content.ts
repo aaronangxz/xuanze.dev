@@ -14,7 +14,14 @@ export async function projects() {
   return all.sort((a, b) => a.data.order - b.data.order);
 }
 
-export const projectHref = (p: CollectionEntry<'projects'>) => p.data.href ?? `/projects/${p.id}`;
+/** Where a project row leads: its own link, its case study, or nowhere (listed only). */
+export const projectHref = (p: CollectionEntry<'projects'>) => p.data.href ?? (p.data.page ? `/projects/${p.id}` : null);
+
+/** The one grouping of projects, shared by the Projects page and search. */
+export const PROJECT_GROUPS = ['Building now', 'Built at work', 'Side projects', 'Inactive'] as const;
+export type ProjectGroup = (typeof PROJECT_GROUPS)[number];
+export const projectGroup = (d: { kind: string; active: boolean }): ProjectGroup =>
+  !d.active ? 'Inactive' : d.kind === 'product' ? 'Building now' : d.kind === 'work' ? 'Built at work' : 'Side projects';
 
 export function readingTime(body = '') {
   const words = body.replace(/```[\s\S]*?```/g, ' ').split(/\s+/).filter(Boolean).length;

@@ -45,6 +45,7 @@ const isHome = !!slot;
 let closing = false;
 
 const L = launcher && (() => {
+  const clearBtn = $('qclear');
   const input = $('q'), list = $('list'), prev = $('prev'), lw = $('lw'), moreBtn = $('more'), moreN = $('more-n'), countEl = $('count');
   let shown = [], active = 0, hl = null, lastFocus = null;
   // Phones: a plain list. A tap opens the row, and only the first rows show until "Show all" is pressed.
@@ -86,6 +87,7 @@ const L = launcher && (() => {
       });
     }
     countEl.textContent = shown.length + (shown.length === 1 ? ' result' : ' results');
+    if (clearBtn) clearBtn.hidden = !input.value;
     requestAnimationFrame(updateScroll);
   }
   function moveHL(instant) {
@@ -184,7 +186,16 @@ const L = launcher && (() => {
     if (i === active) open(); else { select(i); input.focus(); }
   });
   compactMQ.addEventListener('change', () => { setPlaceholder(); render(false); });
-  document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { input.value = b.dataset.q; active = 0; render(); input.focus(); }));
+  clearBtn?.addEventListener('mousedown', (e) => e.preventDefault()); // keep the keyboard up
+  clearBtn?.addEventListener('click', () => { input.value = ''; active = 0; expanded = false; render(); input.focus(); });
+  // A "Try" chip fills the search and brings the top of the search back into view, under the header.
+  document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => {
+    input.value = b.dataset.q; active = 0; expanded = false; render();
+    input.focus({ preventScroll: true });
+    const head = document.querySelector('header.top')?.getBoundingClientRect().bottom ?? 0;
+    const y = launcher.getBoundingClientRect().top + scrollY - head - 12;
+    if (Math.abs(y - scrollY) > 4) scrollTo({ top: Math.max(0, y), behavior: reduce ? 'auto' : 'smooth' });
+  }));
 
   // Focus mode on home: everything around the launcher blurs back while you search.
   const homeEl = document.querySelector('.page.home');
@@ -231,7 +242,7 @@ overlay.addEventListener('mousedown', (e) => { if (!launcher.contains(e.target))
    Life search ("Where to?")
    ========================================================= */
 const LS = $('loverlay') && (() => {
-  const lov = $('loverlay'), lpanel = $('lpanel'), lq = $('lq'), llist = $('llist');
+  const lov = $('loverlay'), lpanel = $('lpanel'), lq = $('lq'), llist = $('llist'), lclear = $('lqclear');
   const litems = JSON.parse($('life-data')?.textContent || '[]');
   let shown = [], act = 0, last = null, isClosing = false;
 
@@ -247,6 +258,7 @@ const LS = $('loverlay') && (() => {
       ? shown.map((it, i) => `<li class="lopt" role="option" id="lo${i}" data-i="${i}" aria-selected="${i === act}"><span class="cat">${it.cat}</span><span class="tt">${it.t}</span><span class="sub">${it.s}</span></li>`).join('')
       : '<li class="lempty">Nowhere yet. Try "race".</li>';
     lq.setAttribute('aria-activedescendant', shown.length ? 'lo' + act : '');
+    if (lclear) lclear.hidden = !lq.value;
     if (animate !== false && !reduce) llist.querySelectorAll('.lopt, .lempty').forEach((el, i) => {
       if (i < 12) el.animate([{ opacity: 0, transform: 'translateX(18px)', filter: 'blur(4px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 360, delay: i * 22, easing: EASE, fill: 'backwards' });
     });
@@ -288,6 +300,8 @@ const LS = $('loverlay') && (() => {
     setTimeout(finish, 230);
   }
   lq.addEventListener('input', () => { act = 0; render(); });
+  lclear?.addEventListener('mousedown', (e) => e.preventDefault());
+  lclear?.addEventListener('click', () => { lq.value = ''; act = 0; render(); lq.focus(); });
   lq.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown') { e.preventDefault(); if (shown.length) select((act + 1) % shown.length); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); if (shown.length) select((act - 1 + shown.length) % shown.length); }

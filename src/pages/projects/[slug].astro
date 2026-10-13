@@ -6,9 +6,11 @@ import { projects, posts, projectHref } from '../../lib/content';
 
 export async function getStaticPaths() {
   const all = await projects();
-  const pages = all.filter((p) => !p.data.href);
+  const pages = all.filter((p) => !p.data.href && p.data.page);
+  // "Next project" only steps through projects that lead somewhere.
+  const linked = all.filter((p) => projectHref(p));
   return pages.map((p) => {
-    const next = all[(all.indexOf(p) + 1) % all.length];
+    const next = linked[(linked.indexOf(p) + 1) % linked.length];
     return { params: { slug: p.id }, props: { project: p, next } };
   });
 }
@@ -29,7 +31,7 @@ const kindLabel = d.kind === 'product' ? 'product · case study' : 'built at wor
         <a class="nextcard" href={`/writing/${r.id}`}><div><span>Related post</span><b>{r.data.title}</b></div><span aria-hidden="true">→</span></a>
       ))}
       {next && next.id !== project.id && (
-        <a class="nextcard" href={projectHref(next)} {...(next.data.href ? { target: '_blank', rel: 'noopener' } : {})}>
+        <a class="nextcard" href={projectHref(next)!} {...(next.data.href ? { target: '_blank', rel: 'noopener' } : {})}>
           <div><span>Next project</span><b>{next.data.title}</b></div><span aria-hidden="true">{next.data.href ? '↗' : '→'}</span>
         </a>
       )}
