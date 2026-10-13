@@ -367,8 +367,7 @@ function visibleMods(pg) {
   }
   return list.filter((el) => { const r = el.getBoundingClientRect(); return r.height > 0 && r.bottom > 0 && r.top < innerHeight; });
 }
-// Phones and tablets slide the modules without the motion blur: a blur on a moving layer is costly there, and
-// on iOS the blur ending made WebKit repaint the hero's gradient text, which blinked once on arrival.
+// Phones and tablets slide the modules without the motion blur: a blur on a moving layer is costly there.
 const slideBlur = !matchMedia('(pointer: coarse)').matches;
 const blurred = (px) => (slideBlur ? { filter: `blur(${px}px)` } : {});
 const navLinks = () => [...document.querySelectorAll('.top nav > *')].filter((el) => el.offsetParent !== null);
@@ -444,11 +443,16 @@ if (root.classList.contains('slide-in')) {
     addEventListener('load', () => { if (scrollY > 0 && !location.hash) scrollTo(0, 0); }, { once: true });
   }
   const mods = pg ? visibleMods(pg) : [];
-  mods.forEach((m, i) => m.animate(
+  const enters = mods.map((m, i) => m.animate(
     [{ transform: `translateX(${-dir * (160 + Math.min(i, 5) * 70)}px)`, opacity: 0, ...blurred(8) }, { transform: 'translateX(0)', opacity: 1, ...blurred(0) }],
     { duration: 560, delay: Math.min(i, 5) * 40, easing: IN, fill: 'backwards' }));
-  navLinks().forEach((l, i) => l.animate([{ transform: `translateX(${-dir * 24}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 420, delay: 60 + i * 35, easing: IN, fill: 'backwards' }));
+  navLinks().forEach((l, i) => enters.push(l.animate([{ transform: `translateX(${-dir * 24}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }], { duration: 420, delay: 60 + i * 35, easing: IN, fill: 'backwards' })));
   root.classList.add('slide-go');
+  // Transitions stay off on the arriving content until it has landed (html.slide-in:not(.slide-done) in CSS).
+  // WebKit starts an element's CSS transition from the animation's FIRST keyframe when a Web Animation on it
+  // ends, so the Work hero (opacity transition, for search focus mode) faded out and back in once it arrived.
+  const done = () => requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('slide-done')));
+  Promise.all(enters.map((a) => a.finished)).then(done, done);
 }
 window.addEventListener('pageshow', (e) => {
   // Coming back with the browser's Back button restores the old page mid-slide; reset it.
