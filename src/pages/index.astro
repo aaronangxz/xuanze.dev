@@ -24,7 +24,26 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
       <a class="try-graph" href="/graph">or explore the graph <span aria-hidden="true">→</span></a>
     </div>
 
-    <div class="widgets rise" style="--d:4">
+    <section class="widget hiw rise" style="--d:4" aria-labelledby="whiw">
+      <h2 id="whiw">How I work <a href="/about/how-i-work" style="font-weight:500">See the whole setup</a></h2>
+      <div class="hiw-body">
+        <div class="hiw-text">
+          <p class="hiw-head">I run Claude Code as a small engineering team.</p>
+          <p>A skill suite I wrote routes every task through the same process, subagents split bigger features from PM to dev lead, and every “it works” comes with evidence. When the process turns out wrong, it gets fixed in the same session.</p>
+          <p class="hiw-loop" aria-label="Every task runs the same loop">
+            <span>route</span><i>→</i><span>ground</span><i>→</i><span>isolate</span><i>→</i><span class="in">edit · run · commit ↻</span><i>→</i><span>fresh eyes</span><i>→</i><span>ship</span><i>→</i><span class="fix">fix the process</span>
+          </p>
+        </div>
+        <dl class="hiw-stats">
+          <div><dt>20</dt><dd>skills I wrote</dd></div>
+          <div><dt>13</dt><dd>subagents</dd></div>
+          <div><dt>8</dt><dd>routing arcs</dd></div>
+          <div><dt>2</dt><dd>approvals: plan, merge</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <div class="widgets rise" style="--d:5">
       <section class="widget" aria-labelledby="w1">
         <h2 id="w1">Currently</h2>
         <ul class="mini">
