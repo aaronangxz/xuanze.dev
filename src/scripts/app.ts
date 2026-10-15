@@ -430,14 +430,16 @@ function slideTo(toMode, href) {
   setTimeout(fade, total + 400);
 }
 
-// Arriving on the other side: swipe the new modules in from the opposite edge.
+// Arriving on the other side (or entering the site, html.entry-in): swipe the new modules in from the opposite edge.
 if (root.classList.contains('slide-in')) {
   const toMode = root.getAttribute('data-slide');
   const dir = toMode === 'life' ? -1 : 1;
   const IN = 'cubic-bezier(.16,1,.3,1)';
   const pg = document.querySelector('.page');
   // A side switch always lands at the top of the other side (or on its anchor), never at a remembered offset.
-  if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+  // Entering the site keeps the browser's own scroll (a reload stays where it was).
+  if (root.classList.contains('entry-in')) {}
+  else if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
   else {
     try { history.scrollRestoration = 'manual'; } catch {}
     scrollTo(0, 0);

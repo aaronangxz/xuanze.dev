@@ -8,14 +8,14 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
 ---
 <Base mode="work" inlineLauncher>
   <div class="page home">
-    <h1 class="rise">{site.hero.greeting} <span>{heroClauses.map((c, i) => <Fragment>{i > 0 && ' '}<span class="clause">{c}</span></Fragment>)}</span></h1>
-    <ul class="facts rise" style="--d:1" aria-label="At a glance">
+    <h1>{site.hero.greeting} <span>{heroClauses.map((c, i) => <Fragment>{i > 0 && ' '}<span class="clause">{c}</span></Fragment>)}</span></h1>
+    <ul class="facts" aria-label="At a glance">
       {site.hero.facts.map((f, i) => <li>{i === 0 ? <b>{f}</b> : f}</li>)}
     </ul>
 
-    <div id="slot" class="rise" style="--d:2"><Launcher /></div>
+    <div id="slot"><Launcher /></div>
 
-    <div class="try rise" style="--d:3">
+    <div class="try">
       <span>Try</span>
       <button type="button" data-q="how i work">how I work</button>
       <button type="button" data-q="avenly">avenly</button>
@@ -24,7 +24,7 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
       <a class="try-graph" href="/graph">or see how my projects and notes connect <span aria-hidden="true">→</span></a>
     </div>
 
-    <section class="widget hiw rise" style="--d:4" aria-labelledby="whiw">
+    <section class="widget hiw" aria-labelledby="whiw">
       <h2 id="whiw">How I work <a href="/about/how-i-work" style="font-weight:500">See the whole setup</a></h2>
       <p class="hiw-head">I run Claude Code as a small engineering team.</p>
       <p>A skill suite I wrote routes every task through the same process, subagents split bigger features from PM to dev lead, and every “it works” comes with evidence. When the process turns out wrong, it gets fixed in the same session.</p>
@@ -39,7 +39,7 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
       </dl>
     </section>
 
-    <div class="widgets rise" style="--d:5">
+    <div class="widgets">
       <section class="widget" aria-labelledby="w1">
         <h2 id="w1">Currently</h2>
         <ul class="mini">
