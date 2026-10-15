@@ -7,7 +7,7 @@
   </div>
   <div class="wb-gleg"><span><i class="wb-gn"></i>gate</span><span><i class="wb-gxk"></i>what happens when it fails</span></div>
 
-  <h3 style="margin-top:10px">Two harnesses, one report</h3>
+  <h3>Two harnesses, one report</h3>
   <div class="wb-lanes">
     <div class="wb-lane">
       <span class="wb-ll">Web</span>
@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <h3 style="margin-top:10px">Case study · iOS #357</h3>
+  <h3>Case study · iOS #357</h3>
   <div class="wb-study">
     <div class="wb-shead">
       <div><small>before</small><b>~1 in 5</b><span>full-suite runs failed on a flaky capture-flow test</span></div>
@@ -40,7 +40,7 @@
     </ol>
   </div>
 
-  <h3 style="margin-top:10px">How the delivery rules were earned</h3>
+  <h3>How the delivery rules were earned</h3>
   <p class="wb-note">Each rule in the QA agent's delivery step traces back to a real failure, recorded in the agent file next to the rule.</p>
   <div class="wb-earn">
     <div class="wb-eh"><span></span><span>what went wrong</span><span></span><span>the rule now</span></div>
@@ -51,7 +51,7 @@
     <div class="wb-er"><span class="wb-qd">standing</span><span class="wb-bad">HEAD returns 403 on working links</span><i>→</i><span class="wb-good">Always check with a GET</span></div>
   </div>
 
-  <div class="wb-levers" style="margin-top:6px">
+  <div class="wb-levers">
     <div class="wb-lever"><b>a green honesty check</b><span>gets diagnosed, not patched. Usually a test asserts a cheap derived value (a label, a count) while the real side effect is broken.</span></div>
     <div class="wb-lever"><b>flake fixes need a receipt</b><span>About 300 clean runs gives ~95% confidence at a 1% flake rate. “Passed three times” proves nothing. <code>flake-rate.sh -n 300</code></span></div>
     <div class="wb-lever"><b>review for agent failure modes</b><span>Plausible but nonexistent APIs, tests that can't fail, swallowed errors, TODO stubs presented as finished.</span></div>
