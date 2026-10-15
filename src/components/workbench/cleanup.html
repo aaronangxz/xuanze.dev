@@ -1,0 +1,11 @@
+<div class="wb-sieve">
+    <div class="wb-sv-in"><b>12</b><span>worktrees found</span><small>run of 2026-10-11</small></div>
+    <div class="wb-sv-steps">
+      <div class="wb-sv"><div class="wb-sv-check"><code>lsof -d cwd</code><span>a process is running inside</span></div><div class="wb-sv-keep"><b>4</b> kept</div></div>
+      <div class="wb-sv"><div class="wb-sv-check"><code>git status --porcelain</code><span>uncommitted changes</span></div><div class="wb-sv-keep"><b>2</b> kept</div></div>
+      <div class="wb-sv"><div class="wb-sv-check"><code>rev-list HEAD --not --remotes</code><span>unpushed commits</span></div><div class="wb-sv-keep wb-zero"><b>0</b> kept</div></div>
+      <div class="wb-sv"><div class="wb-sv-check"><code>index mtime / last commit</code><span>active in the last 3 days</span></div><div class="wb-sv-keep"><b>2</b> kept</div></div>
+    </div>
+    <div class="wb-sv-out"><b>4</b><span>removed with <code>git worktree remove</code>, never <code>--force</code>; branches kept</span><small>3 were leftover subagent worktrees · ~2.2 GB freed</small></div>
+  </div>
+  <p class="wb-note">Also cleared in the same run: iOS simulators shut down for 3+ days, and Playwright MCP profiles (one per worktree path) that no running browser uses. <code>--dry-run</code> prints the plan first. The rest of the environment is stock: Opus with 1M context, auto permission mode, Remote Control, and official plugins such as superpowers, playwright and code-review.</p>

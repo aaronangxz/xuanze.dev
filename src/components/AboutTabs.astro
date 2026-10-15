@@ -1,0 +1,12 @@
+---
+/** The two views of About: the profile, and how I work. Shown at the top of both pages. */
+interface Props { current: 'profile' | 'how' }
+const { current } = Astro.props;
+const tabs = [
+  { id: 'profile', label: 'Profile', href: '/about' },
+  { id: 'how', label: 'How I work', href: '/about/how-i-work' },
+] as const;
+---
+<nav class="subtabs" aria-label="About">
+  {tabs.map((t) => <a href={t.href} aria-current={t.id === current ? 'page' : undefined}>{t.label}</a>)}
+</nav>

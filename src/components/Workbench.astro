@@ -1,0 +1,17 @@
+---
+/**
+ * One diagram from the Claude Code workbench case study. Each diagram is a plain HTML fragment in ./workbench/,
+ * styled by src/styles/workbench.css (wb- prefixed classes, site colour tokens, light and dark).
+ *
+ *   <Workbench part="session" />
+ */
+import '../styles/workbench.css';
+
+const fragments = import.meta.glob<string>('./workbench/*.html', { query: '?raw', import: 'default', eager: true });
+
+interface Props { part: string }
+const { part } = Astro.props;
+const html = fragments[`./workbench/${part}.html`];
+if (!html) throw new Error(`Workbench: no fragment named "${part}" in src/components/workbench/`);
+---
+<div class="wb" set:html={html} />

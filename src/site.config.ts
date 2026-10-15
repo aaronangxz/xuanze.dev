@@ -8,7 +8,7 @@ export const site = {
   url: 'https://xuanze.dev',
   /** Google Analytics 4 measurement ID (the same property the old site used). Empty to turn analytics off. */
   analyticsId: 'G-KP4W6YDH11' as string,
-  description: 'Software engineer in Singapore. I build software in Go and TypeScript, and I make sure it doesn’t break.',
+  description: 'Software engineer in Singapore. Curious by default, building at the edge with AI, shipping things that hold up.',
   email: 'angxze@gmail.com',
   location: 'Singapore',
   timezone: 'GMT+8',
@@ -22,7 +22,7 @@ export const site = {
 
   hero: {
     greeting: 'Hi, I’m Xuan Ze.',
-    line: 'I build software in Go and TypeScript, and I make sure it doesn’t break.',
+    line: 'Curious by default, building at the edge with AI, shipping things that hold up.',
     facts: ['Software engineer', 'Singapore', 'TikTok · Shopee'],
   },
 
@@ -34,6 +34,8 @@ export const site = {
   ],
 
   about: {
+    /** Square profile picture in public/. Leave empty for the placeholder silhouette. */
+    photo: '/about/portrait.jpg',
     lede: 'Software engineer in Singapore, working mostly in Go and TypeScript. Test engineer turned builder.',
     focus: 'Backend systems, product engineering, testing',
     paragraphs: [

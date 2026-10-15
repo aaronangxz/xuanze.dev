@@ -17,14 +17,29 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
 
     <div class="try rise" style="--d:3">
       <span>Try</span>
-      <button type="button" data-q="redis">redis</button>
-      <button type="button" data-q="go">go</button>
-      <button type="button" data-q="tiktok">tiktok</button>
+      <button type="button" data-q="how i work">how I work</button>
+      <button type="button" data-q="avenly">avenly</button>
+      <button type="button" data-q="qa">qa</button>
       <button type="button" data-q="system design">system design</button>
-      <a class="try-graph" href="/graph">or explore the graph <span aria-hidden="true">→</span></a>
+      <a class="try-graph" href="/graph">or see how my projects and notes connect <span aria-hidden="true">→</span></a>
     </div>
 
-    <div class="widgets rise" style="--d:4">
+    <section class="widget hiw rise" style="--d:4" aria-labelledby="whiw">
+      <h2 id="whiw">How I work <a href="/about/how-i-work" style="font-weight:500">See the whole setup</a></h2>
+      <p class="hiw-head">I run Claude Code as a small engineering team.</p>
+      <p>A skill suite I wrote routes every task through the same process, subagents split bigger features from PM to dev lead, and every “it works” comes with evidence. When the process turns out wrong, it gets fixed in the same session.</p>
+      <p class="hiw-loop" aria-label="Every task runs the same loop">
+        <span>route</span><i>→</i><span>ground</span><i>→</i><span>isolate</span><i>→</i><span class="in">edit · run · commit ↻</span><i>→</i><span>fresh eyes</span><i>→</i><span>ship</span><i>→</i><span class="fix">fix the process</span>
+      </p>
+      <dl class="hiw-stats">
+        <div><dt>20</dt><dd>skills I wrote</dd></div>
+        <div><dt>13</dt><dd>subagents</dd></div>
+        <div><dt>8</dt><dd>routing arcs</dd></div>
+        <div><dt>2</dt><dd>sign-offs by me</dd></div>
+      </dl>
+    </section>
+
+    <div class="widgets rise" style="--d:5">
       <section class="widget" aria-labelledby="w1">
         <h2 id="w1">Currently</h2>
         <ul class="mini">

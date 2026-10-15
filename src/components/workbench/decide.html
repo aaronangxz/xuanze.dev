@@ -1,0 +1,38 @@
+<div class="wb-dec">
+    <div class="wb-dstart">an unknown</div>
+    <div class="wb-drow">
+      <div class="wb-dq"><span>Could a source I can reach settle it?</span><small>code, schema, migrations, config, docs, a command</small></div>
+      <div class="wb-dyes">yes →</div>
+      <div class="wb-dout wb-c"><b>CHECK</b><span>Read it or run it. The guess becomes an observed fact in seconds.</span></div>
+    </div>
+    <div class="wb-dno">no ↓</div>
+    <div class="wb-drow">
+      <div class="wb-dq"><span>Is it a gate?</span><small>destructive or irreversible · real spend · kill / keep · publishing</small></div>
+      <div class="wb-dyes">yes →</div>
+      <div class="wb-dout wb-k"><b>ASK</b><span>Stop and ask me. These are the only interruptions.</span></div>
+    </div>
+    <div class="wb-dno">no ↓</div>
+    <div class="wb-drow wb-last">
+      <div class="wb-dout wb-d wb-wide"><b>DEFAULT</b><span>Take the strongest defensible choice and state it in one line: “Defaulting to X because Y; flag if wrong.” A load-bearing default goes first in the report, not buried.</span></div>
+    </div>
+  </div>
+
+  <h3>Sorting one task's unknowns</h3>
+  <p class="wb-note">The skill's worked example: “add an AI expense categorizer” in an unfamiliar repo. Five of the seven unknowns could be settled by reading or computing, so none of them become assumptions.</p>
+  <div class="wb-scroll"><table class="wb-sort">
+    <thead><tr><th>Unknown</th><th>Bin</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Is the app multi-tenant?</td><td><em class="wb-bin wb-c">CHECK</em></td><td>tenant_id columns in the schema answer it in seconds</td></tr>
+      <tr><td>Categories: per-tenant table or global enum?</td><td><em class="wb-bin wb-c">CHECK</em></td><td>schema and migrations</td></tr>
+      <tr><td>An existing jobs pipeline to reuse?</td><td><em class="wb-bin wb-c">CHECK</em></td><td>grep before designing a new one</td></tr>
+      <tr><td>Cost-viable model tier?</td><td><em class="wb-bin wb-c">CHECK</em></td><td>current pricing × measured token counts</td></tr>
+      <tr><td>Send transaction text to a third-party API?</td><td><em class="wb-bin wb-d">DEFAULT ⚑</em></td><td>no repo source settles policy; default to the provider's data terms, flagged as load-bearing</td></tr>
+      <tr><td>Sync or async categorization?</td><td><em class="wb-bin wb-d">DEFAULT</em></td><td>reversible; default async, one line of why</td></tr>
+      <tr><td>Auto-apply above a confidence bar?</td><td><em class="wb-bin wb-k">ASK</em></td><td>turns suggestions into ledger writes, which changes the blast radius</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="wb-evrow">
+    <span class="wb-evlabel">Claims are ranked by how they were obtained</span>
+    <div class="wb-evid"><span>observed · ran it, read it</span><i>&gt;</i><span>inferred · labelled with its basis</span><i>&gt;</i><span>remembered · never shown as fact</span></div>
+  </div>

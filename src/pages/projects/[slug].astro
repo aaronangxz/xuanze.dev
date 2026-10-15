@@ -18,7 +18,7 @@ const { project, next } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 const related = (await posts()).filter((p) => p.data.project === project.id);
-const kindLabel = d.kind === 'product' ? 'product · case study' : 'built at work · case study';
+const kindLabel = { product: 'product', work: 'built at work', side: 'side project' }[d.kind] + ' · case study';
 ---
 <Base title={d.title} nav="projects" description={d.summary}>
   <article class="page">

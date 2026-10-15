@@ -54,6 +54,8 @@ export async function launcherItems(): Promise<LauncherItem[]> {
   // After me and the products: a way to wander through everything else.
   items.push({ g: 'Explore', t: 'Graph view', s: 'Everything, connected', i: 'graph', k: 'graph map obsidian connections links topics knowledge notes', href: '/graph', cta: 'Open the graph',
       p: preview('graph', 'Graph view', 'The projects I\'ve built and what I\'ve learned along the way, as one map joined by the topics they share.') });
+  items.push({ g: 'Explore', t: 'How I work', s: 'Claude Code, day to day', i: 'doc', k: 'how i work workflow claude code ai agents skills subagents orchestrator qa ci worktree', href: '/about/how-i-work', cta: 'Open page',
+      p: preview('about · how I work', 'How I work', 'How I run Claude Code as a small engineering team: a skill suite I wrote, role-specific subagents, QA with evidence, and a setup that fixes itself.') });
 
   for (const x of site.experience.slice(0, 2)) {
     items.push({
