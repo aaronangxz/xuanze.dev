@@ -8,7 +8,7 @@ export const site = {
   url: 'https://xuanze.dev',
   /** Google Analytics 4 measurement ID (the same property the old site used). Empty to turn analytics off. */
   analyticsId: 'G-KP4W6YDH11' as string,
-  description: 'Software engineer in Singapore. I build software with AI agents, and I check their work.',
+  description: 'Software engineer in Singapore. Curious by default, building at the edge with AI, shipping things that hold up.',
   email: 'angxze@gmail.com',
   location: 'Singapore',
   timezone: 'GMT+8',
@@ -22,7 +22,7 @@ export const site = {
 
   hero: {
     greeting: 'Hi, I’m Xuan Ze.',
-    line: 'I build software with AI agents, and I check their work.',
+    line: 'Curious by default, building at the edge with AI, shipping things that hold up.',
     facts: ['Software engineer', 'Singapore', 'TikTok · Shopee'],
   },
 
