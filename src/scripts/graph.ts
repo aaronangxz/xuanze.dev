@@ -165,14 +165,14 @@ export function mountGraph() {
       }
     }
 
-    /* nodes: glassy beads */
+    /* nodes: flat dots */
     for (const n of vis) {
       const s = grow(n);
       if (s <= 0) continue;
       const r = n.r * s, x = n.x!, y = n.y!;
       if (n === f) {
-        ctx.save(); ctx.globalAlpha = 0.5; ctx.shadowColor = col.accent; ctx.shadowBlur = 16 * view.k * dpr;
-        ctx.fillStyle = col.accent; ctx.beginPath(); ctx.arc(x, y, r + 2 * px, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+        ctx.globalAlpha = 0.18; ctx.fillStyle = col.accent;
+        ctx.beginPath(); ctx.arc(x, y, r + 6 * px, 0, Math.PI * 2); ctx.fill();
       }
       ctx.globalAlpha = n.a;
       if (n.type === 'topic') {
@@ -186,9 +186,6 @@ export function mountGraph() {
         ctx.strokeStyle = col.ink; ctx.lineWidth = 1.2 * px;
         ctx.beginPath(); ctx.arc(x, y, r + 2.4 * px + 1, 0, Math.PI * 2); ctx.stroke();
       }
-      const hl = ctx.createRadialGradient(x - r * 0.38, y - r * 0.42, 0, x - r * 0.38, y - r * 0.42, r * 1.05);
-      hl.addColorStop(0, 'rgba(255,255,255,.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = hl; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     }
 
     /* labels: hubs always, everything once zoomed in, and the focused neighbourhood on top */

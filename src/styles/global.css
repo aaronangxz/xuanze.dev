@@ -1473,8 +1473,7 @@ html.scrolling:not(.mk-in) .mk-pane:not(.mk-in) .mk * { animation-play-state: pa
 .g-touch { display: none; }
 @media (hover: none) { .g-mouse { display: none; } .g-touch { display: inline; } }
 /* legend glyphs: the same marks the canvas draws */
-.gg { width: 9px; height: 9px; border-radius: 50%; flex: none; position: relative; background: var(--ink);
-  background-image: radial-gradient(circle at 32% 30%, rgba(255,255,255,.55), transparent 62%); }
+.gg { width: 9px; height: 9px; border-radius: 50%; flex: none; position: relative; background: var(--ink); }
 .gg-note { background-color: var(--accent); }
 .gg-post { background-color: var(--ink); }
 .gg-project { background-color: var(--ink); box-shadow: 0 0 0 1.5px var(--glass-solid), 0 0 0 2.7px var(--ink); width: 7px; height: 7px; margin: 1px; }
