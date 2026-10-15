@@ -2,7 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import DocWindow from '../../components/DocWindow.astro';
 import AboutTabs from '../../components/AboutTabs.astro';
-import { Content, frontmatter as fm } from '../../content/about/how-i-work.mdx';
+import { Content, frontmatter as fm, getHeadings } from '../../content/about/how-i-work.mdx';
+
+const sections = getHeadings().filter((h) => h.depth === 2);
 ---
 <Base title={fm.title} nav="about" description={fm.summary}>
   <article class="page">
@@ -11,6 +13,10 @@ import { Content, frontmatter as fm } from '../../content/about/how-i-work.mdx';
       <span class="k">working with Claude Code</span>
       <h1>{fm.title}</h1>
       <p class="lede">{fm.summary}</p>
+      <nav class="toc" aria-label="On this page">
+        <span>On this page</span>
+        <ol>{sections.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+      </nav>
       <div class="prose prose-wide"><Content /></div>
     </DocWindow>
   </article>
