@@ -1429,3 +1429,34 @@ figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display
 @media (prefers-reduced-motion: reduce) { .mk, .mk * { animation: none !important; } }
 /* hold the pose while the page scrolls (set in app.ts): see the note there */
 html.scrolling:not(.mk-in) .mk-pane:not(.mk-in) .mk * { animation-play-state: paused !important; }
+
+/* ---------- Graph (/graph) ---------- */
+.graph { position: relative; height: clamp(440px, 72vh, 760px); margin-top: 6px; border: 1px solid var(--line); border-radius: 14px; background: radial-gradient(circle at 50% 55%, var(--win) 0, var(--win2) 75%); overflow: hidden; touch-action: none; }
+.graph canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; }
+.graph-bar { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; pointer-events: none; }
+.graph-bar > * { pointer-events: auto; }
+.graph-find { flex: 0 1 16rem; padding: 6px 12px; background: var(--win); }
+.graph-find input { font-size: .9375rem; }
+.graph-types { display: flex; flex-wrap: wrap; gap: 6px; }
+.graph-types button { display: inline-flex; align-items: center; gap: 6px; font: 500 .8125rem var(--sans); color: var(--ink); background: var(--win); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; min-height: 30px; cursor: pointer; }
+.graph-types button span { font-family: var(--mono); font-size: .6875rem; color: var(--muted); }
+.graph-types button[aria-pressed="false"] { color: var(--faint); background: transparent; border-style: dashed; }
+.graph-types button[aria-pressed="false"] i { opacity: .3; }
+.graph-types i { width: 8px; height: 8px; border-radius: 50%; }
+.gt-note { background: var(--accent); } .gt-post { background: var(--c-str); } .gt-project { background: var(--c-num); } .gt-leetcode { background: var(--c-kw); } .gt-topic { background: var(--faint); }
+.graph-zoom { position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; border: 1px solid var(--line2); border-radius: 10px; background: var(--win); overflow: hidden; }
+.graph-zoom button { width: 34px; height: 34px; border: 0; background: none; color: var(--muted); font: 500 1rem var(--sans); cursor: pointer; }
+.graph-zoom button + button { border-top: 1px solid var(--line); }
+.graph-zoom button:hover { color: var(--ink); background: var(--sel); }
+.graph-card { position: absolute; left: 12px; bottom: 12px; max-width: min(22rem, calc(100% - 72px)); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 14px; align-items: center; padding: 10px 14px; border: 1px solid var(--line2); border-radius: 12px; background: var(--win); box-shadow: 0 12px 30px -18px var(--shadow); pointer-events: none; }
+.graph-card[hidden] { display: none; }
+.graph-card .k { grid-column: 1; font-family: var(--mono); font-size: .6875rem; color: var(--muted); }
+.graph-card b { grid-column: 1; font-weight: 600; line-height: 1.3; }
+.graph-card .gc-n { grid-column: 1; font-size: .8125rem; color: var(--muted); }
+.graph-card a { grid-column: 2; grid-row: 1 / 4; pointer-events: auto; font: 600 .8125rem var(--sans); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 8px; }
+.graph-card a:hover { border-color: var(--accent); color: var(--accent); }
+.graph-card a[hidden] { display: none; }
+@media (hover: hover) and (pointer: fine) { .graph-card a { display: none; } }
+@media (max-width: 640px) { .graph { margin-inline: -8px; height: 70vh; } .graph-find { flex-basis: 100%; } .graph-types button { min-height: 36px; } .graph-zoom button { width: 40px; height: 40px; } }
+.graph-link { display: inline-flex; align-items: center; gap: 8px; font-size: .9375rem; font-weight: 500; color: var(--accent); text-decoration: none; width: fit-content; }
+.graph-link:hover { text-decoration: underline; }

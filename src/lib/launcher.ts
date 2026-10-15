@@ -82,6 +82,8 @@ export async function launcherItems(): Promise<LauncherItem[]> {
   const lc = await getCollection('leetcode');
   items.push({ g: 'Notes', t: 'Notes & LeetCode', s: `${notes.length + lc.length} pages`, i: 'note', k: 'notes study system design algorithms leetcode', href: '/notes', cta: 'Browse notes',
     p: preview('study notes', 'Notes & LeetCode', `${notes.length} study notes on system design, networking and algorithms, plus ${lc.length} LeetCode write-ups.`) });
+  items.push({ g: 'Notes', t: 'Graph view', s: 'Everything, connected', i: 'note', k: 'graph map obsidian connections links topics knowledge', href: '/graph', cta: 'Open the graph',
+    p: preview('graph', 'Graph view', 'Every note, post, project and LeetCode write-up as one map, joined by shared topics, links and mentions.') });
   for (const n of notes) {
     const t = noteTitle(n), g = noteGroup(n, 'src/content/notes');
     items.push({ g: 'Notes', t, s: g, i: 'note', k: `note ${g}`, href: `/notes/${n.id}`, searchOnly: true, cta: 'Open note', p: preview(`note · ${g.toLowerCase()}`, t, `Study notes in ${g}.`) });

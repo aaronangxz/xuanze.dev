@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import DocWindow from '../components/DocWindow.astro';
+import { buildGraph, type NodeType } from '../lib/graph';
+import { toJsonScript } from '../lib/launcher';
+const graph = await buildGraph();
+const count = (t: NodeType) => graph.nodes.filter((n) => n.type === t).length;
+const TYPES: { t: NodeType; label: string }[] = [
+  { t: 'note', label: 'Notes' },
+  { t: 'post', label: 'Writing' },
+  { t: 'project', label: 'Projects' },
+  { t: 'leetcode', label: 'LeetCode' },
+  { t: 'topic', label: 'Topics' },
+];
+const pages = graph.nodes.length - count('topic');
+---
+<Base title="Graph" nav="notes" description="Every note, post, project and LeetCode write-up on the site as one connected graph.">
+  <div class="page">
+    <DocWindow crumbs={[{ label: 'notes', href: '/notes' }, { label: 'graph' }]} wide>
+      <span class="k">{pages} pages · {count('topic')} topics · {graph.links.length} links</span>
+      <h1>Graph</h1>
+      <p class="lede">Everything I've written, as one map. Pages that share a topic, mention or link to each other are joined. Hover to see a page's neighbours, click to open it.</p>
+      <div class="graph" id="graph">
+        <canvas id="graph-canvas" role="img" aria-label="Graph of notes, posts, projects and LeetCode solutions. Use the search box to find and open a page."></canvas>
+        <div class="graph-bar">
+          <div class="filter graph-find">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+            <input id="graph-q" type="text" placeholder="Find a page" aria-label="Find a page in the graph" autocomplete="off" />
+          </div>
+          <div class="graph-types" role="group" aria-label="Show">
+            {TYPES.map(({ t, label }) => (
+              <button type="button" data-type={t} aria-pressed="true"><i class={`gt-${t}`} aria-hidden="true"></i>{label} <span>{count(t)}</span></button>
+            ))}
+          </div>
+        </div>
+        <div class="graph-zoom" role="group" aria-label="Zoom">
+          <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+          <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
+          <button type="button" data-zoom="fit" aria-label="Fit the whole graph">⤢</button>
+        </div>
+        <div class="graph-card" id="graph-card" hidden>
+          <span class="k" id="gc-k"></span>
+          <b id="gc-t"></b>
+          <span class="gc-n" id="gc-n"></span>
+          <a id="gc-a" href="/">Open</a>
+        </div>
+      </div>
+    </DocWindow>
+  </div>
+  <script type="application/json" id="graph-data" set:html={toJsonScript(graph)} />
+</Base>
+
+<script>
+  import { mountGraph } from '../scripts/graph';
+  mountGraph();
+</script>
