@@ -2,7 +2,6 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import DocWindow from '../../components/DocWindow.astro';
-import ProjectDetails from '../../components/ProjectDetails.astro';
 import { projects, posts, projectHref } from '../../lib/content';
 
 export async function getStaticPaths() {
@@ -23,12 +22,11 @@ const kindLabel = { product: 'product', work: 'built at work', side: 'side proje
 ---
 <Base title={d.title} nav="projects" description={d.summary}>
   <article class="page">
-    <DocWindow crumbs={[{ label: 'projects', href: '/projects' }, { label: project.id }]} wide={d.wide}>
+    <DocWindow crumbs={[{ label: 'projects', href: '/projects' }, { label: project.id }]}>
       <span class="k">{kindLabel}</span>
       <h1 class={d.logo ? 'with-logo' : undefined}>{d.logo && <img class="tlogo" src={d.logo} alt="" width="48" height="48" />}{d.title}</h1>
       <p class="lede">{d.summary}</p>
-      {d.wide && <ProjectDetails data={d} row />}
-      <div class:list={['prose', { 'prose-wide': d.wide }]}><Content /></div>
+      <div class="prose"><Content /></div>
       {related.map((r) => (
         <a class="nextcard" href={`/writing/${r.id}`}><div><span>Related post</span><b>{r.data.title}</b></div><span aria-hidden="true">→</span></a>
       ))}
@@ -39,7 +37,14 @@ const kindLabel = { product: 'product', work: 'built at work', side: 'side proje
       )}
       <Fragment slot="inspector">
         <h2>Details</h2>
-        <ProjectDetails data={d} />
+        <dl class="insp">
+          <div><dt>status</dt><dd>{d.kind === 'product' && d.active ? <span class="status" style="font-weight:500">{d.status}</span> : d.status}</dd></div>
+          {d.company && <div><dt>company</dt><dd>{d.company}</dd></div>}
+          {d.role && <div><dt>role</dt><dd>{d.role}</dd></div>}
+          <div><dt>period</dt><dd>{d.period}</dd></div>
+          {d.stack.length > 0 && <div><dt>stack</dt><dd><div class="chips">{d.stack.map((s) => <span>{s}</span>)}</div></dd></div>}
+          {d.live && <div><dt>links</dt><dd><a href={d.live}>Live site ↗</a></dd></div>}
+        </dl>
       </Fragment>
     </DocWindow>
   </article>

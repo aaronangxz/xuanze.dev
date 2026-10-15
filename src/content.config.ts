@@ -38,8 +38,6 @@ const projects = defineCollection({
     active: z.boolean().default(true),
     /** false: no case-study page (and no href), so the project is listed but not a link. */
     page: z.boolean().default(true),
-    /** Diagram-heavy case study: full window width, with the details as a strip under the summary instead of a side panel. */
-    wide: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
 });

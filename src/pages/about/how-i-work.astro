@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import DocWindow from '../../components/DocWindow.astro';
+import { Content, frontmatter as fm } from '../../content/about/how-i-work.mdx';
+---
+<Base title={fm.title} nav="about" description={fm.summary}>
+  <article class="page">
+    <DocWindow crumbs={[{ label: 'about', href: '/about' }, { label: 'how-i-work' }]} wide>
+      <span class="k">about · working with Claude Code</span>
+      <h1>{fm.title}</h1>
+      <p class="lede">{fm.summary}</p>
+      <div class="prose prose-wide"><Content /></div>
+      <a class="nextcard" href="/about"><div><span>Back to</span><b>About me</b></div><span aria-hidden="true">←</span></a>
+    </DocWindow>
+  </article>
+</Base>
