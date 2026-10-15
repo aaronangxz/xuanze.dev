@@ -66,15 +66,15 @@ const lifeSearch = [
 <Base title="Life" mode="life" description="Trips, races and the odd detour. The off-the-clock side of Ang Xuan Ze.">
   <div class="page life">
     <section class="l-hero" aria-labelledby="l-h1">
-      <span class="l-kicker rise">off the clock</span>
-      <h1 class="l-h1 rise" style="--d:1" id="l-h1">{site.hero.greeting} <span set:html={L.tagline} /></h1>
-      <dl class="l-stats rise" style="--d:3">
+      <span class="l-kicker">off the clock</span>
+      <h1 class="l-h1" id="l-h1">{site.hero.greeting} <span set:html={L.tagline} /></h1>
+      <dl class="l-stats">
         <div><dt>countries visited</dt><dd>{travelStats.countries}</dd></div>
         <div><dt>flights flown</dt><dd>{travelStats.flights}</dd></div>
         <div><dt>km run in {running.year}</dt><dd>{fmtKm(running.yearKm)}</dd></div>
         <div><dt>half marathons</dt><dd>{halves}</dd></div>
       </dl>
-      {hasPlaceholders && <span class="sample rise" style="--d:4">A few entries here are still placeholders</span>}
+      {hasPlaceholders && <span class="sample">A few entries here are still placeholders</span>}
     </section>
 
     <div class="places" aria-hidden="true"><div class="ptrack">

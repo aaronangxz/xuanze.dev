@@ -53,15 +53,21 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
         try { t = localStorage.getItem('xz-theme'); } catch (e) {}
         if (!t) { var m = /(?:^|;)xz-theme=(\w+)/.exec(window.name || ''); if (m) t = m[1]; }
         if (t === 'light' || t === 'dark') r.setAttribute('data-theme', t);
-        // Arriving from another page of the site: the page transition already eases it in, so skip the
-        // per-element rise (it started the content invisible, which read as a blank flash).
+        // Arriving from another page of the site: the page transition already eases it in.
         try { if (document.referrer && new URL(document.referrer).origin === location.origin) r.classList.add('nav-in'); } catch (e) {}
         // Pages usually continue below the fold: show the bottom edge blur from the first frame (no fade-in flash).
         r.classList.add('edge-down');
+        var s = null;
         try {
-          var s = sessionStorage.getItem('xz-slide');
+          s = sessionStorage.getItem('xz-slide');
           if (s) { sessionStorage.removeItem('xz-slide'); r.classList.add('slide-in'); r.setAttribute('data-slide', s); }
         } catch (e) {}
+        // Entering the site (not moving within it): the whole page swipes in the way it does after a Work/Life
+        // switch, from this side's edge (app.ts). If the script never gets to it, show the page anyway.
+        if (!s && !r.classList.contains('nav-in') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          r.classList.add('slide-in', 'entry-in'); r.setAttribute('data-slide', r.getAttribute('data-mode') || 'work');
+          setTimeout(function () { r.classList.add('slide-go'); }, 2500);
+        }
         // Header mark: play its entrance on the first page of a visit and whenever the side changes; moving
         // between pages on the same side just continues the loop.
         try {
