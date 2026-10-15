@@ -7,7 +7,7 @@ export interface LauncherItem {
   g: string;            // group heading
   t: string;            // title
   s: string;            // subtitle
-  i: 'user' | 'box' | 'doc' | 'work' | 'mail' | 'link' | 'note' | 'sun';
+  i: 'user' | 'box' | 'doc' | 'work' | 'mail' | 'link' | 'note' | 'sun' | 'graph';
   k: string;            // extra search keywords
   p: string;            // preview HTML
   href?: string;
@@ -32,7 +32,7 @@ export async function launcherItems(): Promise<LauncherItem[]> {
     { g: 'Start here', t: 'Copy email address', s: 'Action', i: 'mail', k: 'email contact mail talk', copy: true, cta: 'Copy email',
       p: preview('action', site.email, 'The fastest way to reach me. I usually reply within a day.') },
   );
-  if (site.resume) items.splice(items.length - 1, 0,
+  if (site.resume) items.splice(1, 0,
     { g: 'Start here', t: 'Résumé', s: 'One page, PDF', i: 'doc', k: 'resume cv experience skills pdf', href: site.resume, external: true, cta: 'Open PDF',
       p: preview('document · pdf', 'Résumé', 'Experience, projects and skills on one page.') });
 
@@ -50,6 +50,10 @@ export async function launcherItems(): Promise<LauncherItem[]> {
       p: (d.logo ? `<img class="plogo" src="${esc(d.logo)}" alt="" width="44" height="44">` : '') + preview(`${d.kind === 'side' ? 'side project' : d.kind === 'work' ? 'built at work' : 'product'} · ${d.status}`, d.title, d.summary, chips(d.stack.slice(0, 5))),
     });
   }
+
+  // After me and the products: a way to wander through everything else.
+  items.push({ g: 'Explore', t: 'Graph view', s: 'Everything, connected', i: 'graph', k: 'graph map obsidian connections links topics knowledge notes', href: '/graph', cta: 'Open the graph',
+      p: preview('graph', 'Graph view', 'The projects I\'ve built and what I\'ve learned along the way, as one map joined by the topics they share.') });
 
   for (const x of site.experience.slice(0, 2)) {
     items.push({

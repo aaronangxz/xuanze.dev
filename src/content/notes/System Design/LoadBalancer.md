@@ -1,5 +1,8 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - Hash Functions
+  - Scaling
 ---
 
 # Load Balancer

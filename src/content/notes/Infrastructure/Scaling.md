@@ -1,5 +1,9 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - System Design
+  - Load Balancer
+  - Database
 ---
 
 # Scaling

@@ -1,5 +1,9 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - HTTP
+  - "TCP / UDP"
+  - Cache
 ---
 
 # When You Visit a URL

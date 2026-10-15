@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import { buildGraph, type NodeType } from '../lib/graph';
+import { toJsonScript } from '../lib/launcher';
+const graph = await buildGraph();
+const count = (t: NodeType) => graph.nodes.filter((n) => n.type === t).length;
+const TYPES: { t: NodeType; label: string }[] = [
+  { t: 'note', label: 'Notes' },
+  { t: 'post', label: 'Writing' },
+  { t: 'project', label: 'Projects' },
+  { t: 'leetcode', label: 'LeetCode' },
+  { t: 'topic', label: 'Topics' },
+];
+const pages = graph.nodes.length - count('topic');
+---
+<Base title="Graph" nav="notes" description="The projects I've built and what I've learned along the way, as one connected graph.">
+  <div class="page home graph-page">
+    <h1>How it all connects. <span>What I've built and what I've learned, joined by the ideas they share.</span></h1>
+
+    <div class="app gapp" id="graph">
+      <div class="search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input id="graph-q" type="text" autocomplete="off" placeholder="Find a page in the graph" aria-label="Find a page in the graph" />
+        <span class="gcount">{pages} pages · {graph.links.length} links</span>
+      </div>
+      <div class="gsplit">
+        <div class="gstage" id="gstage">
+          <canvas id="graph-canvas" role="img" aria-label="Graph of notes, posts, projects and LeetCode solutions. Use the search box or the list beside it to move around."></canvas>
+          <div class="gzoom" role="group" aria-label="Zoom">
+            <button type="button" data-zoom="in" aria-label="Zoom in"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+            <button type="button" data-zoom="out" aria-label="Zoom out"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+            <button type="button" data-zoom="fit" aria-label="Fit the whole graph"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+          </div>
+        </div>
+        <aside class="prev gprev" id="gprev" aria-live="polite"></aside>
+      </div>
+      <div class="lfoot gfoot">
+        <div class="gtypes" role="group" aria-label="Show on the graph">
+          {TYPES.map(({ t, label }) => (
+            <button type="button" data-type={t} aria-pressed="true"><i class={`gg gg-${t}`} aria-hidden="true"></i>{label}<span>{count(t)}</span></button>
+          ))}
+        </div>
+        <span class="ghint"><span class="g-mouse">Hover to preview · click to pin · double-click to open</span><span class="g-touch">Tap to preview · pinch to zoom</span></span>
+      </div>
+    </div>
+  </div>
+  <script type="application/json" id="graph-data" set:html={toJsonScript(graph)} />
+</Base>
+
+<script>
+  import { mountGraph } from '../scripts/graph';
+  mountGraph();
+</script>

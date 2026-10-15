@@ -1,5 +1,7 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - Trees
 ---
 
 # Heap Sort

@@ -1,5 +1,8 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - Queues
+  - Cache
 ---
 
 # Rate Limiter

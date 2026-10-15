@@ -1,5 +1,9 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - Git
+  - Go
+  - Redis
 ---
 
 # GitHub Actions
