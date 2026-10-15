@@ -23,12 +23,19 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const chips = (xs: readonly string[]) => (xs.length ? `<div class="chips">${xs.map((x) => `<span>${esc(x)}</span>`).join('')}</div>` : '');
 const preview = (k: string, h: string, p: string, extra = '') => `<span class="k">${esc(k)}</span><h2>${esc(h)}</h2><p>${esc(p)}</p>${extra}`;
 
+/** About me's preview also introduces how I work, linking to the How I work tab. */
+const HOW_I_WORK_CARD = `<a class="pv-card" href="/about/how-i-work">
+  <b>I run Claude Code as a small engineering team.</b>
+  <span>A skill suite I wrote, 13 subagents from PM to dev lead, and QA that comes with evidence.</span>
+  <span class="pv-stats"><span><b>20</b> skills</span><span><b>13</b> subagents</span><span><b>8</b> arcs</span><span class="pv-go">How I work →</span></span>
+</a>`;
+
 export async function launcherItems(): Promise<LauncherItem[]> {
   const items: LauncherItem[] = [];
 
   items.push(
     { g: 'Start here', t: 'About me', s: 'Profile', i: 'user', k: 'about bio profile experience singapore', href: '/about', cta: 'Open profile',
-      p: preview('profile', 'About me', site.about.paragraphs[0], chips(site.about.languages)) },
+      p: preview('profile', 'About me', site.about.paragraphs[0], chips(site.about.languages) + HOW_I_WORK_CARD) },
     { g: 'Start here', t: 'Copy email address', s: 'Action', i: 'mail', k: 'email contact mail talk', copy: true, cta: 'Copy email',
       p: preview('action', site.email, 'The fastest way to reach me. I usually reply within a day.') },
   );

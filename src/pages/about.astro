@@ -14,7 +14,6 @@ const a = site.about;
       <h1>About</h1>
       <p class="lede">{a.lede}</p>
       <div class="prose">
-        <Workbench part="intro" />
         {a.paragraphs.map((p) => <p>{p}</p>)}
         <h2>How I work</h2>
         <ul>{a.howIWork.map((h) => <li>{h}</li>)}</ul>

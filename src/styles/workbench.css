@@ -481,17 +481,3 @@
 .prose .wb .wb-peek-cta span{transition:transform .2s}
 .prose .wb .wb-peek-cta:hover span{transform:translateX(3px)}
 @media (max-width:640px){.prose .wb .wb-peek-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.prose .wb .wb-peek-k{font:500 .6875rem var(--mono);color:var(--muted);margin-bottom:-8px}
-
-/* About › Profile, first screen: condensed card linking to the How I work tab */
-.prose .wb .wb-intro{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"text go" "stats go";gap:10px 20px;align-items:center;padding:16px 18px;border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));border-radius:14px;background:linear-gradient(150deg,var(--wb-accent-soft),var(--wb-surface) 70%);text-decoration:none;color:var(--ink);transition:border-color .2s}
-.prose .wb .wb-intro:hover{border-color:var(--accent)}
-.prose .wb .wb-intro-text{grid-area:text;display:grid;gap:3px}
-.prose .wb .wb-intro-text b{font-size:1.02rem;font-weight:600}
-.prose .wb .wb-intro-text>span{font-size:.9rem;color:var(--body);line-height:1.5}
-.prose .wb .wb-intro-stats{grid-area:stats;display:flex;flex-wrap:wrap;gap:6px 16px;font:500 .78rem var(--mono);color:var(--muted)}
-.prose .wb .wb-intro-stats b{font:600 .95rem var(--sans);color:var(--ink);margin-right:2px}
-.prose .wb .wb-intro-go{grid-area:go;font:600 .875rem var(--sans);color:var(--accent);white-space:nowrap;display:inline-flex;gap:6px}
-.prose .wb .wb-intro-go span{transition:transform .2s}
-.prose .wb .wb-intro:hover .wb-intro-go span{transform:translateX(3px)}
-@media (max-width:560px){.prose .wb .wb-intro{grid-template-columns:1fr;grid-template-areas:"text" "stats" "go"}}

@@ -109,6 +109,14 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 .prev h2 { font-size: 1.75rem; letter-spacing: -.025em; font-weight: 600; line-height: 1.15; }
 .prev p { color: var(--body); line-height: 1.6; }
 .prev ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 4px; color: var(--body); }
+/* About me's preview: a condensed How I work card */
+.pv-card { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: 12px; background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%); text-decoration: none; color: var(--ink); transition: border-color .2s; }
+.pv-card:hover { border-color: var(--accent); }
+.pv-card > b { font-weight: 600; }
+.pv-card > span { font-size: .9rem; color: var(--body); line-height: 1.5; }
+.pv-card .pv-stats { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; font: 500 .78rem var(--mono); color: var(--muted); }
+.pv-card .pv-stats b { font: 600 .95rem var(--sans); color: var(--ink); margin-right: 2px; }
+.pv-card .pv-go { margin-left: auto; font: 600 .85rem var(--sans); color: var(--accent); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chips span { font-family: var(--mono); font-size: .75rem; padding: 3px 8px; border-radius: 6px; background: var(--chip); color: var(--body); }
 .cta { align-self: flex-start; margin-top: auto; display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 9px; background: var(--ink); color: var(--win); font: 600 .9375rem var(--sans); text-decoration: none; border: 0; cursor: pointer; }
