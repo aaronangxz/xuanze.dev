@@ -7,9 +7,11 @@ import type { Graph, GraphNode, NodeType } from '../lib/graph';
 interface N extends GraphNode, SimulationNodeDatum {
   i: number; deg: number; r: number; nb: Set<number>;
   a: number;     // drawn emphasis, eased toward 1 (lit) or a low value (dimmed)
+  lab: number;   // label opacity, eased
+  hf: number;    // how much this is the focused dot (its halo), eased
   born: number;  // entrance delay, ms
 }
-interface L { source: N; target: N; bend: number }
+interface L { source: N; target: N; bend: number; on: number /* eased: 1 when it touches the focused dot */ }
 
 const KIND: Record<NodeType, string> = { note: 'note', post: 'writing', project: 'project', leetcode: 'leetcode', topic: 'topic' };
 const CTA: Record<NodeType, string> = { note: 'Open note', post: 'Read the post', project: 'Open project', leetcode: 'Open solution', topic: '' };
@@ -27,10 +29,10 @@ export function mountGraph() {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- data ---------- */
-  const nodes: N[] = data.nodes.map((n, i) => ({ ...n, i, deg: 0, r: 0, nb: new Set(), a: 1, born: 0 }));
+  const nodes: N[] = data.nodes.map((n, i) => ({ ...n, i, deg: 0, r: 0, nb: new Set(), a: 1, lab: 0, hf: 0, born: 0 }));
   const allLinks: L[] = data.links.map(([a, b], k) => {
     nodes[a].deg++; nodes[b].deg++; nodes[a].nb.add(b); nodes[b].nb.add(a);
-    return { source: nodes[a], target: nodes[b], bend: ((k * 7919) % 13) / 13 - 0.5 };
+    return { source: nodes[a], target: nodes[b], bend: ((k * 7919) % 13) / 13 - 0.5, on: 0 };
   });
   for (const n of nodes) n.r = n.type === 'topic' ? 3 + Math.sqrt(n.deg) * 1.1 : 3.4 + Math.sqrt(n.deg) * 1.35;
   // Seeded spiral start, so the layout settles the same way on every visit; hubs first, near the middle.
@@ -108,6 +110,8 @@ export function mountGraph() {
   /* ---------- drawing ---------- */
   let raf = 0;
   const t0 = performance.now();
+  let last = t0;
+  let dim = 0; // eased: 1 while something is focused, so everything else recedes
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
   const easeOutBack = (p: number) => 1 + 2.5 * (p - 1) ** 3 + 1.5 * (p - 1) ** 2;
 
@@ -122,12 +126,20 @@ export function mountGraph() {
       if (p < 1) busy = true; else tw = null;
     }
 
+    // Focus changes cross-fade: every emphasis value eases toward its target over about a quarter second.
     const f = focus();
+    const kE = reduce ? 1 : 1 - Math.exp(-Math.min(64, now - last) / 85);
+    last = now;
+    const ease = (v: number, to: number) => { const d = to - v; if (Math.abs(d) < 0.004) return to; busy = true; return v + d * kE; };
+    const zoomA = Math.max(0, Math.min(1, (view.k - 1.05) / 0.5));
+    dim = ease(dim, f ? 1 : 0);
     for (const n of vis) {
-      const target = !f || n === f || f.nb.has(n.i) ? 1 : 0.14;
-      n.a += (target - n.a) * (reduce ? 1 : 0.2);
-      if (Math.abs(target - n.a) > 0.01) busy = true; else n.a = target;
+      const near = !!f && (n === f || f.nb.has(n.i));
+      n.a = ease(n.a, !f || near ? 1 : 0.14);
+      n.hf = ease(n.hf, n === f ? 1 : 0);
+      n.lab = ease(n.lab, f ? (near ? 1 : 0) : n.deg >= 9 ? 0.95 : zoomA);
     }
+    for (const l of links) l.on = ease(l.on, f && (l.source === f || l.target === f) ? 1 : 0);
 
     // The dotted backdrop moves with the graph.
     const g = 22 * view.k;
@@ -145,20 +157,20 @@ export function mountGraph() {
     ctx.lineCap = 'round';
     for (const l of links) {
       const s = l.source, t = l.target;
-      const on = !!f && (s === f || t === f);
+      const on = l.on;
       const shown = Math.min(1, grow(s), grow(t));
       if (shown <= 0) continue;
       const dx = t.x! - s.x!, dy = t.y! - s.y!;
       const cx = (s.x! + t.x!) / 2 - dy * l.bend * 0.18, cy = (s.y! + t.y!) / 2 + dx * l.bend * 0.18;
-      ctx.globalAlpha = shown * (on ? 0.85 : f ? 0.05 : dark ? 0.22 : 0.17);
-      ctx.strokeStyle = on ? col.accent : col.ink;
-      ctx.lineWidth = (on ? 1.4 : 0.8) * px;
-      ctx.beginPath(); ctx.moveTo(s.x!, s.y!); ctx.quadraticCurveTo(cx, cy, t.x!, t.y!); ctx.stroke();
-      if (on && !reduce) {
-        const from = f === s ? s : t, to = f === s ? t : s;
+      const base = (dark ? 0.22 : 0.17) * (1 - dim) + 0.05 * dim;
+      ctx.beginPath(); ctx.moveTo(s.x!, s.y!); ctx.quadraticCurveTo(cx, cy, t.x!, t.y!);
+      if (on < 1) { ctx.globalAlpha = shown * base * (1 - on); ctx.strokeStyle = col.ink; ctx.lineWidth = 0.8 * px; ctx.stroke(); }
+      if (on > 0) { ctx.globalAlpha = shown * 0.85 * on; ctx.strokeStyle = col.accent; ctx.lineWidth = (0.8 + 0.6 * on) * px; ctx.stroke(); }
+      if (on > 0.05 && !reduce) {
+        const from = s.hf >= t.hf ? s : t, to = from === s ? t : s;
         const u = (now / 1600 + l.bend + 0.5) % 1, v = 1 - u;
         const qx = v * v * from.x! + 2 * v * u * cx + u * u * to.x!, qy = v * v * from.y! + 2 * v * u * cy + u * u * to.y!;
-        ctx.globalAlpha = Math.sin(u * Math.PI) * 0.9;
+        ctx.globalAlpha = Math.sin(u * Math.PI) * 0.9 * on;
         ctx.fillStyle = col.accent;
         ctx.beginPath(); ctx.arc(qx, qy, 1.7 * px, 0, Math.PI * 2); ctx.fill();
         busy = true;
@@ -170,14 +182,14 @@ export function mountGraph() {
       const s = grow(n);
       if (s <= 0) continue;
       const r = n.r * s, x = n.x!, y = n.y!;
-      if (n === f) {
-        ctx.globalAlpha = 0.18; ctx.fillStyle = col.accent;
-        ctx.beginPath(); ctx.arc(x, y, r + 6 * px, 0, Math.PI * 2); ctx.fill();
+      if (n.hf > 0.01) {
+        ctx.globalAlpha = 0.18 * n.hf; ctx.fillStyle = col.accent;
+        ctx.beginPath(); ctx.arc(x, y, r + 6 * px * n.hf, 0, Math.PI * 2); ctx.fill();
       }
       ctx.globalAlpha = n.a;
       if (n.type === 'topic') {
         ctx.fillStyle = col.halo; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = n === f ? col.accent : col.muted; ctx.lineWidth = 1.3 * px; ctx.stroke();
+        ctx.strokeStyle = n.hf > 0.5 ? col.accent : col.muted; ctx.lineWidth = 1.3 * px; ctx.stroke();
         continue;
       }
       ctx.fillStyle = n.type === 'note' ? col.accent : n.type === 'leetcode' ? col.faint : col.ink;
@@ -192,14 +204,13 @@ export function mountGraph() {
     const fs = 11.5 * px;
     const family = getComputedStyle(document.body).fontFamily;
     ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.lineJoin = 'round';
-    const zoomA = Math.max(0, Math.min(1, (view.k - 1.05) / 0.5));
     // Most important first (the focused dot, its neighbours, then by connections); a label that would overlap
     // one already placed is skipped. The pane lists every neighbour, so nothing is lost.
     const cands: { n: N; a: number; strong: boolean; pri: number }[] = [];
     for (const n of vis) {
       const near = !!f && (n === f || f.nb.has(n.i));
-      const a = (f ? (near ? 1 : 0) : n.deg >= 9 ? 0.95 : zoomA) * Math.min(1, grow(n));
-      if (a > 0.02) cands.push({ n, a, strong: n === f, pri: (n === f ? 1e6 : near ? 1e4 : 0) + n.deg });
+      const a = n.lab * Math.min(1, grow(n));
+      if (a > 0.02) cands.push({ n, a, strong: n.hf > 0.5, pri: (n === f ? 1e6 : near ? 1e4 : 0) + n.lab * 100 + n.deg });
     }
     cands.sort((p, q) => q.pri - p.pri);
     const placed: [number, number, number, number][] = [];
