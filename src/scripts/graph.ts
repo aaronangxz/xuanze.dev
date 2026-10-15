@@ -1,163 +1,267 @@
-/* The /graph page: a force-directed map of every page on the Work side, drawn on a canvas.
-   Hover (or tap) a node to light up its neighbours, click to open it; drag nodes, drag the background to pan,
-   scroll or pinch to zoom. Colours come from the theme tokens, so it follows light and dark mode. */
+/* The /graph page: a force-directed map of every page on the Work side, drawn on a canvas, with a preview pane
+   in the launcher's style. Hover a dot to preview it, click to pin it, double-click (or the pane's button) to open.
+   Drag dots, drag the background to pan, scroll or pinch to zoom. Colours come from the theme tokens. */
 import { forceSimulation, forceLink, forceManyBody, forceX, forceY, forceCollide, type SimulationNodeDatum } from 'd3-force';
 import type { Graph, GraphNode, NodeType } from '../lib/graph';
 
-interface N extends GraphNode, SimulationNodeDatum { i: number; deg: number; r: number; nb: Set<number> }
-interface L { source: N; target: N }
+interface N extends GraphNode, SimulationNodeDatum {
+  i: number; deg: number; r: number; nb: Set<number>;
+  a: number;     // drawn emphasis, eased toward 1 (lit) or a low value (dimmed)
+  born: number;  // entrance delay, ms
+}
+interface L { source: N; target: N; bend: number }
 
-const TYPE_LABEL: Record<NodeType, string> = { note: 'note', post: 'writing', project: 'project', leetcode: 'leetcode', topic: 'topic' };
-const COLOR_VAR: Record<NodeType, string> = { note: '--accent', post: '--c-str', project: '--c-num', leetcode: '--c-kw', topic: '--faint' };
+const KIND: Record<NodeType, string> = { note: 'note', post: 'writing', project: 'project', leetcode: 'leetcode', topic: 'topic' };
+const CTA: Record<NodeType, string> = { note: 'Open note', post: 'Read the post', project: 'Open project', leetcode: 'Open solution', topic: '' };
+
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export function mountGraph() {
-  const box = document.getElementById('graph');
+  const app = document.getElementById('graph');
+  const stage = document.getElementById('gstage');
   const canvas = document.getElementById('graph-canvas') as HTMLCanvasElement | null;
+  const pane = document.getElementById('gprev');
   const data = JSON.parse(document.getElementById('graph-data')?.textContent || 'null') as Graph | null;
-  if (!box || !canvas || !data) return;
+  if (!app || !stage || !canvas || !pane || !data) return;
   const ctx = canvas.getContext('2d')!;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- data ---------- */
-  const nodes: N[] = data.nodes.map((n, i) => ({ ...n, i, deg: 0, r: 0, nb: new Set() }));
-  const allLinks: L[] = data.links.map(([a, b]) => {
+  const nodes: N[] = data.nodes.map((n, i) => ({ ...n, i, deg: 0, r: 0, nb: new Set(), a: 1, born: 0 }));
+  const allLinks: L[] = data.links.map(([a, b], k) => {
     nodes[a].deg++; nodes[b].deg++; nodes[a].nb.add(b); nodes[b].nb.add(a);
-    return { source: nodes[a], target: nodes[b] };
+    return { source: nodes[a], target: nodes[b], bend: ((k * 7919) % 13) / 13 - 0.5 };
   });
-  for (const n of nodes) n.r = (n.type === 'topic' ? 2.5 : 3.5) + Math.sqrt(n.deg) * 1.5;
-  // Start on a loose spiral (seeded, so the layout settles the same way on every visit).
-  nodes.forEach((n, k) => { const a = k * 2.4, d = 14 * Math.sqrt(k + 1); n.x = Math.cos(a) * d; n.y = Math.sin(a) * d; });
+  for (const n of nodes) n.r = n.type === 'topic' ? 3 + Math.sqrt(n.deg) * 1.1 : 3.4 + Math.sqrt(n.deg) * 1.35;
+  // Seeded spiral start, so the layout settles the same way on every visit; hubs first, near the middle.
+  const order = [...nodes].sort((a, b) => b.deg - a.deg);
+  order.forEach((n, k) => { const t = k * 2.39996, d = 11 * Math.sqrt(k + 1); n.x = Math.cos(t) * d; n.y = Math.sin(t) * d; n.born = reduce ? -1e4 : 120 + k * 9; });
 
   const hidden = new Set<NodeType>();
   let vis = nodes, links = allLinks;
 
   /* ---------- simulation ---------- */
   const sim = forceSimulation<N>(nodes)
-    .force('link', forceLink<N, L>(allLinks).distance((l) => (l.source.type === 'topic' || l.target.type === 'topic' ? 38 : 48)).strength(0.5))
-    .force('charge', forceManyBody<N>().strength(-110).distanceMax(420))
-    .force('x', forceX<N>(0).strength(0.045))
-    .force('y', forceY<N>(0).strength(0.06))
-    .force('collide', forceCollide<N>((n) => n.r + 3))
-    .alphaDecay(0.025)
-    .on('tick', () => { if (autoFit) fit(false); draw(); });
-  if (reduce) { sim.stop(); for (let k = 0; k < 300; k++) sim.tick(); }
+    .force('link', forceLink<N, L>(allLinks).distance((l) => 26 + (l.source.r + l.target.r) * 2.2).strength((l) => 0.9 / Math.sqrt(Math.min(l.source.deg, l.target.deg) + 0.5)))
+    .force('charge', forceManyBody<N>().strength((n) => -60 - n.deg * 6).distanceMax(380))
+    .force('x', forceX<N>(0).strength(0.05))
+    .force('y', forceY<N>(0).strength(0.07))
+    .force('collide', forceCollide<N>((n) => n.r + 5))
+    .alphaDecay(0.022)
+    .on('tick', () => { if (autoFit) fit(false); kick(); });
+  if (reduce) { sim.stop(); for (let k = 0; k < 320; k++) sim.tick(); }
 
   /* ---------- view ---------- */
   let W = 0, H = 0, dpr = 1;
   const view = { x: 0, y: 0, k: 1 }; // screen = world * k + (x, y)
-  let autoFit = true; // follow the settling layout until the reader takes over
+  let autoFit = true;                // follow the settling layout until the reader takes over
   const resize = () => {
     // clientWidth, not getBoundingClientRect: the page's entrance transform would skew the size.
-    W = box.clientWidth; H = box.clientHeight; dpr = Math.min(2, devicePixelRatio || 1);
-    canvas.width = W * dpr; canvas.height = H * dpr;
+    W = stage.clientWidth; H = stage.clientHeight; dpr = Math.min(2, devicePixelRatio || 1);
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     if (autoFit) fit(false);
-    draw();
+    kick();
   };
   function bounds() {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (const n of vis) { x0 = Math.min(x0, n.x! - n.r); y0 = Math.min(y0, n.y! - n.r); x1 = Math.max(x1, n.x! + n.r); y1 = Math.max(y1, n.y! + n.r); }
+    for (const n of vis) { x0 = Math.min(x0, n.x! - n.r); y0 = Math.min(y0, n.y! - n.r); x1 = Math.max(x1, n.x! + n.r); y1 = Math.max(y1, n.y! + n.r + 14); }
     return vis.length ? { x0, y0, x1, y1 } : { x0: -1, y0: -1, x1: 1, y1: 1 };
   }
   function fit(animate: boolean) {
-    const b = bounds(), pad = W < 600 ? 24 : 56, top = barH();
-    const k = Math.min(2.2, (W - pad * 2) / (b.x1 - b.x0), (H - top - pad * 2) / (b.y1 - b.y0));
-    const to = { k, x: W / 2 - ((b.x0 + b.x1) / 2) * k, y: top + (H - top) / 2 - ((b.y0 + b.y1) / 2) * k };
+    const b = bounds(), pad = W < 600 ? 20 : 40;
+    const k = Math.min(1.8, (W - pad * 2) / (b.x1 - b.x0), (H - pad * 2) / (b.y1 - b.y0));
+    const to = { k, x: W / 2 - ((b.x0 + b.x1) / 2) * k, y: H / 2 - ((b.y0 + b.y1) / 2) * k };
     if (animate && !reduce) tween(to); else Object.assign(view, to);
   }
-  const barH = () => (box.querySelector('.graph-bar') as HTMLElement).offsetHeight + 8;
-  let tweenId = 0;
-  function tween(to: { x: number; y: number; k: number }) {
-    const from = { ...view }, t0 = performance.now(), id = ++tweenId;
-    const step = (t: number) => {
-      if (id !== tweenId) return;
-      const p = Math.min(1, (t - t0) / 380), e = 1 - Math.pow(1 - p, 3);
-      view.k = from.k + (to.k - from.k) * e; view.x = from.x + (to.x - from.x) * e; view.y = from.y + (to.y - from.y) * e;
-      draw();
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
+  let tw: { from: typeof view; to: typeof view; t0: number } | null = null;
+  const tween = (to: typeof view) => { tw = { from: { ...view }, to, t0: performance.now() }; kick(); };
+  const centreOn = (n: N, minK = 1.3) => {
+    autoFit = false;
+    const k = Math.max(view.k, minK);
+    const to = { k, x: W / 2 - n.x! * k, y: H / 2 - n.y! * k };
+    if (reduce) { Object.assign(view, to); kick(); } else tween(to);
+  };
   function zoomAt(f: number, sx: number, sy: number) {
-    const k = Math.max(0.25, Math.min(6, view.k * f));
+    const k = Math.max(0.3, Math.min(5, view.k * f));
     view.x = sx - ((sx - view.x) * k) / view.k; view.y = sy - ((sy - view.y) * k) / view.k; view.k = k;
-    autoFit = false; draw();
+    autoFit = false; tw = null; kick();
   }
 
   /* ---------- colours ---------- */
   let col: Record<string, string> = {};
+  let dark = false;
   const readColors = () => {
     const cs = getComputedStyle(document.documentElement);
     const v = (name: string) => cs.getPropertyValue(name).trim();
-    col = { ink: v('--ink'), muted: v('--muted'), line: v('--line2'), win: v('--win') };
-    for (const t of Object.keys(COLOR_VAR) as NodeType[]) col[t] = v(COLOR_VAR[t]);
-    draw();
+    col = { ink: v('--ink'), muted: v('--muted'), faint: v('--faint'), accent: v('--accent'), halo: v('--glass-solid') || v('--win') };
+    dark = cs.colorScheme.includes('dark');
+    kick();
   };
   new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
 
+  /* ---------- state ---------- */
+  let hover: N | null = null;  // under the pointer
+  let pinned: N | null = null; // clicked, tapped, searched or picked in the pane
+  const focus = () => hover ?? pinned;
+
   /* ---------- drawing ---------- */
-  let focus: N | null = null; // hovered or tapped node
-  let match: N | null = null; // search hit
-  let frame = 0;
-  function draw() {
-    if (frame) return;
-    frame = requestAnimationFrame(render);
-  }
-  function render() {
-    frame = 0;
+  let raf = 0;
+  const t0 = performance.now();
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  const easeOutBack = (p: number) => 1 + 2.5 * (p - 1) ** 3 + 1.5 * (p - 1) ** 2;
+
+  function frame(now: number) {
+    raf = 0;
     if (!W) return;
+    let busy = sim.alpha() > sim.alphaMin();
+
+    if (tw) {
+      const p = Math.min(1, (now - tw.t0) / 420), e = 1 - (1 - p) ** 3;
+      view.k = tw.from.k + (tw.to.k - tw.from.k) * e; view.x = tw.from.x + (tw.to.x - tw.from.x) * e; view.y = tw.from.y + (tw.to.y - tw.from.y) * e;
+      if (p < 1) busy = true; else tw = null;
+    }
+
+    const f = focus();
+    for (const n of vis) {
+      const target = !f || n === f || f.nb.has(n.i) ? 1 : 0.14;
+      n.a += (target - n.a) * (reduce ? 1 : 0.2);
+      if (Math.abs(target - n.a) > 0.01) busy = true; else n.a = target;
+    }
+
+    // The dotted backdrop moves with the graph.
+    const g = 22 * view.k;
+    stage!.style.backgroundSize = `${g}px ${g}px`;
+    stage!.style.backgroundPosition = `${view.x % g}px ${view.y % g}px`;
+
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.setTransform(dpr * view.k, 0, 0, dpr * view.k, dpr * view.x, dpr * view.y);
-    const f = focus ?? match;
-    const lit = (n: N) => !f || n === f || f.nb.has(n.i);
+    const px = 1 / view.k;
+    const age = now - t0;
+    const grow = (n: N) => { const p = Math.max(0, Math.min(1, (age - n.born) / 520)); if (p < 1) busy = true; return p <= 0 ? 0 : easeOutBack(p); };
 
-    ctx.lineWidth = 1 / view.k;
+    /* links: soft curves; the focused dot's links in the accent colour, with a light running along them */
+    ctx.lineCap = 'round';
     for (const l of links) {
-      const on = f && (l.source === f || l.target === f);
-      ctx.strokeStyle = on ? col[f!.type] : col.line;
-      ctx.globalAlpha = f ? (on ? 0.9 : 0.12) : 0.7;
-      ctx.beginPath(); ctx.moveTo(l.source.x!, l.source.y!); ctx.lineTo(l.target.x!, l.target.y!); ctx.stroke();
-    }
-    for (const n of vis) {
-      ctx.globalAlpha = lit(n) ? 1 : 0.18;
-      ctx.fillStyle = col[n.type];
-      ctx.beginPath(); ctx.arc(n.x!, n.y!, n.r, 0, Math.PI * 2); ctx.fill();
-      if (n === f) { ctx.lineWidth = 2 / view.k; ctx.strokeStyle = col.ink; ctx.stroke(); ctx.lineWidth = 1 / view.k; }
+      const s = l.source, t = l.target;
+      const on = !!f && (s === f || t === f);
+      const shown = Math.min(1, grow(s), grow(t));
+      if (shown <= 0) continue;
+      const dx = t.x! - s.x!, dy = t.y! - s.y!;
+      const cx = (s.x! + t.x!) / 2 - dy * l.bend * 0.18, cy = (s.y! + t.y!) / 2 + dx * l.bend * 0.18;
+      ctx.globalAlpha = shown * (on ? 0.85 : f ? 0.05 : dark ? 0.22 : 0.17);
+      ctx.strokeStyle = on ? col.accent : col.ink;
+      ctx.lineWidth = (on ? 1.4 : 0.8) * px;
+      ctx.beginPath(); ctx.moveTo(s.x!, s.y!); ctx.quadraticCurveTo(cx, cy, t.x!, t.y!); ctx.stroke();
+      if (on && !reduce) {
+        const from = f === s ? s : t, to = f === s ? t : s;
+        const u = (now / 1600 + l.bend + 0.5) % 1, v = 1 - u;
+        const qx = v * v * from.x! + 2 * v * u * cx + u * u * to.x!, qy = v * v * from.y! + 2 * v * u * cy + u * u * to.y!;
+        ctx.globalAlpha = Math.sin(u * Math.PI) * 0.9;
+        ctx.fillStyle = col.accent;
+        ctx.beginPath(); ctx.arc(qx, qy, 1.7 * px, 0, Math.PI * 2); ctx.fill();
+        busy = true;
+      }
     }
 
-    // Labels fade in as you zoom; big hubs and the focused neighbourhood are always labelled.
-    const fs = 11 / view.k;
-    ctx.font = `500 ${fs}px ${getComputedStyle(document.body).fontFamily}`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.lineJoin = 'round'; ctx.lineWidth = 3 / view.k; ctx.strokeStyle = col.win;
-    const zoomA = Math.max(0, Math.min(1, (view.k - 1.1) / 0.6));
+    /* nodes: glassy beads */
     for (const n of vis) {
-      let a = f ? (lit(n) ? 1 : 0) : n.deg >= 7 ? 1 : zoomA;
-      if (a <= 0.02) continue;
+      const s = grow(n);
+      if (s <= 0) continue;
+      const r = n.r * s, x = n.x!, y = n.y!;
+      if (n === f) {
+        ctx.save(); ctx.globalAlpha = 0.5; ctx.shadowColor = col.accent; ctx.shadowBlur = 16 * view.k * dpr;
+        ctx.fillStyle = col.accent; ctx.beginPath(); ctx.arc(x, y, r + 2 * px, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      }
+      ctx.globalAlpha = n.a;
+      if (n.type === 'topic') {
+        ctx.fillStyle = col.halo; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = n === f ? col.accent : col.muted; ctx.lineWidth = 1.3 * px; ctx.stroke();
+        continue;
+      }
+      ctx.fillStyle = n.type === 'note' ? col.accent : n.type === 'leetcode' ? col.faint : col.ink;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      if (n.type === 'project') {
+        ctx.strokeStyle = col.ink; ctx.lineWidth = 1.2 * px;
+        ctx.beginPath(); ctx.arc(x, y, r + 2.4 * px + 1, 0, Math.PI * 2); ctx.stroke();
+      }
+      const hl = ctx.createRadialGradient(x - r * 0.38, y - r * 0.42, 0, x - r * 0.38, y - r * 0.42, r * 1.05);
+      hl.addColorStop(0, 'rgba(255,255,255,.5)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = hl; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+
+    /* labels: hubs always, everything once zoomed in, and the focused neighbourhood on top */
+    const fs = 11.5 * px;
+    const family = getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.lineJoin = 'round';
+    const zoomA = Math.max(0, Math.min(1, (view.k - 1.05) / 0.5));
+    // Most important first (the focused dot, its neighbours, then by connections); a label that would overlap
+    // one already placed is skipped. The pane lists every neighbour, so nothing is lost.
+    const cands: { n: N; a: number; strong: boolean; pri: number }[] = [];
+    for (const n of vis) {
+      const near = !!f && (n === f || f.nb.has(n.i));
+      const a = (f ? (near ? 1 : 0) : n.deg >= 9 ? 0.95 : zoomA) * Math.min(1, grow(n));
+      if (a > 0.02) cands.push({ n, a, strong: n === f, pri: (n === f ? 1e6 : near ? 1e4 : 0) + n.deg });
+    }
+    cands.sort((p, q) => q.pri - p.pri);
+    const placed: [number, number, number, number][] = [];
+    for (const { n, a, strong } of cands) {
+      ctx.font = `${strong ? 600 : 500} ${strong ? fs * 1.1 : fs}px ${family}`;
+      const label = n.label.length > 30 ? n.label.slice(0, 28).trimEnd() + '…' : n.label;
+      const y = n.y! + n.r + (n.type === 'project' ? 6 : 4) * px;
+      const w = ctx.measureText(label).width, h = fs * 1.25;
+      const box: [number, number, number, number] = [n.x! - w / 2 - 2 * px, y, n.x! + w / 2 + 2 * px, y + h];
+      if (placed.some((o) => box[0] < o[2] && box[2] > o[0] && box[1] < o[3] && box[3] > o[1])) continue;
+      placed.push(box);
       ctx.globalAlpha = a;
-      const label = n.label.length > 34 ? n.label.slice(0, 32) + '…' : n.label;
-      ctx.strokeText(label, n.x!, n.y! + n.r + 3 / view.k);
-      ctx.fillStyle = n === f ? col.ink : col.muted;
-      ctx.fillText(label, n.x!, n.y! + n.r + 3 / view.k);
+      ctx.lineWidth = 4 * px; ctx.strokeStyle = col.halo; ctx.strokeText(label, n.x!, y);
+      ctx.fillStyle = strong ? col.ink : n.type === 'topic' ? col.faint : col.muted;
+      ctx.fillText(label, n.x!, y);
     }
     ctx.globalAlpha = 1;
+
+    if (busy) kick();
   }
 
-  /* ---------- the card under the graph ---------- */
-  const card = document.getElementById('graph-card')!;
-  const cardA = document.getElementById('gc-a') as HTMLAnchorElement;
-  function showCard(n: N | null) {
-    if (!n) { card.hidden = true; return; }
-    const shown = [...n.nb].filter((j) => !hidden.has(nodes[j].type)).length;
-    document.getElementById('gc-k')!.textContent = n.sub ? `${TYPE_LABEL[n.type]} · ${n.sub.toLowerCase()}` : TYPE_LABEL[n.type];
-    document.getElementById('gc-t')!.textContent = n.label;
-    document.getElementById('gc-n')!.textContent = `${shown} connection${shown === 1 ? '' : 's'}`;
-    cardA.hidden = !n.href;
-    if (n.href) cardA.href = n.href;
-    card.hidden = false;
+  /* ---------- the preview pane ---------- */
+  const glyph = (t: NodeType) => `<i class="gg gg-${t}" aria-hidden="true"></i>`;
+  const row = (n: N) => `<li><button type="button" data-node="${n.i}">${glyph(n.type)}<span class="tt">${esc(n.label)}</span><span class="sub">${esc(KIND[n.type])}</span></button></li>`;
+  const chip = (n: N) => `<button type="button" data-node="${n.i}">${esc(n.label)}</button>`;
+  const shownNb = (n: N) => [...n.nb].map((j) => nodes[j]).filter((m) => !hidden.has(m.type));
+  function renderPane() {
+    const n = focus();
+    if (!n) {
+      const hubs = vis.filter((m) => m.type !== 'topic').sort((a, b) => b.deg - a.deg).slice(0, 6);
+      const topics = vis.filter((m) => m.type === 'topic').sort((a, b) => b.deg - a.deg).slice(0, 8);
+      pane!.innerHTML = `<span class="k">graph</span><h2>Everything, connected</h2>
+        <p>Pages are joined when they share a topic, link to each other, or one mentions the other. Bigger dots have more connections.</p>
+        ${topics.length ? `<h3>Biggest topics</h3><div class="gchips">${topics.map(chip).join('')}</div>` : ''}
+        ${hubs.length ? `<h3>Most connected</h3><ul class="gnb">${hubs.map(row).join('')}</ul>` : ''}`;
+      return;
+    }
+    const nb = shownNb(n);
+    const topics = nb.filter((m) => m.type === 'topic').sort((a, b) => b.deg - a.deg);
+    const pagesNb = nb.filter((m) => m.type !== 'topic').sort((a, b) => b.deg - a.deg);
+    const k = n.type === 'topic' ? 'topic' : n.sub ? `${KIND[n.type]} · ${n.sub.toLowerCase()}` : KIND[n.type];
+    const desc = n.type === 'topic' ? `${pagesNb.length} page${pagesNb.length === 1 ? '' : 's'} on this topic.` : n.desc ?? '';
+    pane!.innerHTML = `<span class="k">${esc(k)}</span><h2>${esc(n.label)}</h2>${desc ? `<p>${esc(desc)}</p>` : ''}
+      ${topics.length ? `<div class="gchips">${topics.map(chip).join('')}</div>` : ''}
+      ${pagesNb.length ? `<h3>${n.type === 'topic' ? 'Pages' : 'Connected to'} <span>${pagesNb.length}</span></h3><ul class="gnb">${pagesNb.map(row).join('')}</ul>` : ''}
+      ${n.href ? `<a class="cta" href="${esc(n.href)}">${CTA[n.type]} <span aria-hidden="true">→</span></a>` : ''}`;
   }
-  const setFocus = (n: N | null) => { if (n === focus) return; focus = n; showCard(n ?? match); draw(); };
+  let paneFor: N | null | undefined;
+  const syncPane = () => { const f = focus(); if (f !== paneFor) { paneFor = f; renderPane(); } };
+  const setHover = (n: N | null) => { if (n === hover) return; hover = n; syncPane(); kick(); };
+  const pin = (n: N | null, centre = false) => {
+    pinned = n; hover = null; syncPane();
+    if (n && centre) centreOn(n);
+    kick();
+  };
+  pane.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-node]');
+    if (b) pin(nodes[Number(b.dataset.node)], true);
+  });
 
   /* ---------- pointer: hover, click, drag, pan, pinch ---------- */
   const toWorld = (sx: number, sy: number) => ({ x: (sx - view.x) / view.k, y: (sy - view.y) / view.k });
@@ -170,7 +274,7 @@ export function mountGraph() {
     }
     return best && bd * view.k <= slop ? best : null;
   }
-  const local = (e: PointerEvent | WheelEvent) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const local = (e: MouseEvent) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
 
   const pts = new Map<number, { x: number; y: number }>();
   let drag: { n: N | null; x0: number; y0: number; moved: boolean; vx: number; vy: number } | null = null;
@@ -187,31 +291,29 @@ export function mountGraph() {
       drag = null;
       return;
     }
-    const n = hit(p.x, p.y, e.pointerType === 'touch' ? 14 : 6);
-    drag = { n, x0: p.x, y0: p.y, moved: false, vx: view.x, vy: view.y };
-    tweenId++;
+    drag = { n: hit(p.x, p.y, e.pointerType === 'touch' ? 14 : 6), x0: p.x, y0: p.y, moved: false, vx: view.x, vy: view.y };
+    tw = null;
   });
   canvas.addEventListener('pointermove', (e) => {
     const p = local(e);
     if (pts.has(e.pointerId)) pts.set(e.pointerId, p);
     if (pinch && pts.size === 2) {
       const [a, b] = [...pts.values()];
-      const d = Math.hypot(a.x - b.x, a.y - b.y);
-      zoomAt((pinch.k * d) / pinch.d / view.k, (a.x + b.x) / 2, (a.y + b.y) / 2);
+      zoomAt((pinch.k * Math.hypot(a.x - b.x, a.y - b.y)) / pinch.d / view.k, (a.x + b.x) / 2, (a.y + b.y) / 2);
       return;
     }
     if (drag) {
       if (!drag.moved && Math.hypot(p.x - drag.x0, p.y - drag.y0) < 4) return;
-      if (!drag.moved) { drag.moved = true; autoFit = false; if (drag.n) { sim.alphaTarget(0.25).restart(); } }
-      if (drag.n) { const w = toWorld(p.x, p.y); drag.n.fx = w.x; drag.n.fy = w.y; setFocus(drag.n); }
-      else { view.x = drag.vx + p.x - drag.x0; view.y = drag.vy + p.y - drag.y0; draw(); }
-      canvas.style.cursor = 'grabbing';
+      if (!drag.moved) { drag.moved = true; autoFit = false; if (drag.n) sim.alphaTarget(0.2).restart(); }
+      if (drag.n) { const w = toWorld(p.x, p.y); drag.n.fx = w.x; drag.n.fy = w.y; setHover(drag.n); }
+      else { view.x = drag.vx + p.x - drag.x0; view.y = drag.vy + p.y - drag.y0; kick(); }
+      stage.classList.add('grabbing');
       return;
     }
     if (e.pointerType === 'mouse') {
       const n = hit(p.x, p.y, 6);
-      canvas.style.cursor = n?.href ? 'pointer' : n ? 'default' : 'grab';
-      setFocus(n);
+      stage.classList.toggle('over', !!n);
+      setHover(n);
     }
   });
   const end = (e: PointerEvent) => {
@@ -219,33 +321,33 @@ export function mountGraph() {
     if (pinch) { if (pts.size < 2) pinch = null; return; }
     if (!drag) return;
     const d = drag; drag = null;
-    canvas.style.cursor = '';
+    stage.classList.remove('grabbing');
     if (d.n && d.moved) { d.n.fx = d.n.fy = null; sim.alphaTarget(0); }
     if (d.moved || e.type === 'pointercancel') return;
-    // A click: open the page with a mouse; on touch the first tap shows the card (with an Open link).
-    if (e.pointerType === 'mouse') { if (d.n?.href) location.href = d.n.href; else setFocus(d.n); }
-    else setFocus(d.n === focus ? null : d.n);
+    // A tap on the pinned dot (touch) unpins it; a click or tap on the background clears the pin.
+    pin(d.n === pinned && e.pointerType !== 'mouse' ? null : d.n);
   };
   canvas.addEventListener('pointerup', end);
   canvas.addEventListener('pointercancel', end);
-  canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !drag) setFocus(null); });
+  canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !drag) { stage.classList.remove('over'); setHover(null); } });
+  canvas.addEventListener('dblclick', (e) => { const p = local(e); const n = hit(p.x, p.y, 6); if (n?.href) location.href = n.href; });
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     const p = local(e);
-    zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0022)), p.x, p.y);
+    zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), p.x, p.y);
   }, { passive: false });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && pinned && document.activeElement?.id !== 'graph-q') pin(null); });
 
-  box.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((b) => b.addEventListener('click', () => {
+  app.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((b) => b.addEventListener('click', () => {
     const z = b.dataset.zoom;
-    if (z === 'fit') { autoFit = false; fit(true); return; }
-    const target = { ...view }, f = z === 'in' ? 1.4 : 1 / 1.4;
-    const k = Math.max(0.25, Math.min(6, view.k * f));
-    target.x = W / 2 - ((W / 2 - view.x) * k) / view.k; target.y = H / 2 - ((H / 2 - view.y) * k) / view.k; target.k = k;
-    autoFit = false; tween(target);
+    autoFit = false;
+    if (z === 'fit') { fit(true); return; }
+    const k = Math.max(0.3, Math.min(5, view.k * (z === 'in' ? 1.4 : 1 / 1.4)));
+    tween({ k, x: W / 2 - ((W / 2 - view.x) * k) / view.k, y: H / 2 - ((H / 2 - view.y) * k) / view.k });
   }));
 
   /* ---------- type filters ---------- */
-  box.querySelectorAll<HTMLButtonElement>('[data-type]').forEach((b) => b.addEventListener('click', () => {
+  app.querySelectorAll<HTMLButtonElement>('[data-type]').forEach((b) => b.addEventListener('click', () => {
     const t = b.dataset.type as NodeType;
     const on = b.getAttribute('aria-pressed') !== 'true';
     b.setAttribute('aria-pressed', String(on));
@@ -254,11 +356,12 @@ export function mountGraph() {
     links = allLinks.filter((l) => !hidden.has(l.source.type) && !hidden.has(l.target.type));
     sim.nodes(vis);
     (sim.force('link') as ReturnType<typeof forceLink<N, L>>).links(links);
-    if (focus && hidden.has(focus.type)) setFocus(null);
-    if (match && hidden.has(match.type)) match = null;
+    if (hover && hidden.has(hover.type)) hover = null;
+    if (pinned && hidden.has(pinned.type)) pinned = null;
+    paneFor = undefined; syncPane();
     autoFit = true;
-    if (reduce) { for (let k = 0; k < 200; k++) sim.tick(); fit(false); draw(); }
-    else sim.alpha(0.5).restart();
+    if (reduce) { for (let k = 0; k < 200; k++) sim.tick(); fit(false); kick(); }
+    else sim.alpha(0.6).restart();
   }));
 
   /* ---------- find ---------- */
@@ -266,25 +369,18 @@ export function mountGraph() {
   const find = (s: string) => {
     const t = s.trim().toLowerCase();
     if (!t) return null;
-    const pool = vis.filter((n) => n.href);
-    return pool.find((n) => n.label.toLowerCase() === t) ?? pool.find((n) => n.label.toLowerCase().startsWith(t)) ?? pool.find((n) => n.label.toLowerCase().includes(t)) ?? null;
+    const pool = [...vis].sort((a, b) => b.deg - a.deg);
+    return pool.find((n) => n.label.toLowerCase() === t) ?? pool.find((n) => n.label.toLowerCase().startsWith(t))
+      ?? pool.find((n) => n.label.toLowerCase().includes(t)) ?? null;
   };
-  q.addEventListener('input', () => {
-    match = find(q.value);
-    showCard(focus ?? match);
-    if (match) {
-      autoFit = false;
-      const k = Math.max(view.k, 1.6);
-      tween({ k, x: W / 2 - match.x! * k, y: barH() + (H - barH()) / 2 - match.y! * k });
-    }
-    draw();
-  });
+  q.addEventListener('input', () => { const m = find(q.value); if (m) pin(m, true); else if (!q.value.trim()) pin(null); });
   q.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && match?.href) location.href = match.href;
-    if (e.key === 'Escape') { q.value = ''; match = null; showCard(focus); draw(); }
+    if (e.key === 'Enter' && pinned?.href) location.href = pinned.href;
+    if (e.key === 'Escape') { q.value = ''; pin(null); }
   });
 
-  new ResizeObserver(resize).observe(box);
+  new ResizeObserver(resize).observe(stage);
   readColors();
+  renderPane();
   resize();
 }

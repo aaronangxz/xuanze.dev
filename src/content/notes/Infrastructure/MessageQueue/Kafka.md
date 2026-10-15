@@ -1,5 +1,7 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - System Design
 ---
 
 # Kafka

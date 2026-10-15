@@ -7,20 +7,20 @@ import { posts, projects, projectHref, noteTitle, noteGroup } from './content';
  *   - links between pages: markdown links to /notes, /writing, /projects, /leetcode, or [[Title]] wikilinks
  *   - a post's `project`
  *   - folders: a note joins its folder, a subfolder joins its parent folder
- *   - tags (posts, LeetCode) and stack items (projects)
+ *   - tags (notes, posts, LeetCode) and stack items (projects)
  *   - mentions: a page whose text names a note (e.g. "Redis", "Merge Sort") links to that note
  * A topic with the same name as a note is that note, so tagging a post `redis` links it to the Redis note.
  */
 
 export type NodeType = 'note' | 'post' | 'project' | 'leetcode' | 'topic';
-export interface GraphNode { id: string; label: string; type: NodeType; href?: string; sub?: string }
+export interface GraphNode { id: string; label: string; type: NodeType; href?: string; sub?: string; desc?: string }
 export interface Graph { nodes: GraphNode[]; links: [number, number][] }
 
 /** Matching key: "Linked List", "linkedlist" and "Linked Lists" all become "linkedlist". */
 const key = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '').replace(/(?<=[a-z]{3})s$/, '');
 
 /** Display names for folders and tags whose spelling on disk is terse. */
-const LABELS: Record<string, string> = { cicd: 'CI/CD', easy: 'Easy', medium: 'Medium', hard: 'Hard', recursive: 'Recursion', tree: 'Trees' };
+const LABELS: Record<string, string> = { cicd: 'CI/CD', messagequeue: 'Message Queue', csfundamental: 'CS Fundamentals', tree: 'Trees' };
 
 /** Tags and folders that say nothing about the content. */
 const SKIP_TOPICS = new Set(['project', 'demo', 'gettingstarted', 'other', 'general']);
@@ -44,6 +44,23 @@ function links(body = '') {
   const paths = [...text.matchAll(/\]\((?:https?:\/\/(?:www\.)?xuanze\.dev)?(\/(?:notes|writing|projects|leetcode)\/[^)#?\s]+)/g)].map((m) => decodeURI(m[1]).replace(/\/$/, ''));
   const wiki = [...text.matchAll(/\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]/g)].map((m) => m[1].trim());
   return { paths, wiki };
+}
+
+/** The first paragraph of prose, for the preview pane. */
+function excerpt(body = '', max = 170) {
+  const text = body
+    .replace(/^---[\s\S]*?\n---/, '')
+    .replace(/```[\s\S]*?```/g, '\n\n')
+    .replace(/^\s*#.*$/gm, '\n')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, '');
+  const para = text
+    .split(/\n\s*\n/)
+    .map((p) => p.replace(/^\s*(?:[-*>]|\d+\.)\s+/gm, '').replace(/[*_`~]/g, '').replace(/\s+/g, ' ').trim())
+    .find((p) => p.length > 40 && !p.startsWith('|'));
+  if (!para) return undefined;
+  return para.length > max ? para.slice(0, para.lastIndexOf(' ', max)).replace(/[,.;:]$/, '') + '…' : para;
 }
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -84,13 +101,15 @@ export async function buildGraph(): Promise<Graph> {
   /* Notes first, so topics with a note's name resolve to the note. */
   const notes = await getCollection('notes');
   const noteIdx: [number, string[]][] = [];
+  const noteTags: [number, string[]][] = [];
   for (const n of notes) {
     const label = noteTitle(n);
     const rel = (n.filePath ?? '').split('src/content/notes/')[1] ?? '';
     const folders = rel.split('/').slice(0, -1);
-    const i = add({ id: `note:${n.id}`, label, type: 'note', href: `/notes/${n.id}`, sub: noteGroup(n, 'src/content/notes') });
+    const i = add({ id: `note:${n.id}`, label, type: 'note', href: `/notes/${n.id}`, sub: noteGroup(n, 'src/content/notes'), desc: excerpt(n.body) });
     if (!byKey.has(key(label))) byKey.set(key(label), i);
     noteIdx.push([i, folders]);
+    noteTags.push([i, (n.data.tags ?? []) as string[]]);
     bodies.push([i, n.body ?? '']);
   }
   for (const [i, folders] of noteIdx) {
@@ -105,27 +124,27 @@ export async function buildGraph(): Promise<Graph> {
   }
 
   for (const p of await posts()) {
-    const i = add({ id: `post:${p.id}`, label: p.data.title, type: 'post', href: `/writing/${p.id}`, sub: 'Writing' });
+    const i = add({ id: `post:${p.id}`, label: p.data.title, type: 'post', href: `/writing/${p.id}`, sub: 'Writing', desc: p.data.description ?? excerpt(p.body) });
     bodies.push([i, p.body ?? '']);
   }
 
   const prs = await projects();
   for (const p of prs) {
-    const i = add({ id: `project:${p.id}`, label: p.data.title, type: 'project', href: projectHref(p) ?? '/projects', sub: 'Project' });
+    const i = add({ id: `project:${p.id}`, label: p.data.title, type: 'project', href: projectHref(p) ?? '/projects', sub: p.data.status, desc: p.data.summary });
     if (!byKey.has(key(p.data.title))) byKey.set(key(p.data.title), i);
     bodies.push([i, p.body ?? '']);
   }
 
   const lc = await getCollection('leetcode');
-  const lcHub = topic('LeetCode');
   for (const n of lc) {
+    // Problems join by technique (their tags), not by difficulty: a hub per level would just be a big star.
     const level = noteGroup(n, 'src/content/leetcode').toLowerCase();
-    const i = add({ id: `leetcode:${n.id}`, label: noteTitle(n), type: 'leetcode', href: `/leetcode/${n.id}`, sub: `LeetCode · ${level}` });
-    const lv = topic(level);
-    if (lv >= 0) { link(i, lv); link(lv, lcHub); }
+    const i = add({ id: `leetcode:${n.id}`, label: noteTitle(n), type: 'leetcode', href: `/leetcode/${n.id}`, sub: level, desc: excerpt(n.body) });
     for (const t of (n.data.tags ?? []) as string[]) { const ti = topic(t); if (ti >= 0) link(i, ti); }
     bodies.push([i, n.body ?? '']);
   }
+
+  for (const [i, tags] of noteTags) for (const t of tags) { const ti = topic(t); if (ti >= 0) link(i, ti); }
 
   /* Tags, stacks and a post's project (after all pages exist, so they resolve to pages where they can). */
   for (const p of await posts()) {

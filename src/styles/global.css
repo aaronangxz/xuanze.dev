@@ -1246,7 +1246,7 @@ html.edge-up .edge-t, html.edge-down .edge-b { opacity: 1; }
   .try button { flex: none; min-height: 36px; padding: 0 10px; font-size: .75rem; }
   /* Launcher on a phone: a plain list. A tap opens the row; no preview pane, no keyboard hints, no inner
      scroll. The first few rows show, the rest expand in place. */
-  .prev, .lfoot { display: none !important; }
+  .prev:not(.gprev), .lfoot:not(.gfoot) { display: none !important; }
   .split, .list-wrap { height: auto !important; }
   .list { height: auto; max-height: none; overflow: visible; padding: 6px 6px 8px; }
   .list-wrap .list { -webkit-mask-image: none !important; mask-image: none !important; }
@@ -1430,33 +1430,63 @@ figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display
 /* hold the pose while the page scrolls (set in app.ts): see the note there */
 html.scrolling:not(.mk-in) .mk-pane:not(.mk-in) .mk * { animation-play-state: paused !important; }
 
-/* ---------- Graph (/graph) ---------- */
-.graph { position: relative; height: clamp(440px, 72vh, 760px); margin-top: 6px; border: 1px solid var(--line); border-radius: 14px; background: radial-gradient(circle at 50% 55%, var(--win) 0, var(--win2) 75%); overflow: hidden; touch-action: none; }
-.graph canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; }
-.graph-bar { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; pointer-events: none; }
-.graph-bar > * { pointer-events: auto; }
-.graph-find { flex: 0 1 16rem; padding: 6px 12px; background: var(--win); }
-.graph-find input { font-size: .9375rem; }
-.graph-types { display: flex; flex-wrap: wrap; gap: 6px; }
-.graph-types button { display: inline-flex; align-items: center; gap: 6px; font: 500 .8125rem var(--sans); color: var(--ink); background: var(--win); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; min-height: 30px; cursor: pointer; }
-.graph-types button span { font-family: var(--mono); font-size: .6875rem; color: var(--muted); }
-.graph-types button[aria-pressed="false"] { color: var(--faint); background: transparent; border-style: dashed; }
-.graph-types button[aria-pressed="false"] i { opacity: .3; }
-.graph-types i { width: 8px; height: 8px; border-radius: 50%; }
-.gt-note { background: var(--accent); } .gt-post { background: var(--c-str); } .gt-project { background: var(--c-num); } .gt-leetcode { background: var(--c-kw); } .gt-topic { background: var(--faint); }
-.graph-zoom { position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; border: 1px solid var(--line2); border-radius: 10px; background: var(--win); overflow: hidden; }
-.graph-zoom button { width: 34px; height: 34px; border: 0; background: none; color: var(--muted); font: 500 1rem var(--sans); cursor: pointer; }
-.graph-zoom button + button { border-top: 1px solid var(--line); }
-.graph-zoom button:hover { color: var(--ink); background: var(--sel); }
-.graph-card { position: absolute; left: 12px; bottom: 12px; max-width: min(22rem, calc(100% - 72px)); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 14px; align-items: center; padding: 10px 14px; border: 1px solid var(--line2); border-radius: 12px; background: var(--win); box-shadow: 0 12px 30px -18px var(--shadow); pointer-events: none; }
-.graph-card[hidden] { display: none; }
-.graph-card .k { grid-column: 1; font-family: var(--mono); font-size: .6875rem; color: var(--muted); }
-.graph-card b { grid-column: 1; font-weight: 600; line-height: 1.3; }
-.graph-card .gc-n { grid-column: 1; font-size: .8125rem; color: var(--muted); }
-.graph-card a { grid-column: 2; grid-row: 1 / 4; pointer-events: auto; font: 600 .8125rem var(--sans); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 8px; }
-.graph-card a:hover { border-color: var(--accent); color: var(--accent); }
-.graph-card a[hidden] { display: none; }
-@media (hover: hover) and (pointer: fine) { .graph-card a { display: none; } }
-@media (max-width: 640px) { .graph { margin-inline: -8px; height: 70vh; } .graph-find { flex-basis: 100%; } .graph-types button { min-height: 36px; } .graph-zoom button { width: 40px; height: 40px; } }
+/* ---------- Graph (/graph): a launcher-style app with the graph in place of the list ---------- */
+.graph-page h1 { max-width: 22ch; }
+.gapp .search { padding: 14px 20px; }
+.gapp .search input { font-size: 1.05rem; }
+.gcount { font-family: var(--mono); font-size: .75rem; color: var(--muted); white-space: nowrap; }
+.gsplit { display: grid; grid-template-columns: minmax(0, 1fr) 21rem; height: clamp(460px, 66vh, 680px); }
+.gstage { position: relative; min-width: 0; overflow: hidden; touch-action: none; cursor: grab;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--ink) 11%, transparent) 1px, transparent 1.2px); }
+.gstage.over { cursor: pointer; }
+.gstage.grabbing { cursor: grabbing; }
+.gstage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.gzoom { position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; border-radius: 11px; overflow: hidden;
+  background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%);
+  box-shadow: inset 0 0 0 1px var(--glass-line), inset 0 1px 0 var(--glass-hi), 0 10px 24px -14px var(--glass-shadow); }
+.gzoom button { width: 34px; height: 34px; display: grid; place-items: center; border: 0; background: none; color: var(--muted); cursor: pointer; }
+.gzoom button + button { border-top: 1px solid var(--line); }
+.gzoom button:hover { color: var(--ink); background: linear-gradient(120deg, var(--sel-a), var(--sel-b)); }
+.gprev { overflow-y: auto; gap: 12px; padding: 24px; overscroll-behavior: contain; }
+.gprev h2 { font-size: 1.5rem; }
+.gprev p { font-size: .9375rem; color: var(--body); }
+.gprev h3 { margin: 6px 0 0; font-size: .75rem; font-weight: 600; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
+.gprev h3 span { font-family: var(--mono); font-weight: 400; }
+.gchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.gchips button { font: 400 .75rem var(--mono); padding: 3px 8px; border-radius: 6px; border: 0; color: var(--body); cursor: pointer;
+  background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); box-shadow: inset 0 0 0 1px var(--glass-line); }
+.gchips button:hover { color: var(--accent); box-shadow: inset 0 0 0 1px var(--selline); }
+.gnb { list-style: none; margin: 0 -10px; padding: 0; display: flex; flex-direction: column; }
+.gnb button { width: 100%; display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 7px 10px; border: 0; border-radius: 9px; background: none; font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
+.gnb button:hover { background: linear-gradient(120deg, var(--sel-a), var(--sel-b)); box-shadow: inset 0 0 0 1px var(--glass-line); }
+.gnb .tt { font-size: .9375rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gnb .sub { font-family: var(--mono); font-size: .6875rem; color: var(--muted); }
+.gprev .cta { margin-top: auto; flex: none; }
+.gfoot { display: flex; justify-content: space-between; align-items: center; gap: 8px 18px; padding: 8px 14px; }
+.gtypes { display: flex; flex-wrap: wrap; gap: 2px 4px; }
+.gtypes button { display: inline-flex; align-items: center; gap: 7px; font: 500 .8125rem var(--sans); color: var(--ink); background: none; border: 0; border-radius: 8px; padding: 5px 8px; min-height: 30px; cursor: pointer; transition: color .2s, opacity .2s; }
+.gtypes button:hover { background: linear-gradient(120deg, var(--sel-a), var(--sel-b)); }
+.gtypes button span { font-family: var(--mono); font-size: .6875rem; color: var(--muted); }
+.gtypes button[aria-pressed="false"] { color: var(--faint); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--faint) 60%, transparent); }
+.gtypes button[aria-pressed="false"] .gg { opacity: .3; }
+.ghint { font-size: .8125rem; color: var(--muted); }
+.g-touch { display: none; }
+@media (hover: none) { .g-mouse { display: none; } .g-touch { display: inline; } }
+/* legend glyphs: the same marks the canvas draws */
+.gg { width: 9px; height: 9px; border-radius: 50%; flex: none; position: relative; background: var(--ink);
+  background-image: radial-gradient(circle at 32% 30%, rgba(255,255,255,.55), transparent 62%); }
+.gg-note { background-color: var(--accent); }
+.gg-post { background-color: var(--ink); }
+.gg-project { background-color: var(--ink); box-shadow: 0 0 0 1.5px var(--glass-solid), 0 0 0 2.7px var(--ink); width: 7px; height: 7px; margin: 1px; }
+.gg-leetcode { background-color: var(--faint); }
+.gg-topic { background: var(--glass-solid); box-shadow: inset 0 0 0 1.4px var(--muted); }
+@media (max-width: 860px) {
+  .gsplit { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .gstage { height: 60vh; min-height: 380px; }
+  .gprev { border-left: 0 !important; border-top: 1px solid var(--line); max-height: none; }
+  .gcount { display: none; }
+  .ghint { display: none; }
+}
+@media (max-width: 640px) { .gzoom button { width: 40px; height: 40px; } .gnb button { min-height: 44px; } .gtypes button { min-height: 40px; } .gchips button { padding: 6px 10px; } }
 .graph-link { display: inline-flex; align-items: center; gap: 8px; font-size: .9375rem; font-weight: 500; color: var(--accent); text-decoration: none; width: fit-content; }
 .graph-link:hover { text-decoration: underline; }

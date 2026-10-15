@@ -1,5 +1,7 @@
 ---
 displayed_sidebar: notesSideBar
+tags:
+  - Go Concurrency
 ---
 
 # Multi Threading

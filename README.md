@@ -29,6 +29,23 @@ You never need to touch the design or code to change content. Edit a file, push,
 
 The ⌘K search, the Life "Where to?" search, the stats and the city strip are all generated from these files.
 
+### Keeping the graph connected
+
+`/graph` maps every note, post, project and LeetCode solution, and it is built from these files on each build.
+A new page joins the graph through:
+
+- **Tags.** `tags:` in the front matter of notes, posts and LeetCode solutions, and `stack:` on projects.
+  Reuse names that already exist (the graph page lists the biggest topics). A tag spelled like a note's title links to
+  that note, so `tags: [Redis]` connects a post to the Redis note. Case, spaces and a trailing "s" don't matter:
+  `Stack` and `Stacks` are the same.
+- **LeetCode:** tag the technique (`Two Pointers`, `Hash Table`, `Dynamic Programming`, `Depth First Search`…), not the
+  difficulty.
+- **Links and mentions.** A markdown link to another page, an Obsidian-style `[[Note title]]`, or just naming a note in
+  the text ("…stored in Redis…") links the two.
+- **Folders.** A note joins its folder (`notes/System Design/…`), and each subfolder joins its parent.
+
+A topic that only one page uses is left off the graph, since it connects nothing.
+
 ### Drafted text
 
 Some case-study paragraphs were drafted for you and are wrapped in `<Draft>…</Draft>`. They show a dashed
