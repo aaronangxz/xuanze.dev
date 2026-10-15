@@ -53,7 +53,7 @@ export async function launcherItems(): Promise<LauncherItem[]> {
 
   // After me and the products: a way to wander through everything else.
   items.push({ g: 'Explore', t: 'Graph view', s: 'Everything, connected', i: 'graph', k: 'graph map obsidian connections links topics knowledge notes', href: '/graph', cta: 'Open the graph',
-      p: preview('graph', 'Graph view', 'Every note, post, project and LeetCode write-up as one map, joined by the topics they share, the links between them and the notes they mention.') });
+      p: preview('graph', 'Graph view', 'The projects I\'ve built and what I\'ve learned along the way, as one map joined by the topics they share.') });
 
   for (const x of site.experience.slice(0, 2)) {
     items.push({
