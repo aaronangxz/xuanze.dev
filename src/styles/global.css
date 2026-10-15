@@ -149,6 +149,7 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 /* Diagram-heavy pages (How I work) let the prose and diagrams use the full window width. */
 .prose-wide { max-width: none; }
 .prose-wide h2 { scroll-margin-top: 96px; }
+@media (prefers-reduced-motion: no-preference) { html:has(.toc) { scroll-behavior: smooth; } }
 /* "On this page" jump list at the top of long pages: numbered, two columns on wide screens. */
 .toc { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--win2); }
 .toc > span { font: 500 .6875rem var(--mono); color: var(--muted); text-transform: lowercase; }
