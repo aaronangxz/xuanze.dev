@@ -857,6 +857,7 @@ pre, code, kbd { font-variant-ligatures: none; font-feature-settings: "liga" 0, 
 /* Generic avatar until there's a real headshot */
 .photo.avatar { padding: 0; overflow: hidden; border-style: solid; border-color: var(--glass-line); background: linear-gradient(160deg, var(--sel-a), var(--sel-b)), linear-gradient(140deg, var(--glass-a), var(--glass-b)); }
 .photo.avatar svg { display: block; width: 100%; height: 100%; fill: color-mix(in srgb, var(--muted) 42%, transparent); }
+.photo.avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 /* Upcoming races: the soonest is the hero, the rest sit underneath */
 

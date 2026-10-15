@@ -34,6 +34,8 @@ export const site = {
   ],
 
   about: {
+    /** Square profile picture in public/. Leave empty for the placeholder silhouette. */
+    photo: '/about/portrait.jpg',
     lede: 'Software engineer in Singapore, working mostly in Go and TypeScript. Test engineer turned builder.',
     focus: 'Backend systems, product engineering, testing',
     paragraphs: [

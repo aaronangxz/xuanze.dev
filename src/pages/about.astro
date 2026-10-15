@@ -41,9 +41,11 @@ const a = site.about;
         </ul>
       </div>
       <Fragment slot="inspector">
-        <div class="photo avatar" role="img" aria-label="Profile picture">
-          <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="46" r="21" /><path d="M18 120c3-26 20-40 42-40s39 14 42 40z" /></svg>
-        </div>
+        {a.photo
+          ? <div class="photo avatar"><img src={a.photo} alt="Xuan Ze at sunrise in the mountains" width="720" height="720" /></div>
+          : <div class="photo avatar" role="img" aria-label="Profile picture">
+              <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="46" r="21" /><path d="M18 120c3-26 20-40 42-40s39 14 42 40z" /></svg>
+            </div>}
         <dl class="insp">
           <div><dt>focus</dt><dd>{a.focus}</dd></div>
           <div><dt>based in</dt><dd>{site.location} ({site.timezone})</dd></div>
