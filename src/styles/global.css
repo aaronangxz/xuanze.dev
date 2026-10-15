@@ -55,6 +55,10 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 .try { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: .9375rem; }
 .try button { font: 500 .8125rem var(--mono); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line2); background: var(--win); color: var(--ink); cursor: pointer; min-height: 34px; }
 .try button:hover { border-color: var(--accent); color: var(--accent); }
+.try-graph { flex: none; margin-left: 6px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.try-graph span { display: inline-block; transition: transform .2s; }
+.try-graph:hover { color: var(--accent); }
+.try-graph:hover span { transform: translateX(3px); }
 .widgets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 860px) { .widgets { grid-template-columns: minmax(0, 1fr); } }
 .widget { background: var(--win); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }

@@ -7,7 +7,7 @@ export interface LauncherItem {
   g: string;            // group heading
   t: string;            // title
   s: string;            // subtitle
-  i: 'user' | 'box' | 'doc' | 'work' | 'mail' | 'link' | 'note' | 'sun';
+  i: 'user' | 'box' | 'doc' | 'work' | 'mail' | 'link' | 'note' | 'sun' | 'graph';
   k: string;            // extra search keywords
   p: string;            // preview HTML
   href?: string;
@@ -31,8 +31,10 @@ export async function launcherItems(): Promise<LauncherItem[]> {
       p: preview('profile', 'About me', site.about.paragraphs[0], chips(site.about.languages)) },
     { g: 'Start here', t: 'Copy email address', s: 'Action', i: 'mail', k: 'email contact mail talk', copy: true, cta: 'Copy email',
       p: preview('action', site.email, 'The fastest way to reach me. I usually reply within a day.') },
+    { g: 'Start here', t: 'Graph view', s: 'Everything, connected', i: 'graph', k: 'graph map obsidian connections links topics knowledge notes', href: '/graph', cta: 'Open the graph',
+      p: preview('graph', 'Graph view', 'Every note, post, project and LeetCode write-up as one map, joined by the topics they share, the links between them and the notes they mention.') },
   );
-  if (site.resume) items.splice(items.length - 1, 0,
+  if (site.resume) items.splice(1, 0,
     { g: 'Start here', t: 'Résumé', s: 'One page, PDF', i: 'doc', k: 'resume cv experience skills pdf', href: site.resume, external: true, cta: 'Open PDF',
       p: preview('document · pdf', 'Résumé', 'Experience, projects and skills on one page.') });
 
@@ -82,8 +84,6 @@ export async function launcherItems(): Promise<LauncherItem[]> {
   const lc = await getCollection('leetcode');
   items.push({ g: 'Notes', t: 'Notes & LeetCode', s: `${notes.length + lc.length} pages`, i: 'note', k: 'notes study system design algorithms leetcode', href: '/notes', cta: 'Browse notes',
     p: preview('study notes', 'Notes & LeetCode', `${notes.length} study notes on system design, networking and algorithms, plus ${lc.length} LeetCode write-ups.`) });
-  items.push({ g: 'Notes', t: 'Graph view', s: 'Everything, connected', i: 'note', k: 'graph map obsidian connections links topics knowledge', href: '/graph', cta: 'Open the graph',
-    p: preview('graph', 'Graph view', 'Every note, post, project and LeetCode write-up as one map, joined by shared topics, links and mentions.') });
   for (const n of notes) {
     const t = noteTitle(n), g = noteGroup(n, 'src/content/notes');
     items.push({ g: 'Notes', t, s: g, i: 'note', k: `note ${g}`, href: `/notes/${n.id}`, searchOnly: true, cta: 'Open note', p: preview(`note · ${g.toLowerCase()}`, t, `Study notes in ${g}.`) });
