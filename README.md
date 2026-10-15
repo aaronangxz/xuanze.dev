@@ -17,7 +17,7 @@ You never need to touch the design or code to change content. Edit a file, push,
 | --- | --- | --- |
 | Name, hero, email, links, experience, About page | `src/site.config.ts` | One file for everything about you |
 | Blog posts | `src/content/writing/<slug>.md` | Front matter: `title`, `date`, `tags`, optional `description`, `project`, `draft: true` |
-| Projects / case studies | `src/content/projects/<slug>.mdx` | Front matter feeds the side panel and search. Projects with `href` link out instead of getting a page |
+| Projects / case studies | `src/content/projects/<slug>.mdx` | Front matter feeds the side panel and search. Projects with `href` link out instead of getting a page. `wide: true` gives a diagram-heavy case study the full window width, with the details as a strip under the summary |
 | Study notes | `src/content/notes/<Group>/<Note>.md` | Title comes from the first `# Heading` |
 | LeetCode | `src/content/leetcode/<easy\|medium\|hard>/<n>. <Title>.md` | |
 | Flights and hotels | Export from Flighty and AwayBook, then `node scripts/travel-import.mjs --flights <csv> --stays <csv>` | Writes `src/data/travel/travel.json` without booking refs, gates or room numbers. City pins, brand tags and stays to skip live in `src/data/travel/config.json`; the import stops and names anything missing |

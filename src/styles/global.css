@@ -159,6 +159,10 @@ code { font-family: var(--mono); font-size: .875em; }
 .insp > div { display: flex; flex-direction: column; gap: 2px; padding-block: 10px; border-top: 1px solid var(--line); }
 .insp dt { font-family: var(--mono); font-size: .6875rem; color: var(--muted); text-transform: lowercase; }
 .insp dd { margin: 0; font-size: .9375rem; color: var(--ink); }
+/* Wide case studies show the details as a strip under the summary, and let diagrams use the full width. */
+.insp-row { flex-direction: row; flex-wrap: wrap; gap: 0 32px; border-block: 1px solid var(--line); }
+.insp-row > div { border-top: 0; min-width: 0; }
+.prose-wide { max-width: none; }
 .photo { width: 100%; aspect-ratio: 1; border: 1px dashed var(--line2); border-radius: 12px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 14px; font-family: var(--mono); font-size: .75rem; color: var(--muted); background: var(--win); }
 .nextcard { margin-top: 32px; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: var(--ink); max-width: 42rem; }
 .nextcard:hover { border-color: var(--accent); background: var(--sel); }

@@ -1,0 +1,80 @@
+---
+title: Claude Code workbench
+kind: side
+summary: How I run Claude Code as a small engineering team. A skill suite I wrote routes every task through the same process, role-specific subagents split bigger features, QA comes with evidence, and the setup fixes itself when it turns out wrong.
+status: In daily use
+period: 2026 – now
+role: Designed and maintain it
+stack: [Claude Code, Git, GitHub Actions, Playwright, Python, Bash, Xcode Cloud]
+order: 5
+wide: true
+---
+import Workbench from '../../components/Workbench.astro';
+
+Out of the box, Claude Code is one capable generalist. I treat it as a small engineering team instead. A global `CLAUDE.md` sets four rules: route work through my own 20-skill suite, verify instead of assuming, give every session its own Git worktree, and fix the skills when they turn out wrong. An orchestrator skill picks the workflow (feature, bug, incident) and loads only the skills each phase needs. Bigger features go through 13 subagents I defined, from a PM to a dev lead who signs off, and I approve the plan and the merge.
+
+It's the setup behind [Avenly](/projects/avenly), [Clozit](/projects/clozit) and the [Mobile QA agent](/projects/mobile-qa-agent).
+
+<Workbench part="stats" />
+
+## What the agent sees, and when
+
+Claude Code provides the slots: files that are always loaded, skills pulled in on demand, and subagents with their own context. Those are built in. The design is in what goes into each slot and how much of it: a small fixed core, method that loads only when a phase needs it, and bulky role work pushed out to subagents that return a short report. Built-in pieces are greyed out below.
+
+<Workbench part="context" />
+
+## Every task runs the same loop
+
+This is the `execution-method` skill's loop. Under each step is the tool or command it actually comes down to. Building happens in a tight inner loop of edit, run, commit. What the session learns goes back to disk at the end, so the next session starts further ahead.
+
+<Workbench part="session" />
+
+## Check, default, or ask
+
+> Before writing the word “assuming”, name the source that would settle it. If you can name one, go read it instead.
+
+This rule removed most of the friction. Every unknown goes through the same two questions. The agent stops hedging on facts it could look up, stops asking me what `grep` would answer, and still stops for the decisions that are mine.
+
+<Workbench part="decide" />
+
+## The orchestrator's arcs
+
+A request is matched to an arc, and each phase loads its skill only when the work actually reaches it. A typical feature loads 4–7 skills over its life, never the whole suite. Every skipped phase gets a one-line reason, so skipping is a decision that was made, not something forgotten.
+
+<Workbench part="arcs" />
+
+## A feature costs a quarter of the suite
+
+With 20 skills, the obvious risk is paying for all of them on every task. The routing rules prevent that. Here is what each scenario puts into the main session's context, measured from the files (estimated at about 4 characters per token).
+
+<Workbench part="budget" />
+
+## A subagent team shaped like a product org
+
+For larger features, the main session acts as a hub. It dispatches each role-specific agent with a brief, receives a structured report, and passes the relevant parts to the next stage. Subagents never call each other. Every agent reads the codebase's existing patterns before writing anything, and two points in the pipeline wait for me.
+
+<Workbench part="team" />
+
+## Every claim of “it works” comes with evidence
+
+QA here is about evidence, not a green checkmark. Five gates sit between a change and its PR comment. Each one has a defined way to fail, and none of them can quietly pass something it never checked. The web harness runs against Avenly and the iOS harness against Clozit.
+
+<Workbench part="quality" />
+
+## Small pipelines, strict rules
+
+The CI itself is modest. What's worth showing is how much each step does, and the triage the agents follow when a run goes red. The iOS pipeline ships Clozit to TestFlight; the GitHub Actions workflow is the Mobile QA agent's.
+
+<Workbench part="ci" />
+
+## The setup improves itself as I use it
+
+The skills are living documents in their own Git repo. When real use shows a skill gave wrong or missing guidance, or I correct an approach it prescribed, the fix goes into that skill in the same session: one gap, one targeted edit, one commit that says why. Never a batch rewrite.
+
+<Workbench part="compound" />
+
+## Cleanup for a worktree per session
+
+A worktree per session keeps parallel sessions apart, but they pile up fast, along with simulators (1.5–3 GB each) and Playwright browser profiles. A launchd job runs `~/.claude/scripts/disk-cleanup.sh` every Sunday at 11:00. A worktree is removed only after passing every check, and each keep is logged with its reason.
+
+<Workbench part="cleanup" />

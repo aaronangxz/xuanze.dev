@@ -1,0 +1,31 @@
+<div class="wb-sess">
+    <div class="wb-ph">
+      <div class="wb-phhead"><span>Before the first edit</span></div>
+      <div class="wb-st"><h3><em>01</em>Route</h3><p>Pick the arc and the skills it needs. Skip routing when one skill clearly matches.</p><span class="wb-tool">Skill(orchestrator)</span></div>
+      <div class="wb-st"><h3><em>02</em>Ground</h3><p>Read recorded state, then check the code, schema and config. Anything checkable is never presented as an assumption.</p><span class="wb-tool">before “assuming”: name the source, then read it</span></div>
+      <div class="wb-st"><h3><em>03</em>Isolate</h3><p>Own worktree and branch, so parallel sessions never share files.</p><span class="wb-tool">git worktree add ../&lt;repo&gt;-&lt;slug&gt; -b claude/&lt;slug&gt;</span></div>
+    </div>
+    <div class="wb-phgo">→</div>
+    <div class="wb-ph">
+      <div class="wb-phhead"><span>Build</span></div>
+      <div class="wb-st"><h3><em>04</em>Plan the whole</h3><p>Contracts, seams and the index first, because boundary mistakes are the expensive ones. Each decision gets one line of why and the rejected alternative.</p></div>
+      <div class="wb-inner">
+        <span class="wb-ihead">05 · repeat per increment</span>
+        <div class="wb-ring">
+          <div class="wb-rn"><b>edit</b><small>smallest runnable unit</small></div><i>→</i>
+          <div class="wb-rn"><b>run</b><small>pass path + failure path</small></div><i>→</i>
+          <div class="wb-rn"><b>commit</b><small>one per green, with why</small></div>
+        </div>
+        <div class="wb-again">next increment</div>
+        <div class="wb-fail"><b>fails?</b><span>Re-read reality (the file, the exact error), fix the mental model, then retry. Never retry blind.</span></div>
+      </div>
+    </div>
+    <div class="wb-phgo">→</div>
+    <div class="wb-ph">
+      <div class="wb-phhead"><span>Finish</span></div>
+      <div class="wb-st"><h3><em>06</em>Fresh eyes</h3><p>A clean subagent verifies under real conditions, not the author's.</p><span class="wb-tool">Agent(fresh context)</span></div>
+      <div class="wb-st"><h3><em>07</em>Ship</h3><p>Push the session branch and open a PR, draft if unfinished. Never push to the default branch.</p></div>
+      <div class="wb-st wb-close"><h3><em>08</em>Close the loop</h3><p>Lead the report with the outcome and an honest scope note, record state, tear down what was created.</p><span class="wb-tool">skill fix + commit · worktree remove · delete simulators</span></div>
+    </div>
+  </div>
+  <div class="wb-retbar"><span>memory + skill fixes → the next session's step 02</span></div>

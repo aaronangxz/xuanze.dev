@@ -1,0 +1,65 @@
+<h3>iOS: merge to TestFlight with no manual steps</h3>
+  <div class="wb-tf">
+    <div class="wb-tfn"><small>trigger</small><b>PR merged</b></div>
+    <i class="wb-tfa">→</i>
+    <div class="wb-tfgroup">
+      <span class="wb-tfg"><code>ci_post_clone.sh</code> · runs on the Xcode Cloud runner</span>
+      <div class="wb-tfsteps">
+        <div><b>Regenerate project</b><span>XcodeGen from <code>project.yml</code></span></div>
+        <div><b>Stamp build number</b><span>from the CI counter; TestFlight rejects duplicates</span></div>
+        <div><b>Pin packages</b><span>package resolution is blocked on the runner, so a committed <code>Package.resolved</code> goes in</span></div>
+        <div class="wb-hl"><b>Write “What to Test”</b><span>from the merged PR's feat / fix / perf commits; internal scopes filtered; never fails the build</span></div>
+      </div>
+    </div>
+    <i class="wb-tfa">→</i>
+    <div class="wb-tfn wb-ok"><small>result</small><b>TestFlight build</b><span>with tester notes</span></div>
+  </div>
+
+  <h3 style="margin-top:10px">When a run goes red</h3>
+  <div class="wb-tri">
+    <div class="wb-troot"><b>CI test failed</b><span><code>ci-debug</code> agent · <code>qa-flaky-tests</code> skill</span></div>
+    <div class="wb-tbranches">
+      <div class="wb-tb">
+        <span class="wb-tq">fails on every CI run, never locally</span>
+        <div class="wb-tn">Not a flake. Diff the environments: cores, locale, timezone, container, versions.</div>
+      </div>
+      <div class="wb-tb wb-main">
+        <span class="wb-tq">fails sometimes</span>
+        <ol class="wb-tn wb-steps"><li>Capture first: log, seed, runner, co-scheduled tests</li><li>Amplify for a repro rate: <code>flake-rate.sh -n 50</code></li><li>Match the signature to a cause class</li><li>Fix the class: condition waits, isolated fixtures, injected clock</li><li>Receipt: <code>-n 300</code> clean</li></ol>
+        <div class="wb-tside">can't fix now → quarantine with an owner, a deadline and an issue, or delete it</div>
+      </div>
+      <div class="wb-tb">
+        <span class="wb-tq">an external dependency is unreliable</span>
+        <div class="wb-tn">Retry that one step only, with the retry rate logged and alerted on growth.</div>
+      </div>
+    </div>
+    <div class="wb-tnever">Never: blanket test-level retries. They ship product races behind a green check.</div>
+  </div>
+
+  <div class="wb-pair" style="margin-top:6px">
+    <div>
+      <span class="wb-snipcap">The test workflow in mobile-qa-agent, annotated</span>
+<pre class="wb-snip"><span class="wb-c"># Unit tests on every push and PR. No devices or API keys:</span>
+<span class="wb-c"># the suite runs on fakes. Live device runs and the model</span>
+<span class="wb-c"># eval suite are manual (they need simulators and cost money).</span>
+<span class="wb-k">permissions</span>:
+  contents: read                                <span class="wb-m">← ①</span>
+<span class="wb-k">strategy</span>:
+  fail-fast: false
+  matrix: { python-version: ["3.12", "3.13"] }  <span class="wb-m">← ②</span>
+<span class="wb-k">steps</span>:
+  - uses: actions/checkout@11bd719…             <span class="wb-m">← ③</span>
+  - uses: actions/setup-python@0b93645…
+  - run: python -m pytest -q                    <span class="wb-m">← ④</span></pre>
+    </div>
+    <div class="wb-card">
+      <h3>What each line buys</h3>
+      <ul class="wb-anno">
+        <li><b>①</b> The token can read the repo and nothing else, so a compromised step can't push.</li>
+        <li><b>②</b> Both supported Pythons; one failing version doesn't hide the other's result.</li>
+        <li><b>③</b> Actions pinned to commit SHAs, not movable tags, so an upstream retag can't change what runs.</li>
+        <li><b>④</b> Fakes only: free, fast, no secrets in CI. The expensive checks are deliberate and manual.</li>
+      </ul>
+      <p>The budget behind it: the pre-merge suite stays under ~10 minutes, and slower tiers run on a schedule.</p>
+    </div>
+  </div>

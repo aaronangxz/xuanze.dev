@@ -1,0 +1,59 @@
+<div class="wb-gt">
+    <div class="wb-g"><i class="wb-gn"></i><span class="wb-gk">before code</span><b>Cases first</b><p>Test cases by layer and risk, including boundary and state cases.</p><div class="wb-gx">no case list → no implementation</div></div>
+    <div class="wb-g"><i class="wb-gn"></i><span class="wb-gk">after code</span><b>Honesty check</b><p>Revert the change just made and see which test fails.</p><div class="wb-gx">none fails → coverage is decorative; diagnose it</div></div>
+    <div class="wb-g"><i class="wb-gn"></i><span class="wb-gk">running app</span><b>Drive it</b><p>Expected values come from a DB query or the code path, never from the UI under test.</p><div class="wb-gx">mismatch → FAIL, with the measured values</div></div>
+    <div class="wb-g"><i class="wb-gn"></i><span class="wb-gk">verdict</span><b>Three states</b><p><em class="wb-v wb-p">PASS</em> <em class="wb-v wb-f">FAIL</em> <em class="wb-v wb-u">UNVERIFIED</em></p><div class="wb-gx">can't reach it → UNVERIFIED + reason, never PASS</div></div>
+    <div class="wb-g wb-end"><i class="wb-gn"></i><span class="wb-gk">delivery</span><b>Verify the verifier</b><p>curl GET, then a real browser load of the hosted report.</p><div class="wb-gx">title, image or case card missing → re-encode, re-host</div></div>
+  </div>
+  <div class="wb-gleg"><span><i class="wb-gn"></i>gate</span><span><i class="wb-gxk"></i>what happens when it fails</span></div>
+
+  <h3 style="margin-top:10px">Two harnesses, one report</h3>
+  <div class="wb-lanes">
+    <div class="wb-lane">
+      <span class="wb-ll">Web</span>
+      <div class="wb-lsteps"><span>Playwright</span><i>→</i><span>measure DOM<small>getBoundingClientRect, computed style</small></span><i>→</i><span>screenshot<small>at the moment that proves it; 390×844 for phone</small></span></div>
+    </div>
+    <div class="wb-lane">
+      <span class="wb-ll">iOS</span>
+      <div class="wb-lsteps"><span>simulator build</span><i>→</i><span>debug launch router<small>sample data, no login, no backend</small></span><i>→</i><span>screenshot per route<small>+ a JSON test plan (29 so far)</small></span></div>
+    </div>
+    <div class="wb-merge">
+      <b>Same report shape</b>
+      <span>summary table + one card per case</span>
+      <span>screenshots embedded as cropped JPEG, under 1 MB</span>
+      <span>hosted as a page → linked in a PR comment</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:10px">Case study · iOS #357</h3>
+  <div class="wb-study">
+    <div class="wb-shead">
+      <div><small>before</small><b>~1 in 5</b><span>full-suite runs failed on a flaky capture-flow test</span></div>
+      <i>→</i>
+      <div class="wb-ok"><small>after</small><b>0 / 225</b><span>runs failed: 200× the suite, 25× the full suite (12,175 tests)</span></div>
+    </div>
+    <ol class="wb-sproof">
+      <li><b>Proved the cause.</b> Marking the view model <code>@MainActor</code> made the test build fail on main-actor state used off-actor. The race is stated by the compiler, not guessed from a flake.</li>
+      <li><b>Fixed without collateral.</b> Image processing stays off the main thread; only the write-back hops to main.</li>
+      <li><b>Proved the fix by amplification,</b> under the exact condition that produced the flake.</li>
+      <li><b>Filed what else it found.</b> Amplification exposed a separate timing flake (a 500 ms sleep margin). It was tracked on its own, not absorbed into this fix.</li>
+    </ol>
+  </div>
+
+  <h3 style="margin-top:10px">How the delivery rules were earned</h3>
+  <p class="wb-note">Each rule in the QA agent's delivery step traces back to a real failure, recorded in the agent file next to the rule.</p>
+  <div class="wb-earn">
+    <div class="wb-eh"><span></span><span>what went wrong</span><span></span><span>the rule now</span></div>
+    <div class="wb-er"><span class="wb-qd">PR #499 · #520</span><span class="wb-bad">Bare gist links showed HTML source</span><i>→</i><span class="wb-good">Publish a link that renders as a page</span></div>
+    <div class="wb-er"><span class="wb-qd">PR #523</span><span class="wb-bad">Reviewer asked to download a local file</span><i>→</i><span class="wb-good">A local path is a footnote, never the delivery</span></div>
+    <div class="wb-er"><span class="wb-qd">2026-09-22</span><span class="wb-bad">curl got 200; real browsers got an ad wall</span><i>→</i><span class="wb-good">curl proves reachability; a browser load proves the report</span></div>
+    <div class="wb-er"><span class="wb-qd">PR #537</span><span class="wb-bad">2.39 MB report cut to one case, still 200</span><i>→</i><span class="wb-good">Cropped JPEGs (138 KB); confirm every case card renders</span></div>
+    <div class="wb-er"><span class="wb-qd">standing</span><span class="wb-bad">HEAD returns 403 on working links</span><i>→</i><span class="wb-good">Always check with a GET</span></div>
+  </div>
+
+  <div class="wb-levers" style="margin-top:6px">
+    <div class="wb-lever"><b>a green honesty check</b><span>gets diagnosed, not patched. Usually a test asserts a cheap derived value (a label, a count) while the real side effect is broken.</span></div>
+    <div class="wb-lever"><b>flake fixes need a receipt</b><span>About 300 clean runs gives ~95% confidence at a 1% flake rate. “Passed three times” proves nothing. <code>flake-rate.sh -n 300</code></span></div>
+    <div class="wb-lever"><b>review for agent failure modes</b><span>Plausible but nonexistent APIs, tests that can't fail, swallowed errors, TODO stubs presented as finished.</span></div>
+    <div class="wb-lever"><b>see it, don't infer it</b><span>UI is checked in a real browser at the right viewport, not from logs. A simulator pass isn't proof for device-only behaviour.</span></div>
+  </div>

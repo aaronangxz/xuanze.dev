@@ -1,0 +1,43 @@
+<div class="wb-pipe">
+    <div class="wb-hub"><b>main session</b><span>dispatches every stage ↓ and relays the reports</span></div>
+
+    <div class="wb-prow"><div class="wb-tick"></div><span class="wb-pstage">Shape</span>
+      <div class="wb-agents"><div class="wb-ag"><b>product-manager</b><span>asks questions, challenges assumptions, explores edge cases</span></div></div>
+      <div class="wb-doc">A defined feature: problem, scope, trade-offs</div></div>
+
+    <div class="wb-prow"><div class="wb-tick"></div><span class="wb-pstage">Plan</span>
+      <div class="wb-agents"><div class="wb-ag"><b>planner</b><span>reads the code, compares approaches, assigns every task to an agent</span></div></div>
+      <div class="wb-doc">Task plan. Flags any migration, and that proto changes need <code>make gen</code></div></div>
+
+    <div class="wb-pgate"><i></i><span>I approve the plan. Nothing is built before that.</span></div>
+
+    <div class="wb-prow"><div class="wb-tick"></div><span class="wb-pstage">Design</span>
+      <div class="wb-agents"><div class="wb-ag"><b>infra-designer</b><span>schema and API contracts</span></div><span class="wb-par">∥</span><div class="wb-ag"><b>ui-designer</b><span>layouts, flows, states, real UI strings</span></div></div>
+      <div class="wb-doc">Copy-pasteable migration SQL, proto3 messages and RPCs · a UI spec frontend-dev can build directly</div></div>
+
+    <div class="wb-prow"><div class="wb-tick"></div><span class="wb-pstage">Build</span>
+      <div class="wb-agents"><div class="wb-ag"><b>backend-dev</b><span>codegen first, sqlc queries, auth check on every handler</span></div><span class="wb-par">∥</span><div class="wb-ag"><b>frontend-dev</b><span>loading, error and empty states, mobile, lint clean</span></div><span class="wb-plus">called in here <em>test-writer</em></span></div>
+      <div class="wb-doc">New endpoints and query names, migrations still to run, field and enum changes the other side needs</div></div>
+
+    <div class="wb-prow"><div class="wb-tick"></div><span class="wb-pstage">Verify</span>
+      <div class="wb-agents"><div class="wb-ag"><b>qa-tester</b><span>browser checks of every changed feature, with screenshots</span></div><span class="wb-plus">called in here <em>security-audit</em><em>perf-audit</em></span></div>
+      <div class="wb-doc">Self-contained HTML report, hosted and linked in a PR comment, never committed</div></div>
+
+    <div class="wb-prow"><div class="wb-tick"></div><span class="wb-pstage">Sign off</span>
+      <div class="wb-agents"><div class="wb-ag wb-lead"><b>dev-lead</b><span>cross-checks schema ↔ backend ↔ frontend, then runs build, lint and the PR</span></div></div>
+      <div class="wb-doc">“Ready to merge ✅” or “Blocked ❌”, naming the agent that has to fix each issue</div></div>
+
+    <div class="wb-pgate"><i></i><span>I approve the merge.</span></div>
+  </div>
+  <div class="wb-blocked">Blocked goes back to the named agent, then through sign-off again</div>
+  <div class="wb-offpipe">Outside the pipeline: <span class="wb-chip">ci-debug</span> when a CI run fails <span class="wb-chip">changelog</span> when cutting a release</div>
+
+  <div class="wb-card">
+    <h3>What I added on top of stock subagents</h3>
+    <ul>
+      <li><b>Read before write.</b> Every builder agent starts by reading the project's CLAUDE.md and the neighbouring handlers, queries or components, and copies their patterns.</li>
+      <li><b>Fixed handoff formats.</b> Each agent ends with a set list (new RPCs, query names, nullable fields, migrations still to run), so the hub passes exact facts instead of retelling them.</li>
+      <li><b>Briefs carry the rules.</b> Subagents don't inherit loaded skills, so the brief includes the 3–5 rules that bind that agent.</li>
+      <li><b>Stack-specific guardrails.</b> Never edit generated files, run codegen before handlers, auth check on every handler, batch queries instead of N+1.</li>
+    </ul>
+  </div>

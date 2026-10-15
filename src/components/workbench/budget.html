@@ -1,0 +1,23 @@
+<div class="wb-bigs">
+    <div class="wb-big"><b>~4.9k</b><span>fixed cost per session: 20 skill descriptions, 13 agent descriptions and the global CLAUDE.md, about 0.5% of the window</span></div>
+    <div class="wb-big"><b>26%</b><span>of the suite's method a full feature arc loads (7 of 20 skill bodies), with no reference docs unless a sub-task needs them</span></div>
+    <div class="wb-big"><b>~13k</b><span>tokens of agent instructions that never enter the main session; each loads only inside its own subagent</span></div>
+  </div>
+  <div class="wb-budget" role="img" aria-label="Bar chart of estimated tokens loaded into the main session: always loaded 4.9k, bug-fix arc 9.5k, feature arc 15.5k, whole suite up front 58.9k">
+    <div class="wb-brow" title="Always loaded: about 4.9k tokens"><div class="wb-bl"><b>Always loaded</b><small>descriptions + global CLAUDE.md</small></div><div class="wb-track"><div class="wb-bar" style="width:8.2%"></div></div><span class="wb-bv">4.9k</span></div>
+    <div class="wb-brow" title="Bug-fix arc: about 9.5k tokens"><div class="wb-bl"><b>Bug-fix arc</b><small>execution-method, qa-debugging, test-strategy, release</small></div><div class="wb-track"><div class="wb-bar" style="width:15.8%"></div></div><span class="wb-bv">9.5k</span></div>
+    <div class="wb-brow" title="Feature arc: about 15.5k tokens"><div class="wb-bl"><b>Feature arc</b><small>7 skill bodies, from spec to observability</small></div><div class="wb-track"><div class="wb-bar" style="width:25.8%"></div></div><span class="wb-bv">15.5k</span></div>
+    <div class="wb-brow" title="Whole suite up front: about 58.9k tokens"><div class="wb-bl"><b>Whole suite up front</b><small>what loading everything would cost (not done)</small></div><div class="wb-track"><div class="wb-bar wb-alt" style="width:98.2%"></div></div><span class="wb-bv">58.9k</span></div>
+    <div class="wb-axis"><span></span><div><span>0</span><span>15k</span><span>30k</span><span>45k</span><span>60k</span></div><span></span></div>
+  </div>
+  <h3 style="margin-top:8px">Where the savings come from</h3>
+  <div class="wb-levers">
+    <div class="wb-lever"><b>descriptions route, bodies execute</b><span>Routing reads only the always-loaded descriptions. A body loads when its phase actually starts.</span></div>
+    <div class="wb-lever"><b>once per session</b><span>A loaded skill is applied from context afterwards. It's re-read only if compaction dropped it or the file changed.</span></div>
+    <div class="wb-lever"><b>most specific wins</b><span>A task that matches one skill goes straight to it, skipping the orchestrator's ~2.3k-token body.</span></div>
+    <div class="wb-lever"><b>reasoned skips</b><span>Scoping, design docs, UX flows and code review each have a skip condition. A skipped phase costs one ledger line.</span></div>
+    <div class="wb-lever"><b>references just in time</b><span>16.5k tokens of deep material load only during the sub-task that needs them.</span></div>
+    <div class="wb-lever"><b>scripts over re-derivation</b><span><code>lint-spec.sh</code> and <code>flake-rate.sh</code> run and return a result. The checks aren't re-reasoned in context each time.</span></div>
+    <div class="wb-lever"><b>distilled briefs</b><span>A subagent gets the 3–5 rules that bind it, never a pasted skill body. Its noisy reads stay in its own window.</span></div>
+    <div class="wb-lever"><b>outcome-first reports</b><span>Reports lead with the result and a scope note; the journey stays in the transcript. The ledger stops the next session re-deriving decisions.</span></div>
+  </div>

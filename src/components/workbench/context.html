@@ -1,0 +1,53 @@
+<div class="wb-ctxmap">
+    <div class="wb-ctxin"><b>my prompt</b> ↓ lands in a session that already holds</div>
+    <div class="wb-zones">
+      <div class="wb-window">
+        <span class="wb-wlabel">Main session · Opus · 1M-token window</span>
+        <div class="wb-zone wb-res">
+          <h3>Always loaded</h3>
+          <span class="wb-zsub">at session start · small and fixed</span>
+          <div class="wb-item"><code>~/.claude/CLAUDE.md</code><small>4 global rules: routing, verify first, worktrees, fix skills</small></div>
+          <div class="wb-item"><code>&lt;repo&gt;/CLAUDE.md</code><small>project conventions, such as this site's tagging rules</small></div>
+          <div class="wb-item wb-stock"><code>memory/MEMORY.md</code><small>built-in auto-memory index</small></div>
+          <div class="wb-item"><code>20 skill descriptions</code><small>≤1,024 chars each; they do the routing</small></div>
+          <div class="wb-item"><code>13 agent descriptions</code><small>when to dispatch each subagent</small></div>
+        </div>
+        <div class="wb-wire"><i>→</i><b>Skill tool</b><span>once per phase</span></div>
+        <div class="wb-zone wb-dem">
+          <h3>Loaded on demand</h3>
+          <span class="wb-zsub">when a phase or question needs it</span>
+          <div class="wb-item"><code>SKILL.md bodies</code><small>2,626 lines across the suite; each loaded at most once</small></div>
+          <div class="wb-item"><code>references/ · scripts/</code><small>17 docs + 2 scripts, read only during that sub-task</small></div>
+          <div class="wb-item wb-stock"><code>memory/*.md</code><small>built-in; the full note behind an index line</small></div>
+        </div>
+      </div>
+      <div class="wb-wire"><i>⇄</i><b>Agent tool</b><span>brief in, report out</span></div>
+      <div class="wb-zone wb-iso">
+        <h3>Separate contexts</h3>
+        <span class="wb-zsub">fresh window per dispatch</span>
+        <div class="wb-item"><code>13 subagents</code><small>PM, planner, designers, devs, QA, dev lead and 5 specialists, each with a fixed handoff format</small></div>
+        <div class="wb-item"><code>fresh-eyes reviewer</code><small>my rule: the final check runs in a clean context, so the author never grades their own work</small></div>
+      </div>
+    </div>
+    <div class="wb-writeback"><i></i>at close: skill fixes are committed to the skills repo</div>
+    <div class="wb-harness"><b>Harness</b><span>Outside the model: stock <code>settings.json</code> options, plus my weekly launchd cleanup script.</span></div>
+  </div>
+
+  <h3 style="margin-top:10px">Where each file ends up</h3>
+  <div class="wb-legend">
+    <span><i class="wb-dotk wb-r"></i>always in context</span><span><i class="wb-dotk wb-d"></i>on demand</span><span><i class="wb-dotk wb-s"></i>subagent's context</span><span><i class="wb-dotk wb-h"></i>read by the harness</span>
+  </div>
+  <div class="wb-scroll"><table class="wb-matrix">
+    <thead><tr><th>File</th><th>Always</th><th>On demand</th><th>Subagent</th><th>Harness</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>~/.claude/CLAUDE.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>&lt;repo&gt;/CLAUDE.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-s"></i></span></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>skills/*/SKILL.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i>description</span></td><td><span class="wb-mk"><i class="wb-dotk wb-d"></i>body</span></td><td><span class="wb-mk">path, if briefed</span></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>skills/*/references/</td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-d"></i></span></td><td></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>agents/*.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i>description</span></td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-s"></i>system prompt</span></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>memory/MEMORY.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td></td><td></td><td class="wb-who">built-in</td></tr>
+      <tr><td>memory/*.md</td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-d"></i></span></td><td></td><td></td><td class="wb-who">built-in</td></tr>
+      <tr><td>settings.json</td><td></td><td></td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-h"></i></span></td><td class="wb-who">built-in</td></tr>
+    </tbody>
+  </table></div>
+  <p class="wb-note">A skill description's “for X use skill-y” clauses break ties between neighbouring skills. They're load-bearing, so I re-run a trigger test whenever one changes.</p>

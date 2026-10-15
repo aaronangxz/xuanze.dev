@@ -1,0 +1,40 @@
+<div class="wb-cyc">
+    <div class="wb-cn"><small>during a session</small><b>Use</b><span>A skill guides real work.</span></div><i>→</i>
+    <div class="wb-cn"><small>trigger</small><b>Gap</b><span>Reality disagrees, or I correct the approach.</span></div><i>→</i>
+    <div class="wb-cn"><small>same session</small><b>Edit</b><span>One targeted change to that one skill.</span></div><i>→</i>
+    <div class="wb-cn"><small>guardrails</small><b>Verify</b><span>Name check; a trigger test if a description changed.</span></div><i>→</i>
+    <div class="wb-cn wb-hl"><small>skills repo</small><b>Commit</b><span>The message says why.</span></div>
+  </div>
+  <div class="wb-retbar"><span>the next session loads the corrected skill</span></div>
+
+  <h3 style="margin-top:22px">Every commit to the suite so far</h3>
+  <div class="wb-tline" role="img" aria-label="Timeline of six commits to the skills repo between July 8 and October 6, 2026">
+    <div class="wb-taxis"><span style="left:0%">Jul 8</span><span style="left:24.2%">Aug 1</span><span style="left:55.6%">Sep 1</span><span style="left:85.9%">Oct 1</span><span style="left:100%">Oct 15</span></div>
+    <div class="wb-ttrack">
+      <div class="wb-tev wb-up" style="left:0%"><i></i><div><small>Jul 8</small><b>suite v1</b><span>20 skills, orchestrator, execution method</span></div></div>
+      <div class="wb-tev wb-dn" style="left:2%"><i></i><div><small>Jul 10</small><b>execution-method</b><span>worktree isolation rule</span></div></div>
+      <div class="wb-tev wb-dn" style="left:44.4%"><i></i><div><small>Aug 21</small><b>qa-test-strategy</b><span>what to do when the honesty check is green</span></div></div>
+      <div class="wb-tev wb-up wb-r" style="left:69.7%"><i></i><div><small>Sep 15</small><b>eng-data-modeling</b><span>concurrent index builds can leave an invalid index</span></div></div>
+      <div class="wb-tev wb-dn" style="left:79.8%"><i></i><div><small>Sep 25</small><b>qa-debugging</b><span>Railway CLI logs only cover the current deploy</span></div></div>
+      <div class="wb-tev wb-up wb-r" style="left:90.9%"><i></i><div><small>Oct 6</small><b>execution-method</b><span>closing tears down simulators and worktrees</span></div></div>
+    </div>
+  </div>
+  <p class="wb-note">Each fix came from a real session. A gotcha specific to one project, such as an iOS Safari quirk, goes to that project's built-in memory instead. Only lessons that apply everywhere change a skill.</p>
+
+  <div>
+    <span class="wb-snipcap">Guardrails on every skill edit</span>
+<pre class="wb-snip" style="margin-top:8px"><span class="wb-c"># frontmatter contract</span>
+name == folder name
+description ≤ 1024 chars: what + when + triggers
+body ≤ ~500 lines, depth goes to references/
+
+<span class="wb-c"># validate after any edit</span>
+<span class="wb-k">for</span> d <span class="wb-k">in</span> */; <span class="wb-k">do</span>
+  name=$(awk '/^name:/{print $2; exit}' "$d/SKILL.md")
+  [ "$name" = "${d%/}" ] || echo "NAME MISMATCH: $d"
+<span class="wb-k">done</span>
+
+<span class="wb-c"># after a description change: trigger test</span>
+fresh subagent + all 20 descriptions + ~6 prompts
+→ right skill fires, no neighbour steals it</pre>
+  </div>

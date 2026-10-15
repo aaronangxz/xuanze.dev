@@ -1,0 +1,50 @@
+<h3>The “new feature” arc</h3>
+  <p class="wb-ft-intro">Read it top to bottom: each row is one phase, in order. The Build rows repeat for every slice. “Only if” rows are skipped when their condition fails, and the skip is logged with its reason.</p>
+  <div class="wb-ft" role="table" aria-label="Phases of the new feature arc">
+    <div class="wb-ft-row wb-ft-head" role="row"><span>#</span><span>Skill</span><span>Runs</span><span>Leaves behind</span></div>
+    <div class="wb-ft-grp"><b>Define</b><span>once per feature</span></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">01</span><span class="wb-ft-skill">product-spec-writing</span><div class="wb-ft-runs"><span class="wb-badge wb-if">only if</span><span>the change isn’t cheap, reversible and solo</span><span class="wb-else">else: skip; the change is its own spec</span></div><div class="wb-ft-out">Problem, primary user, non-goals, observable acceptance criteria, day-30 success metric. Checked with <code>lint-spec.sh</code>.</div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">02</span><span class="wb-ft-skill">product-scoping</span><div class="wb-ft-runs"><span class="wb-badge wb-if">only if</span><span>there’s more than one slice</span><span class="wb-else">else: skip</span></div><div class="wb-ft-out">Vertical slices ordered riskiest assumption first, with the cuts decided in advance.</div></div>
+    <div class="wb-ft-loop">
+    <div class="wb-ft-grp"><b>↻ Build</b><span>repeats for each slice</span></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">03</span><span class="wb-ft-skill">eng-design-doc</span><div class="wb-ft-runs"><span class="wb-badge wb-if">only if</span><span>it’s a one-way door</span><span class="wb-else">else: one line in the ADR log</span></div><div class="wb-ft-out">Design doc with real alternatives, trade-offs on the axes that differ, and failure modes.</div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">04</span><span class="wb-ft-skill">facet skills<br><span class="wb-badge wb-if" style="margin-top:6px">only if touched</span></span>
+      <div class="wb-ft-facets">
+        <div><small>new endpoint, webhook, tool schema</small><b>eng-api-design</b></div>
+        <div><small>schema or migration</small><b>eng-data-modeling</b></div>
+        <div><small>auth, PII, money, uploads</small><b>eng-security-baseline</b></div>
+        <div><small>prompts, models, agents</small><b>eng-ai-features</b></div>
+      </div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">05</span><span class="wb-ft-skill">product-ux-flows</span><div class="wb-ft-runs"><span class="wb-badge wb-if">only if</span><span>the slice is user-facing</span><span class="wb-else">else: skip</span></div><div class="wb-ft-out">Screens with one primary action each, plus a grid of states: empty, loading, partial, error, success, denied.</div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">06</span><span class="wb-ft-skill">qa-test-strategy</span><div class="wb-ft-runs"><span class="wb-badge wb-always">always</span><span>before any code</span></div><div class="wb-ft-out">A list of test cases by layer, chosen by risk, with boundary and state cases.</div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">07</span><span class="wb-ft-skill">eng-implementation</span><div class="wb-ft-runs"><span class="wb-badge wb-always">always</span></div><div class="wb-ft-out">Smallest runnable increments, failure paths wired in the same pass, one commit per green test.</div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">08</span><span class="wb-ft-skill">eng-code-review</span><div class="wb-ft-runs"><span class="wb-badge wb-if">only if</span><span>the diff is agent-written, risky or large</span><span class="wb-else">else: ops-release’s self-read gate covers it</span></div><div class="wb-ft-out">Correctness first, then contract, security and failure modes. Checks for hallucinated APIs and tests that can’t fail.</div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">09</span><span class="wb-ft-skill">ops-release</span><div class="wb-ft-runs"><span class="wb-badge wb-always">always</span></div><div class="wb-ft-out">Pre-merge gates, rollback criteria written <em>before</em> deploying. Migrations run against schema N−1 and N, so rollback reverts code, never schema.</div></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">10</span><span class="wb-ft-skill">ops-observability</span><div class="wb-ft-runs"><span class="wb-badge wb-always">always</span><span>in the same PR</span></div><div class="wb-ft-out">Structured logs, the few metrics that matter, and alerts on user-visible symptoms.</div></div>
+    </div>
+    <div class="wb-ft-grp"><b>Learn</b><span>at launch, then at the review date</span></div>
+    <div class="wb-ft-row"><span class="wb-ft-n">11</span><span class="wb-ft-skill">product-metrics</span><div class="wb-ft-runs"><span class="wb-badge wb-gate">my call</span><span>at the review date</span></div><div class="wb-ft-out">Review date set at launch. At the review: an explicit <b>iterate / kill / keep</b> decision.</div></div>
+    <div class="wb-ft-foot">↺ “iterate” goes back to 02 · product-scoping for the next cut</div>
+  </div>
+  <div class="wb-pair">
+    <div>
+      <span class="wb-snipcap">The ledger: one line per phase, kept in the task list</span>
+<pre class="wb-snip"><span class="wb-k">spec-writing</span>   invoked  <span class="wb-c"># day-30 metric set, lint-spec passed</span>
+<span class="wb-k">scoping</span>        <span class="wb-g">skipped</span>  <span class="wb-c"># single slice</span>
+<span class="wb-k">design-doc</span>     <span class="wb-g">skipped</span>  <span class="wb-c"># two-way door, one ADR line for storage</span>
+<span class="wb-k">api-design</span>     invoked  <span class="wb-c"># new endpoint + async job resource</span>
+<span class="wb-k">test-strategy</span>  invoked  <span class="wb-c"># case list written before code</span></pre>
+    </div>
+  </div>
+  <h3 style="margin-top:8px">Other arcs</h3>
+  <div class="wb-scroll"><table>
+    <thead><tr><th>Signal</th><th>Route</th></tr></thead>
+    <tbody>
+      <tr><td>Bug, wrong behaviour</td><td><span class="wb-mono">qa-debugging</span> → regression case via <span class="wb-mono">qa-test-strategy</span> → <span class="wb-mono">ops-release</span></td></tr>
+      <tr><td>Production incident</td><td><span class="wb-mono">qa-debugging</span> (capture, mitigate, postmortem) → <span class="wb-mono">ops-observability</span> → <span class="wb-mono">ops-release</span></td></tr>
+      <tr><td>“What should I build?”</td><td><span class="wb-mono">product-brainstorming</span> → winner goes to <span class="wb-mono">product-spec-writing</span></td></tr>
+      <tr><td>“Is this secure / ready?”</td><td><span class="wb-mono">eng-security-baseline</span> → <span class="wb-mono">ops-release</span> gates</td></tr>
+      <tr><td>Pricing, tiers</td><td><span class="wb-mono">product-pricing</span> → shipped as a launch with <span class="wb-mono">product-metrics</span> thresholds</td></tr>
+      <tr><td>“Did it work?”</td><td><span class="wb-mono">product-metrics</span> → <span class="wb-mono">product-scoping</span> for the next cut</td></tr>
+    </tbody>
+  </table></div>
