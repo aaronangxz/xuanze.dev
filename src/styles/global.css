@@ -1463,8 +1463,14 @@ figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display
 @keyframes mk-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mk-runin { from { transform: translateX(-62px); } to { transform: translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .mk, .mk * { animation: none !important; } }
-/* while the page scrolls (set in app.ts) the loop is paused and app.ts steps it at 12fps instead: see the note there */
-html.scrolling:not(.mk-in) .mk-pane:not(.mk-in) .mk * { animation-play-state: paused !important; }
+/* while the page scrolls the scenery holds and the character rests (set and eased in app.ts): see the note there */
+html.scrolling:not(.mk-in) .mk-pane:not(.mk-in) .mk *, html.mk-wake .mk * { animation-play-state: paused !important; }
+html:is(.mk-rest, .mk-wake):not(.mk-in) .mk-pane:not(.mk-in) .mk :is(.fig, .fig *, .spark) { animation: none !important; }
+html.mk-rest .mk-life .up { transform: none; }
+html.mk-rest .mk-life .th.f { transform: rotate(-6deg); } html.mk-rest .mk-life .sh.f { transform: rotate(4deg); }
+html.mk-rest .mk-life .th.b { transform: rotate(6deg); }  html.mk-rest .mk-life .sh.b { transform: rotate(-2deg); }
+html.mk-rest .mk-life .ua.f { transform: rotate(6deg); }  html.mk-rest .mk-life .fa.f { transform: rotate(-20deg); }
+html.mk-rest .mk-life .ua.b { transform: rotate(-6deg); } html.mk-rest .mk-life .fa.b { transform: rotate(-20deg); }
 
 /* ---------- Graph (/graph): a launcher-style app with the graph in place of the list ---------- */
 .graph-page h1 { max-width: 22ch; }

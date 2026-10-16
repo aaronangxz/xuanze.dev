@@ -621,27 +621,37 @@ if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races
   };
   const measure = () => { max = document.documentElement.scrollHeight - innerHeight; queue(); };
   const queue = () => { if (!raf) raf = requestAnimationFrame(edges); };
-  // While the page scrolls, the header mark's CSS loop is paused (html.scrolling): it animates SVG shapes, which
-  // can't run on the compositor, so every frame repaints and re-layerizes the page on the main thread (on /life,
-  // at 6x CPU throttle: 23% busy paused, 82% running). Instead of freezing, the paused loop is stepped here at
-  // 12fps, like a cartoon on twos: about 30% busy, and the mark keeps moving.
+  // While the page scrolls, the header mark rests: its loop animates SVG shapes, which repaints on the main thread
+  // every frame and was the biggest cost of a scroll frame on phones. Rather than freezing mid-move, the character
+  // eases into a resting pose (html.mk-rest: the Work coder stops typing, the Life runner stops and stands) while
+  // the scenery holds (html.scrolling), and eases back into the loop's first pose (html.mk-wake) once scrolling
+  // stops. Removing a CSS animation snaps to the new pose instead of transitioning, so the ease is done here.
   const mark = document.getElementById('mark');
-  const STEP = 1000 / 12;
-  let still = 0, moving = false, last = 0;
-  const step = (t) => {
-    if (!moving) return;
-    requestAnimationFrame(step);
-    if (!last) { last = t; return; }
-    if (t - last < STEP - 4) return;
-    const dt = t - last; last = t;
-    // During an entrance (.mk-in) the mark isn't paused, so it is already moving on its own.
-    if (!mark || root.classList.contains('mk-in') || mark.querySelector('.mk-in')) return;
-    mark.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = (Number(a.currentTime) || 0) + dt; });
+  let still = 0, wake = 0, moving = false;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const entering = () => !mark || calm.matches || root.classList.contains('mk-in') || !!mark.querySelector('.mk-in');
+  const ease = (change: () => void, ms: number) => {
+    const els = mark ? [...mark.querySelectorAll<SVGElement>('.fig, .fig g, .spark')] : [];
+    const from = els.map((el) => getComputedStyle(el).transform);
+    change();
+    els.forEach((el, i) => {
+      const to = getComputedStyle(el).transform;
+      if (to !== from[i]) el.animate([{ transform: from[i] }, { transform: to }], { duration: ms, easing: 'ease-in-out' });
+    });
   };
-  const settle = () => { moving = false; root.classList.remove('scrolling'); };
+  const settle = () => {
+    moving = false; root.classList.remove('scrolling');
+    if (!root.classList.contains('mk-rest')) return;
+    ease(() => root.classList.replace('mk-rest', 'mk-wake'), 250);
+    wake = window.setTimeout(() => root.classList.remove('mk-wake'), 250);
+  };
   addEventListener('scroll', () => {
     queue();
-    if (!moving) { moving = true; last = 0; root.classList.add('scrolling'); requestAnimationFrame(step); }
+    if (!moving) {
+      moving = true; root.classList.add('scrolling');
+      clearTimeout(wake);
+      if (!entering()) ease(() => { root.classList.remove('mk-wake'); root.classList.add('mk-rest'); }, 400);
+    }
     clearTimeout(still); still = window.setTimeout(settle, 200);
   }, { passive: true });
   addEventListener('resize', measure);
