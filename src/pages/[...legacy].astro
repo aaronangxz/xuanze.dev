@@ -1,0 +1,24 @@
+---
+/**
+ * Redirect pages for the old site's URLs (src/lib/legacy.ts). GitHub Pages can't send a real 301, so each is a
+ * 0-second meta refresh with a canonical link to the new page, which Google treats as a permanent redirect
+ * (no noindex: Google reads noindex plus a canonical as conflicting signals).
+ * Left out of the sitemap (astro.config.mjs).
+ */
+import { legacyRedirects } from '../lib/legacy';
+export async function getStaticPaths() {
+  return [...(await legacyRedirects())].map(([legacy, to]) => ({ params: { legacy }, props: { to } }));
+}
+const { to } = Astro.props;
+const href = new URL(to, Astro.site).href;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Moved to {to}</title>
+    <link rel="canonical" href={href} />
+    <meta http-equiv="refresh" content={`0;url=${to}`} />
+  </head>
+  <body><a href={to}>This page moved to {href}</a></body>
+</html>

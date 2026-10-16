@@ -17,6 +17,22 @@ const { title, description = site.description, mode = 'work', nav, inlineLaunche
 const fullTitle = title ? `${title} · ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const items = await launcherItems();
+// On the home page: who this site belongs to, so a search for the name can be tied to it (schema.org Person).
+const home = new URL('/', Astro.site).href;
+const identity = Astro.url.pathname === '/' && {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${home}#website`, url: home, name: site.name, publisher: { '@id': `${home}#person` } },
+    {
+      '@type': 'Person', '@id': `${home}#person`, name: site.name, alternateName: ['Xuan Ze Ang', site.shortName],
+      url: home, image: new URL(site.about.photo || '/apple-touch-icon.png', Astro.site).href, description: site.description,
+      jobTitle: site.currently[0].sub, worksFor: { '@type': 'Organization', name: site.currently[0].title },
+      alumniOf: site.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.org })),
+      address: { '@type': 'PostalAddress', addressLocality: site.location },
+      sameAs: Object.values(site.links),
+    },
+  ],
+};
 const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
 ---
 <!doctype html>
@@ -35,6 +51,8 @@ const PLANE_L = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentCo
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    {identity && <script type="application/ld+json" is:inline set:html={JSON.stringify(identity)} />}
     {mode === 'life'
       ? <meta name="theme-color" content="#0B1220" />
       : <><meta name="theme-color" media="(prefers-color-scheme: light)" content="#E8E9EC" /><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0C0E" /></>}
