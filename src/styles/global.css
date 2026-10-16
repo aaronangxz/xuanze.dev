@@ -1463,7 +1463,7 @@ figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display
 @keyframes mk-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mk-runin { from { transform: translateX(-62px); } to { transform: translateX(0); } }
 @media (prefers-reduced-motion: reduce) { .mk, .mk * { animation: none !important; } }
-/* hold the pose while the page scrolls (set in app.ts): see the note there */
+/* while the page scrolls (set in app.ts) the loop is paused and app.ts steps it at 12fps instead: see the note there */
 html.scrolling:not(.mk-in) .mk-pane:not(.mk-in) .mk * { animation-play-state: paused !important; }
 
 /* ---------- Graph (/graph): a launcher-style app with the graph in place of the list ---------- */

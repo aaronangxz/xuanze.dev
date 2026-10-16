@@ -621,13 +621,27 @@ if (nrs.length && !document.querySelector('.nr')) document.querySelector('.races
   };
   const measure = () => { max = document.documentElement.scrollHeight - innerHeight; queue(); };
   const queue = () => { if (!raf) raf = requestAnimationFrame(edges); };
-  // While the page scrolls, the header mark holds its pose (html.scrolling): its loop animates SVG shapes,
-  // which repaints on the main thread every frame and was the biggest cost of a scroll frame on phones.
-  let still = 0, moving = false;
+  // While the page scrolls, the header mark's CSS loop is paused (html.scrolling): it animates SVG shapes, which
+  // can't run on the compositor, so every frame repaints and re-layerizes the page on the main thread (on /life,
+  // at 6x CPU throttle: 23% busy paused, 82% running). Instead of freezing, the paused loop is stepped here at
+  // 12fps, like a cartoon on twos: about 30% busy, and the mark keeps moving.
+  const mark = document.getElementById('mark');
+  const STEP = 1000 / 12;
+  let still = 0, moving = false, last = 0;
+  const step = (t) => {
+    if (!moving) return;
+    requestAnimationFrame(step);
+    if (!last) { last = t; return; }
+    if (t - last < STEP - 4) return;
+    const dt = t - last; last = t;
+    // During an entrance (.mk-in) the mark isn't paused, so it is already moving on its own.
+    if (!mark || root.classList.contains('mk-in') || mark.querySelector('.mk-in')) return;
+    mark.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = (Number(a.currentTime) || 0) + dt; });
+  };
   const settle = () => { moving = false; root.classList.remove('scrolling'); };
   addEventListener('scroll', () => {
     queue();
-    if (!moving) { moving = true; root.classList.add('scrolling'); }
+    if (!moving) { moving = true; last = 0; root.classList.add('scrolling'); requestAnimationFrame(step); }
     clearTimeout(still); still = window.setTimeout(settle, 200);
   }, { passive: true });
   addEventListener('resize', measure);
