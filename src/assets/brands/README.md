@@ -5,4 +5,4 @@ One single-colour SVG per brand, named by the brand in lower case with spaces, p
 `ritzcarlton.svg` for The Ritz-Carlton, `stregis.svg` for St. Regis. A brand without a file keeps its printed name.
 The logo is painted in the chain's colour, so any fill in the file is ignored; a roughly square mark reads best.
 
-`ritzcarlton.svg` comes from Simple Icons. The marks are the brands' trademarks.
+`ritzcarlton.svg` and `hiltonhotelsresorts.svg` (Hilton Hotels & Resorts) come from Simple Icons. The marks are the brands' trademarks.

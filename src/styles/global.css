@@ -791,7 +791,6 @@ html.sliding .page { pointer-events: none; }
 .notes-groups ul a { display: flex; align-items: baseline; gap: 6px; width: fit-content; max-width: calc(100% + 16px); }
 
 /* Life: sample-data notice and Strava credit */
-.sample { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; font: 500 .75rem var(--mono); color: var(--l-muted); padding: 6px 12px; border-radius: 999px; border: 1px dashed rgba(var(--l-ink-rgb), .25); }
 .gear-block { margin-top: 40px; margin-bottom: 18px; }
 .gear { list-style: none; margin: 0; padding: 0; }
 .gear li { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) auto; gap: 16px; padding-block: 12px; border-top: 1px solid var(--l-line); align-items: baseline; }
