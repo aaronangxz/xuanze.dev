@@ -88,9 +88,9 @@ const journal = defineCollection({
   }),
 });
 
-const shelf = defineCollection({
-  loader: file('src/content/life/shelf.yaml'),
-  schema: z.object({ label: z.string(), value: z.string(), example }),
+const gear = defineCollection({
+  loader: file('src/content/life/gear.yaml'),
+  schema: z.object({ kind: z.string(), name: z.string(), km: z.number().optional(), retired: z.boolean().default(false) }),
 });
 
 const polaroids = defineCollection({
@@ -103,4 +103,4 @@ const polaroids = defineCollection({
   }),
 });
 
-export const collections = { writing, projects, notes, leetcode, races, shelf, polaroids, journal };
+export const collections = { writing, projects, notes, leetcode, races, gear, polaroids, journal };
