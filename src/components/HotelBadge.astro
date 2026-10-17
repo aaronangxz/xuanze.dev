@@ -6,6 +6,14 @@ interface Props { hotel: Hotel; size?: number; link?: boolean }
 const { hotel: h, size = 104, link = true } = Astro.props;
 const id = `hb-${h.slug}`;
 const brand = (h.tag ?? 'INDEPENDENT').toUpperCase();
+// A brand logo from src/assets/brands/<brand>.svg replaces the printed name on the top arc.
+const logos = import.meta.glob<string>('../assets/brands/*.svg', { query: '?raw', import: 'default', eager: true });
+const logoKey = (h.brand ?? '').toLowerCase().replace(/^the\s+/, '').replace(/[^a-z0-9]+/g, '');
+const logoRaw = logoKey ? logos[`../assets/brands/${logoKey}.svg`] : undefined;
+const logo = logoRaw && {
+  viewBox: logoRaw.match(/viewBox="([^"]+)"/)?.[1] ?? '0 0 24 24',
+  body: logoRaw.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '').replace(/<title>[\s\S]*?<\/title>/g, '').replace(/\sfill="[^"]*"/g, ''),
+};
 // City in one or two lines, sized to fit inside the inner ring.
 const words = h.city.split(' ');
 const lines = h.city.length > 8 && words.length > 1 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [h.city];
@@ -24,7 +32,9 @@ const Tag = link ? 'a' : 'div';
     </defs>
     <circle class="hb-outer" cx="50" cy="50" r="47.5" fill={`url(#${id}-g)`} />
     <circle class="hb-inner" cx="50" cy="50" r="41" fill="none" />
-    <text class="hb-arc"><textPath href={`#${id}-t`} startOffset="50%" text-anchor="middle">{brand}</textPath></text>
+    {logo
+      ? <svg class="hb-logo" x="39" y="14" width="22" height="22" viewBox={logo.viewBox} set:html={logo.body} />
+      : <text class="hb-arc"><textPath href={`#${id}-t`} startOffset="50%" text-anchor="middle">{brand}</textPath></text>}
     <text class="hb-arc hb-years"><textPath href={`#${id}-b`} startOffset="50%" text-anchor="middle">{h.upcoming ? 'SOON' : h.years}</textPath></text>
     <text class="hb-city" x="50" y={lines.length > 1 ? 50 - fs * 0.15 : 50 + fs * 0.35} text-anchor="middle" font-size={fs}>
       {lines.map((l, i) => <tspan x="50" dy={i === 0 ? 0 : fs * 1.05}>{l}</tspan>)}

@@ -85,6 +85,11 @@ const journal = defineCollection({
     rating: z.number().min(0).max(5).optional(),
     title: z.string().optional(),
     photos: z.array(z.object({ src: image(), alt: z.string().default(''), caption: z.string().optional() })).default([]),
+    /** A Xiaohongshu (RED) post about this stay or flight, shown as a link card: the post's link, or { url, title, cover }. */
+    xhs: z.union([
+      z.string().url().transform((url) => ({ url, title: undefined, cover: undefined })),
+      z.object({ url: z.string().url(), title: z.string().optional(), cover: image().optional() }),
+    ]).optional(),
   }),
 });
 

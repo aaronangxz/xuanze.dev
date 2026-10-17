@@ -1053,6 +1053,7 @@ a.hbadge:hover::before, a.hbadge:focus-visible::before { opacity: 1; transform: 
 .hb-outer { stroke: var(--chain); stroke-width: 2.2; }
 .hb-inner { stroke: var(--chain); stroke-width: .7; stroke-dasharray: 1.4 2.4; opacity: .7; }
 .hb-arc { font: 600 7.2px var(--mono); letter-spacing: 1.4px; fill: var(--chain); }
+.hb-logo { fill: var(--chain); filter: none; }
 .hb-years { font-size: 6.4px; letter-spacing: 1.2px; fill: rgba(var(--l-ink-rgb), .62); }
 .hb-city { font-family: var(--serif); fill: var(--l-ink); }
 .hb-dot { fill: var(--chain); opacity: .8; }
@@ -1141,6 +1142,15 @@ a.hbadge:hover .hb-name { color: var(--l-ink); }
 .jr-photos figure { break-inside: avoid; margin: 0 0 12px; }
 .jr-photos img { display: block; width: 100%; height: auto; border-radius: 12px; }
 .jr-photos figcaption { font: .75rem var(--sans); color: var(--l-muted); margin-top: 6px; }
+.xhs-card { display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 10px; border-radius: 14px; border: 1px solid var(--l-line); background: rgba(var(--l-ink-rgb), .04); color: var(--l-ink); text-decoration: none; transition: border-color .2s, background .2s; }
+.xhs-card:hover, .xhs-card:focus-visible { border-color: #FF2442; background: rgba(255, 36, 66, .08); }
+.xhs-cover { flex: none; width: 72px; height: 72px; border-radius: 10px; object-fit: cover; }
+.xhs-mark { display: grid; place-items: center; background: #FF2442; }
+.xhs-mark svg { width: 46px; height: 46px; fill: #fff; }
+.xhs-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.jr .xhs-text .lab { margin: 0; }
+.xhs-text b { font-family: var(--serif); font-weight: 400; font-size: 1.25rem; line-height: 1.2; }
+.xhs-text small { font: .75rem var(--sans); color: var(--l-muted); }
 .jr-empty p { color: var(--l-muted); margin: 0; }
 
 a.pass { text-decoration: none; }
