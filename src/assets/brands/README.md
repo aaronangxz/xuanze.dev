@@ -3,8 +3,9 @@
 Shown at the top of a hotel's stamp in place of its brand name (`brandTags` in `src/data/travel/config.json`).
 One single-colour SVG per brand, named by the brand in lower case with spaces, punctuation and a leading "The" removed:
 `ritzcarlton.svg` for The Ritz-Carlton, `stregis.svg` for St. Regis. A brand without a file keeps its printed name.
-The logo is painted in the chain's colour, so any fill in the file is ignored. It sits in a 40×22 box at the top of the stamp:
-a roughly square mark reads best, a short wordmark works, and a long thin one (Sofitel's) is unreadable, so leave it out.
+The logo is painted in the chain's colour, so any fill in the file is ignored. It sits in a 40×22 box at the top of the stamp;
+a wordmark more than 3× wider than tall gets a 58×14 strip across the ring instead, so its letters stay about as tall as the
+printed name. A roughly square mark reads best; a thin, widely spaced one (Sofitel's wordmark) is unreadable, so leave it out.
 Crop the viewBox to the artwork and keep one path where possible (`fill-rule="evenodd"` for knocked-out marks).
 
 Sources (the marks are the brands' trademarks):
@@ -22,9 +23,10 @@ Sources (the marks are the brands' trademarks):
 - The brands' own sites: `doubletreebyhilton.svg` (hilton.com/modules/assets/svgs/logos/DT.svg, the tree and D),
   `raffles.svg` (raffles.com logo-brand-large.svg, the traveller's palm), `sofitel.svg` (sofitel.accor.com Sofitel_CL_Gold.svg, the interlocking mark).
 - Logo images XZ supplied, vectorised automatically (thresholded and traced with potrace, nothing redrawn):
-  `hyattcentric.svg` (the two-line wordmark), `jwmarriott.svg` (the griffin), `unboundcollectionbyhyatt.svg` (the UB monogram).
+  `hyattcentric.svg` (the two-line wordmark), `jwmarriott.svg` (the griffin), `unboundcollectionbyhyatt.svg` (the UB monogram),
+  `parkhyatt.svg`, `courtyard.svg` (without "by Marriott") and `parkroyalcollection.svg` (the "PARKROYAL" wordmark, from the
+  PARKROYAL Hotels & Resorts logo, without the rule and tagline).
 
 Without a logo, so they keep their printed name:
 - No clean source: The Luxury Collection (only a PGA Tour co-brand file), MGallery and AutoCamp (raster only).
-- Tried but unreadable at stamp size (long or thin wordmarks): Park Hyatt, Courtyard, PARKROYAL COLLECTION, and Sofitel's wordmark
-  (its mark is used instead).
+- Sofitel's wordmark is unreadable at stamp size, so its mark is used instead.
