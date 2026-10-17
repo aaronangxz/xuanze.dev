@@ -40,14 +40,14 @@
   <div class="wb-scroll"><table class="wb-matrix">
     <thead><tr><th>File</th><th>Always</th><th>On demand</th><th>Subagent</th><th>Harness</th><th>Content</th></tr></thead>
     <tbody>
-      <tr><td>~/.claude/CLAUDE.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td></td><td></td><td class="wb-who wb-me">mine</td></tr>
-      <tr><td>&lt;repo&gt;/CLAUDE.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-s"></i></span></td><td></td><td class="wb-who wb-me">mine</td></tr>
-      <tr><td>skills/*/SKILL.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i>description</span></td><td><span class="wb-mk"><i class="wb-dotk wb-d"></i>body</span></td><td><span class="wb-mk">path, if briefed</span></td><td></td><td class="wb-who wb-me">mine</td></tr>
-      <tr><td>skills/*/references/</td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-d"></i></span></td><td></td><td></td><td class="wb-who wb-me">mine</td></tr>
-      <tr><td>agents/*.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i>description</span></td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-s"></i>system prompt</span></td><td></td><td class="wb-who wb-me">mine</td></tr>
-      <tr><td>memory/MEMORY.md</td><td><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td></td><td></td><td class="wb-who">built-in</td></tr>
-      <tr><td>memory/*.md</td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-d"></i></span></td><td></td><td></td><td class="wb-who">built-in</td></tr>
-      <tr><td>settings.json</td><td></td><td></td><td></td><td><span class="wb-mk"><i class="wb-dotk wb-h"></i></span></td><td class="wb-who">built-in</td></tr>
+      <tr><td>~/.claude/CLAUDE.md</td><td data-l="Always"><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>&lt;repo&gt;/CLAUDE.md</td><td data-l="Always"><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td data-l="Subagent"><span class="wb-mk"><i class="wb-dotk wb-s"></i></span></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>skills/*/SKILL.md</td><td data-l="Always"><span class="wb-mk"><i class="wb-dotk wb-r"></i>description</span></td><td data-l="On demand"><span class="wb-mk"><i class="wb-dotk wb-d"></i>body</span></td><td data-l="Subagent"><span class="wb-mk">path, if briefed</span></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>skills/*/references/</td><td></td><td data-l="On demand"><span class="wb-mk"><i class="wb-dotk wb-d"></i></span></td><td></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>agents/*.md</td><td data-l="Always"><span class="wb-mk"><i class="wb-dotk wb-r"></i>description</span></td><td></td><td data-l="Subagent"><span class="wb-mk"><i class="wb-dotk wb-s"></i>system prompt</span></td><td></td><td class="wb-who wb-me">mine</td></tr>
+      <tr><td>memory/MEMORY.md</td><td data-l="Always"><span class="wb-mk"><i class="wb-dotk wb-r"></i></span></td><td></td><td></td><td></td><td class="wb-who">built-in</td></tr>
+      <tr><td>memory/*.md</td><td></td><td data-l="On demand"><span class="wb-mk"><i class="wb-dotk wb-d"></i></span></td><td></td><td></td><td class="wb-who">built-in</td></tr>
+      <tr><td>settings.json</td><td></td><td></td><td></td><td data-l="Harness"><span class="wb-mk"><i class="wb-dotk wb-h"></i></span></td><td class="wb-who">built-in</td></tr>
     </tbody>
   </table></div>
   <p class="wb-note">A skill description's “for X use skill-y” clauses break ties between neighbouring skills. They're load-bearing, so I re-run a trigger test whenever one changes.</p>

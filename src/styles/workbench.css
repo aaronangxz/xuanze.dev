@@ -9,7 +9,7 @@
   font-size: 1rem; line-height: 1.6; color: var(--ink); min-width: 0;
 }
 /* The parts of one section (diagram, sub-heading, table, note) are spaced like the original page's sections */
-.prose .wb { display: grid; gap: 24px; }
+.prose .wb { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
 .prose .wb > h3 { margin-top: 16px; }
 .prose .wb > h3 + * { margin-top: -10px; }
 .prose .wb p, .prose .wb li { font-size: inherit; line-height: inherit; color: inherit; margin: 0; }
@@ -71,7 +71,7 @@
 .prose .wb .wb-snip .wb-m{color:var(--wb-mem)}
 .prose .wb .wb-snip .wb-g{color:var(--wb-gate)}
 .prose .wb .wb-snipcap{font:500 .7rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.prose .wb .wb-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start}
+.prose .wb .wb-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px;align-items:start}
 .prose .wb .wb-pair>div{display:grid;gap:8px;min-width:0}
 .prose .wb .wb-note{font-size:.9rem;color:var(--muted);max-width:none}
 .prose .wb .wb-evid{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:500 .82rem var(--mono)}
@@ -276,14 +276,14 @@
 .prose .wb .wb-v.wb-u{background:var(--wb-gate-soft);color:var(--wb-gate)}
 .prose .wb .wb-qd{font:500 .74rem var(--mono);color:var(--muted)}
 .prose .wb .wb-gt{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;position:relative}
-.prose .wb .wb-g{display:grid;grid-template-rows:auto auto auto 1fr auto;gap:6px;padding:0 14px 0 0;position:relative;min-width:0}
-.prose .wb .wb-g::before{content:"";position:absolute;top:7px;left:14px;right:0;height:2px;background:var(--accent)}
-.prose .wb .wb-g.wb-end::before{display:none}
+.prose .wb .wb-gt>.wb-g{display:grid;grid-template-rows:auto auto auto 1fr auto;gap:6px;padding:0 14px 0 0;position:relative;min-width:0}
+.prose .wb .wb-gt>.wb-g::before{content:"";position:absolute;top:7px;left:14px;right:0;height:2px;background:var(--accent)}
+.prose .wb .wb-gt>.wb-g.wb-end::before{display:none}
 .prose .wb .wb-gn,.prose .wb .wb-gleg .wb-gn{display:block;width:16px;height:16px;border-radius:50%;background:var(--wb-surface);border:3px solid var(--accent);position:relative;z-index:1;box-sizing:border-box}
-.prose .wb .wb-g.wb-end .wb-gn{background:var(--accent)}
+.prose .wb .wb-gt>.wb-g.wb-end .wb-gn{background:var(--accent)}
 .prose .wb .wb-gk{font:500 .66rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px}
-.prose .wb .wb-g b{font-size:.98rem}
-.prose .wb .wb-g p{font-size:.82rem;color:var(--muted);line-height:1.45}
+.prose .wb .wb-gt>.wb-g b{font-size:.98rem}
+.prose .wb .wb-gt>.wb-g p{font-size:.82rem;color:var(--muted);line-height:1.45}
 .prose .wb .wb-gx{font-size:.78rem;line-height:1.4;color:var(--wb-gate);border-left:2px solid var(--wb-gate);padding:4px 0 4px 9px;margin-top:4px}
 .prose .wb .wb-gx::before{content:"if it fails ";display:block;font:500 .62rem var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.8}
 .prose .wb .wb-gleg{display:flex;gap:18px;font-size:.78rem;color:var(--muted)}
@@ -291,9 +291,9 @@
 .prose .wb .wb-gxk{display:inline-block;width:2px;height:14px;background:var(--wb-gate)}
 @media (max-width:860px){
   .prose .wb .wb-gt{grid-template-columns:1fr;padding-left:28px}
-  .prose .wb .wb-g{padding:0 0 18px 0;grid-template-rows:none}
-  .prose .wb .wb-g::before{top:16px;bottom:0;left:-21px;right:auto;width:2px;height:auto}
-  .prose .wb .wb-g .wb-gn{position:absolute;left:-28px;top:0}
+  .prose .wb .wb-gt>.wb-g{padding:0 0 18px 0;grid-template-rows:none}
+  .prose .wb .wb-gt>.wb-g::before{top:16px;bottom:0;left:-21px;right:auto;width:2px;height:auto}
+  .prose .wb .wb-gt>.wb-g .wb-gn{position:absolute;left:-28px;top:0}
   .prose .wb .wb-gk{margin-top:0}
 }
 .prose .wb .wb-lanes{display:grid;grid-template-columns:minmax(0,1fr) 230px;grid-template-rows:auto auto;gap:10px 0}
@@ -485,3 +485,29 @@
 .prose .wb .wb-peek-cta span{transition:transform .2s}
 .prose .wb .wb-peek-cta:hover span{transform:translateX(3px)}
 @media (max-width:640px){.prose .wb .wb-peek-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Phones: the window label wraps instead of running past the frame, the decision tree and evidence chain point
+   down once they stack, and tables turn into one block per row (a sideways-scrolling table hides its last columns) */
+@media (max-width:820px){
+  .prose .wb .wb-window{padding-top:46px}
+  .prose .wb .wb-window>.wb-wlabel{right:14px;letter-spacing:.06em;line-height:1.4}
+}
+@media (max-width:700px){
+  .prose .wb .wb-dyes i{display:inline-block;font-style:normal;transform:rotate(90deg)}
+}
+@media (max-width:640px){
+  .prose .wb .wb-evid{flex-direction:column;align-items:flex-start}
+  .prose .wb .wb-evid i{transform:rotate(90deg);padding-left:14px}
+  .prose .wb .wb-scroll{overflow:visible;padding-bottom:0}
+  .prose .wb .wb-scroll table,.prose .wb .wb-scroll tbody,.prose .wb .wb-scroll tr,.prose .wb .wb-scroll td{display:block;min-width:0;width:auto}
+  .prose .wb .wb-scroll thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .prose .wb .wb-scroll tr{padding:12px 2px;border-bottom:1px solid var(--line);display:grid;gap:4px}
+  .prose .wb .wb-scroll tr:first-child{border-top:1px solid var(--line)}
+  .prose .wb .wb-scroll td{padding:0;border:0;white-space:normal}
+  .prose .wb .wb-sort td:nth-child(2){margin:2px 0}
+  .prose .wb .wb-matrix tr{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
+  .prose .wb .wb-matrix td:first-child{grid-column:1 / -1;overflow-wrap:anywhere}
+  .prose .wb .wb-matrix td:not(:first-child){width:auto}
+  .prose .wb .wb-matrix td:empty{display:none}
+  .prose .wb .wb-matrix td[data-l]::before{content:attr(data-l);display:block;font:500 .62rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+  .prose .wb .wb-matrix td.wb-who{grid-column:1 / -1}
+}
