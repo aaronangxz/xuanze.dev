@@ -26,7 +26,8 @@ You never need to touch the design or code to change content. Edit a file, push,
 | Hotel and flight notes, ratings, photos | `src/content/journal/{hotels,flights}/<slug>/index.md` | See `src/content/journal/README.md`. Pages exist for every hotel and flight; an entry fills in their notes |
 | Races | `src/content/life/races.yaml` | One bib per race; `pb: true` adds the stamp |
 | Running totals and PBs | `src/content/life/running.json` | Snapshot from Strava |
-| Polaroids, "Everything else" | `src/content/life/polaroids.yaml`, `shelf.yaml` | |
+| Running gear (watch, shoes) | `src/content/life/gear.yaml` | Shoes and km from Strava; `retired: true` greys a pair out |
+| Polaroids, "Everything else" | `src/content/life/polaroids.yaml` | |
 
 The ⌘K search, the Life "Where to?" search, the stats and the city strip are all generated from these files.
 

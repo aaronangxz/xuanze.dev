@@ -1,0 +1,36 @@
+# Running gear on the Life page, under Running. Shoes and distances come from Strava (My Gear); refresh `km` now and then.
+# `retired: true` keeps a pair in the list, greyed out.
+- id: forerunner-265
+  kind: Watch
+  name: Garmin Forerunner 265
+- id: endorphin-speed-5
+  kind: Shoes
+  name: Saucony Endorphin Speed 5
+  km: 750
+- id: xtep-160x-7
+  kind: Shoes
+  name: Xtep 160X 7.0
+  km: 255
+- id: novablast-5
+  kind: Shoes
+  name: ASICS Novablast 5
+  km: 229
+- id: evo-sl-blue
+  kind: Shoes
+  name: Adidas Adizero Evo SL (blue)
+  km: 10
+- id: evo-sl
+  kind: Shoes
+  name: Adidas Adizero Evo SL
+  km: 690
+  retired: true
+- id: boston-13
+  kind: Shoes
+  name: Adidas Adizero Boston 13
+  km: 404
+  retired: true
+- id: pegasus-34
+  kind: Shoes
+  name: Nike Air Zoom Pegasus 34
+  km: 213
+  retired: true

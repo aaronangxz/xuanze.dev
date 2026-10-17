@@ -20,9 +20,19 @@ photos:
   - src: ./lobby.jpg
     alt: The lobby at night
     caption: Optional caption
+xhs: http://xhslink.com/o/…   # optional: a Xiaohongshu (RED) post, shown as a link card
 ---
 
 A few paragraphs of Markdown. Short is fine.
 ```
 
 Photos can be any size; the build resizes them. JPG or PNG straight from the phone works.
+
+For a nicer RED card, give the post's title and a cover image instead of the bare link:
+
+```yaml
+xhs:
+  url: http://xhslink.com/o/…
+  title: Three nights at the Opera
+  cover: ./cover.jpg
+```

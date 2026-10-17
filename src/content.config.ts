@@ -85,12 +85,17 @@ const journal = defineCollection({
     rating: z.number().min(0).max(5).optional(),
     title: z.string().optional(),
     photos: z.array(z.object({ src: image(), alt: z.string().default(''), caption: z.string().optional() })).default([]),
+    /** A Xiaohongshu (RED) post about this stay or flight, shown as a link card: the post's link, or { url, title, cover }. */
+    xhs: z.union([
+      z.string().url().transform((url) => ({ url, title: undefined, cover: undefined })),
+      z.object({ url: z.string().url(), title: z.string().optional(), cover: image().optional() }),
+    ]).optional(),
   }),
 });
 
-const shelf = defineCollection({
-  loader: file('src/content/life/shelf.yaml'),
-  schema: z.object({ label: z.string(), value: z.string(), example }),
+const gear = defineCollection({
+  loader: file('src/content/life/gear.yaml'),
+  schema: z.object({ kind: z.string(), name: z.string(), km: z.number().optional(), retired: z.boolean().default(false) }),
 });
 
 const polaroids = defineCollection({
@@ -103,4 +108,4 @@ const polaroids = defineCollection({
   }),
 });
 
-export const collections = { writing, projects, notes, leetcode, races, shelf, polaroids, journal };
+export const collections = { writing, projects, notes, leetcode, races, gear, polaroids, journal };

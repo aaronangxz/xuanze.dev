@@ -12,8 +12,11 @@ import WALabel from '../../components/WALabel.astro';
 import { stats as travelStats, cities, recentFlights, upcomingFlights, airportCity, runs as travelRuns, hotels, collection, flightId, allFlights } from '../../lib/travel';
 
 const races = (await getCollection('races')).map((r) => ({ id: r.id, ...r.data })).sort((a, b) => b.date.localeCompare(a.date)); // newest first
-const shelf = (await getCollection('shelf')).map((s) => ({ id: s.id, ...s.data }));
-const polaroids = (await getCollection('polaroids')).map((p) => ({ id: p.id, ...p.data }));
+// Watch first, then shoes in use by distance, then retired pairs.
+const gear = (await getCollection('gear')).map((g) => ({ id: g.id, ...g.data }))
+  .sort((a, b) => Number(a.retired) - Number(b.retired) || Number(a.km != null) - Number(b.km != null) || (b.km ?? 0) - (a.km ?? 0));
+// Example polaroids stay hidden; "Everything else" appears once a real one exists.
+const polaroids = (await getCollection('polaroids')).map((p) => ({ id: p.id, ...p.data })).filter((p) => !p.example);
 const L = site.life;
 
 const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -25,7 +28,6 @@ const featured = [...new Map([upcomingFlights[0], travelStats.longest, board[0]]
 const stayCities = cities.filter((c) => c.nights > 0 && c.country !== 'Singapore').map((c) => c.name);
 const tilt = [-1.6, 1.2, -0.8, 1.4];
 const PLANE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-1.8l-8-5V3.6a1.5 1.5 0 0 0-3 0v5.1l-8 5v1.8l8-2.4v5.1l-2 1.5V21l3.5-1 3.5 1v-1.3l-2-1.5v-5.1z" transform="rotate(90 12 12)"/></svg>';
-const hasPlaceholders = [...shelf, ...polaroids].some((x) => x.example);
 const upcoming = [...L.upcoming].sort((a, b) => a.date.localeCompare(b.date));
 const fmtKm = (n: number) => Math.round(n).toLocaleString('en-US');
 const raceDay = (ymd: string) => new Date(ymd + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
@@ -59,8 +61,8 @@ const lifeSearch = [
   ...travelRuns.map((r, i, all) => ({ top: i >= all.length - 2, cat: 'RUN', t: r.title, s: `${r.city} · ${r.km} km · ${niceDay(r.date)}`, k: `run running strava abroad ${r.city}`, city: r.city.toLowerCase().replace(/[^a-z0-9]+/g, '-') })),
   ...races.map((r) => ({ cat: 'RACE', t: r.name, s: `${r.time}${r.pb ? ' · PB' : ''}`, k: `race run ${r.label} ${r.distance} half marathon`, sel: `#r-${r.id}` })),
   ...running.pbs.map((p) => ({ cat: 'PB', t: p.label, s: p.time, k: `personal best pb ${p.note}`, sel: '.pb-block' })),
-  ...shelf.map((s) => ({ cat: 'NOTE', t: s.label, s: s.value, k: s.value, sel: `#sh-${s.id}` })),
-  { cat: 'NOTE', t: 'Polaroids', s: polaroids.map((p) => p.caption).join(' · '), k: 'photos polaroid', sel: '.polaroids' },
+  ...gear.map((g) => ({ cat: 'GEAR', t: g.name, s: g.retired ? `${g.kind} · retired` : g.kind, k: `gear ${g.kind} ${g.name}`, sel: `#g-${g.id}` })),
+  ...(polaroids.length ? [{ cat: 'NOTE', t: 'Polaroids', s: polaroids.map((p) => p.caption).join(' · '), k: 'photos polaroid', sel: '.polaroids' }] : []),
 ];
 ---
 <Base title="Life" mode="life" description="Trips, races and the odd detour. The off-the-clock side of Ang Xuan Ze.">
@@ -74,7 +76,6 @@ const lifeSearch = [
         <div><dt>km run in {running.year}</dt><dd>{fmtKm(running.yearKm)}</dd></div>
         <div><dt>half marathons</dt><dd>{halves}</dd></div>
       </dl>
-      {hasPlaceholders && <span class="sample">A few entries here are still placeholders</span>}
     </section>
 
     <div class="places" aria-hidden="true"><div class="ptrack">
@@ -226,10 +227,22 @@ const lifeSearch = [
         <span class="deck-hint"><span class="h-fine">Hover to fan out, click to flip</span><span class="h-touch">Swipe or tap to flip</span></span>
       </div>
       </div>
+      <div class="gear-block">
+        <div class="l-sub-head"><span class="lab">gear</span></div>
+        <ul class="gear">
+          {gear.map((g) => (
+            <li id={`g-${g.id}`} class:list={[g.retired && 'retired']}>
+              <span class="g-kind">{g.kind}</span>
+              <span class="g-name">{g.name}{g.retired && <small>retired</small>}</span>
+              <span class="g-km">{g.km != null && <>{fmtKm(g.km)} <small>km</small></>}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
       <p class="strava-credit">Running data from <a href="https://www.strava.com">Strava</a> · updated {niceDay(running.updated)}</p>
     </section>
 
-    <section id="l-misc" aria-labelledby="l-misc-h">
+    {polaroids.length > 0 && <section id="l-misc" aria-labelledby="l-misc-h">
       <div class="l-head"><span class="l-no">05</span><h2 id="l-misc-h">Everything else</h2></div>
       <div class="misc">
         <div class="polaroids">
@@ -240,11 +253,8 @@ const lifeSearch = [
             </figure>
           ))}
         </div>
-        <dl class="shelf">
-          {shelf.map((s) => <div id={`sh-${s.id}`}><dt>{s.label}</dt><dd>{s.value}</dd></div>)}
-        </dl>
       </div>
-    </section>
+    </section>}
 
     <footer class="l-foot"><p>That's the other side of me.</p><button class="l-back" type="button" data-mode-btn="work">Back to work</button></footer>
   </div>
