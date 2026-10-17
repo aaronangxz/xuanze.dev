@@ -26,6 +26,8 @@ Sources (the marks are the brands' trademarks):
   `hyattcentric.svg` (the two-line wordmark), `jwmarriott.svg` (the griffin), `unboundcollectionbyhyatt.svg` (the UB monogram),
   `parkhyatt.svg`, `courtyard.svg` (without "by Marriott") and `parkroyalcollection.svg` (the "PARKROYAL" wordmark, from the
   PARKROYAL Hotels & Resorts logo, without the rule and tagline), `luxurycollection.svg` (the three-line wordmark),
-  `mgallerycollection.svg` (the M, without "GALLERY"), `autocamp.svg` (the arrow) and `tributeportfolio.svg` (the two-line wordmark).
+  `mgallerycollection.svg` (the M, without "GALLERY"), `autocamp.svg` (the arrow), `tributeportfolio.svg` (the two-line wordmark) and `ramadaencore.svg` (the "e" swirl, flattened
+  to one colour).
+- `fourseasons.svg`: the tree, traced from a render of `src/assets/chains/fourseasons.svg` (English Wikipedia).
 
-Still printed as text: Four Seasons and Ramada Encore. Sofitel's wordmark is unreadable at stamp size, so its mark is used instead.
+Every brand stayed with so far has a logo. Sofitel's wordmark is unreadable at stamp size, so its mark is used instead.
