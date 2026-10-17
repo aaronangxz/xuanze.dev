@@ -33,7 +33,7 @@ const Tag = link ? 'a' : 'div';
     <circle class="hb-outer" cx="50" cy="50" r="47.5" fill={`url(#${id}-g)`} />
     <circle class="hb-inner" cx="50" cy="50" r="41" fill="none" />
     {logo
-      ? <svg class="hb-logo" x="39" y="14" width="22" height="22" viewBox={logo.viewBox} set:html={logo.body} />
+      ? <svg class="hb-logo" x="30" y="14" width="40" height="22" viewBox={logo.viewBox} set:html={logo.body} />
       : <text class="hb-arc"><textPath href={`#${id}-t`} startOffset="50%" text-anchor="middle">{brand}</textPath></text>}
     <text class="hb-arc hb-years"><textPath href={`#${id}-b`} startOffset="50%" text-anchor="middle">{h.upcoming ? 'SOON' : h.years}</textPath></text>
     <text class="hb-city" x="50" y={lines.length > 1 ? 50 - fs * 0.15 : 50 + fs * 0.35} text-anchor="middle" font-size={fs}>
