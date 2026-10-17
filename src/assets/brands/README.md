@@ -21,9 +21,10 @@ Sources (the marks are the brands' trademarks):
 - worldvectorlogo: `hyatthouse.svg` (hyatt-house-1, the H), `hyattregency.svg` (hyatt-regency-1, wordmark without the box), `voco.svg`.
 - The brands' own sites: `doubletreebyhilton.svg` (hilton.com/modules/assets/svgs/logos/DT.svg, the tree and D),
   `raffles.svg` (raffles.com logo-brand-large.svg, the traveller's palm), `sofitel.svg` (sofitel.accor.com Sofitel_CL_Gold.svg, the interlocking mark).
+- Logo images XZ supplied, vectorised automatically (thresholded and traced with potrace, nothing redrawn):
+  `hyattcentric.svg` (the two-line wordmark), `jwmarriott.svg` (the griffin), `unboundcollectionbyhyatt.svg` (the UB monogram).
 
 Without a logo, so they keep their printed name:
-- No clean vector source found: Hyatt Centric, Park Hyatt, The Unbound Collection by Hyatt (hyatt.com blocks scripted access),
-  The Luxury Collection (only a PGA Tour co-brand file), MGallery and AutoCamp (raster only).
-- Found but unreadable at stamp size: JW Marriott (English Wikipedia's "JW Marriott Hotels Logo", wordmark too long),
-  Courtyard (Commons, thin wordmark), PARKROYAL COLLECTION (panpacific.com, two-line wordmark), Sofitel's wordmark (the mark is used instead).
+- No clean source: The Luxury Collection (only a PGA Tour co-brand file), MGallery and AutoCamp (raster only).
+- Tried but unreadable at stamp size (long or thin wordmarks): Park Hyatt, Courtyard, PARKROYAL COLLECTION, and Sofitel's wordmark
+  (its mark is used instead).
