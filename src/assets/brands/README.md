@@ -25,8 +25,7 @@ Sources (the marks are the brands' trademarks):
 - Logo images XZ supplied, vectorised automatically (thresholded and traced with potrace, nothing redrawn):
   `hyattcentric.svg` (the two-line wordmark), `jwmarriott.svg` (the griffin), `unboundcollectionbyhyatt.svg` (the UB monogram),
   `parkhyatt.svg`, `courtyard.svg` (without "by Marriott") and `parkroyalcollection.svg` (the "PARKROYAL" wordmark, from the
-  PARKROYAL Hotels & Resorts logo, without the rule and tagline).
+  PARKROYAL Hotels & Resorts logo, without the rule and tagline), `luxurycollection.svg` (the three-line wordmark),
+  `mgallerycollection.svg` (the M, without "GALLERY"), `autocamp.svg` (the arrow) and `tributeportfolio.svg` (the two-line wordmark).
 
-Without a logo, so they keep their printed name:
-- No clean source: The Luxury Collection (only a PGA Tour co-brand file), MGallery and AutoCamp (raster only).
-- Sofitel's wordmark is unreadable at stamp size, so its mark is used instead.
+Still printed as text: Four Seasons and Ramada Encore. Sofitel's wordmark is unreadable at stamp size, so its mark is used instead.
