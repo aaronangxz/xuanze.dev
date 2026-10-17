@@ -16,7 +16,14 @@ Sources (the marks are the brands' trademarks):
   `holidayinnexpress.svg` (Holiday Inn Express by IHG logo, the H box), `hyatthotels.svg` (Hyatt Logo), `sheraton.svg` (Sheraton Hotels and Resorts, the laurel S),
   `stregis.svg` (St. Regis Hotels & Resorts logo, the R monogram), `westinhotelsresorts.svg` (Westin Hotels & Resorts logo, "WESTIN" only),
   `whotels.svg` (W Hotels logo, the W).
+  Also `aloft.svg` (Aloft Hotels Logo, "aloft" only), `crowneplaza.svg` (Crowne Plaza logo, the emblem),
+  `ibis.svg` (Ibis-logo-2019) and `ibisstyles.svg` (Ibis-styles-2019), the pillow with the name knocked out.
 - worldvectorlogo: `hyatthouse.svg` (hyatt-house-1, the H), `hyattregency.svg` (hyatt-regency-1, wordmark without the box), `voco.svg`.
+- The brands' own sites: `doubletreebyhilton.svg` (hilton.com/modules/assets/svgs/logos/DT.svg, the tree and D),
+  `raffles.svg` (raffles.com logo-brand-large.svg, the traveller's palm), `sofitel.svg` (sofitel.accor.com Sofitel_CL_Gold.svg, the interlocking mark).
 
-Still without a clean vector source, so they keep their printed name: Hyatt Centric, Park Hyatt, The Unbound Collection by Hyatt,
-JW Marriott, The Luxury Collection, MGallery, Raffles, AutoCamp, Sofitel (too thin at stamp size).
+Without a logo, so they keep their printed name:
+- No clean vector source found: Hyatt Centric, Park Hyatt, The Unbound Collection by Hyatt (hyatt.com blocks scripted access),
+  The Luxury Collection (only a PGA Tour co-brand file), MGallery and AutoCamp (raster only).
+- Found but unreadable at stamp size: JW Marriott (English Wikipedia's "JW Marriott Hotels Logo", wordmark too long),
+  Courtyard (Commons, thin wordmark), PARKROYAL COLLECTION (panpacific.com, two-line wordmark), Sofitel's wordmark (the mark is used instead).
