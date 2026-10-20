@@ -1377,6 +1377,17 @@ figure.arch ul.arch-key { display: flex; flex-direction: row; margin: 10px 0 0; 
 figure.arch ul.arch-key li { margin: 0; font-size: .6875rem; line-height: 1.4; display: inline-flex; align-items: center; gap: 6px; }
 figure.arch ul.arch-key i { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
 
+/* Screenshots in a row (Shots.astro): phone screens side by side, each opening full size */
+.shots { margin: 6px 0 4px; }
+.shots-row { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 12px; align-items: start; }
+@media (max-width: 600px) { .shots[data-wrap] .shots-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.shot { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.shot a { display: block; }
+.prose .shot img { display: block; width: 100%; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
+.shot-tag { font: 600 .625rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.prose .shot-cap { font-size: .8125rem; line-height: 1.45; color: var(--muted); }
+.shots figcaption { margin-top: 10px; text-align: center; font: .75rem var(--mono); color: var(--muted); }
+
 /* ===== Header mark scenes (HeaderMark.astro) ===== */
 /* Work follows light/dark (day/night); Life is always night, like its pages. */
 /* Day/night: --d is 1 in light mode, 0 in dark; everything below derives from it and cross-fades on toggle. */

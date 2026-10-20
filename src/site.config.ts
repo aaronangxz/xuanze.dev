@@ -32,6 +32,7 @@ export const site = {
     { title: 'Avenly', sub: 'Event platform', meta: 'product', href: '/projects/avenly', logo: '/logos/avenly.png' },
     { title: 'Clozit', sub: 'Fashion app', meta: 'product', href: '/projects/clozit', logo: '/logos/clozit.png' },
     { title: 'Runner Readiness', sub: 'Garmin MCP for runners', meta: 'product', href: '/projects/runner-readiness-mcp', logo: '/logos/runner-readiness.png' },
+    { title: 'Parallax', sub: 'Cross-platform QA agent', meta: 'work', href: '/projects/mobile-qa-agent', logo: '/logos/parallax.png' },
   ],
 
   about: {

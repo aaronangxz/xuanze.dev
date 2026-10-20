@@ -6,7 +6,7 @@ import Workbench from '../../components/Workbench.astro';
 
 Out of the box, Claude Code is one capable generalist. I treat it as a small engineering team instead. A global `CLAUDE.md` sets four rules: route work through my own 20-skill suite, verify instead of assuming, give every session its own Git worktree, and fix the skills when they turn out wrong. An orchestrator skill picks the workflow (feature, bug, incident) and loads only the skills each phase needs. Bigger features go through 13 subagents I defined, from a PM to a dev lead who signs off, and I approve the plan and the merge.
 
-It's the setup behind [Avenly](/projects/avenly), [Clozit](/projects/clozit) and the [Mobile QA agent](/projects/mobile-qa-agent).
+It's the setup behind [Avenly](/projects/avenly), [Clozit](/projects/clozit) and [Parallax](/projects/mobile-qa-agent), the mobile QA agent.
 
 <Workbench part="stats" />
 
@@ -56,7 +56,7 @@ QA here is about evidence, not a green checkmark. Five gates sit between a chang
 
 ## Small pipelines, strict rules
 
-The CI itself is modest. What's worth showing is how much each step does, and the triage the agents follow when a run goes red. The iOS pipeline ships Clozit to TestFlight; the GitHub Actions workflow is the Mobile QA agent's.
+The CI itself is modest. What's worth showing is how much each step does, and the triage the agents follow when a run goes red. The iOS pipeline ships Clozit to TestFlight; the GitHub Actions workflow is Parallax's.
 
 <Workbench part="ci" />
 
