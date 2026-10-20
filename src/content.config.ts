@@ -24,6 +24,8 @@ const projects = defineCollection({
     kind: z.enum(['product', 'work', 'side']),
     summary: z.string(),
     status: z.string(),
+    /** Lifecycle shown as a pill wherever the project is listed. Words in `status` that repeat it ("Live, …") are dropped next to the pill. */
+    stage: z.enum(['live', 'beta', 'building']).optional(),
     period: z.string(),
     role: z.string().optional(),
     company: z.string().optional(),

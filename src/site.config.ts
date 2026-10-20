@@ -26,11 +26,12 @@ export const site = {
     facts: ['Software engineer', 'Singapore', 'TikTok · Shopee'],
   },
 
-  /** The "Currently" card on the home page. */
+  /** The "Currently" card on the home page. A Live / Beta pill comes from the linked project's `stage`. */
   currently: [
     { title: 'TikTok', sub: 'Software Engineer in Test', meta: 'work' },
-    { title: 'Avenly', sub: 'Event platform, live', meta: 'product', href: '/projects/avenly', logo: '/logos/avenly.png' },
-    { title: 'Clozit', sub: 'Fashion app, in beta', meta: 'product', href: '/projects/clozit', logo: '/logos/clozit.png' },
+    { title: 'Avenly', sub: 'Event platform', meta: 'product', href: '/projects/avenly', logo: '/logos/avenly.png' },
+    { title: 'Clozit', sub: 'Fashion app', meta: 'product', href: '/projects/clozit', logo: '/logos/clozit.png' },
+    { title: 'Runner Readiness', sub: 'Garmin MCP for runners', meta: 'product', href: '/projects/runner-readiness-mcp', logo: '/logos/runner-readiness.png' },
   ],
 
   about: {
@@ -40,7 +41,7 @@ export const site = {
     focus: 'Backend systems, product engineering, testing',
     paragraphs: [
       'I build backend systems and the products around them, and I care about what happens to software after it ships.',
-      'I started in test engineering. At Shopee I wrote API automation for voucher services in Marketplace Promotions. At TikTok I test Data Insights products end to end and build internal tools like DataHelperV2. I finished a B.Tech in Software Engineering at NUS alongside both jobs. Outside work I build my own products: right now that’s Avenly, an event platform, and Clozit, a fashion app.',
+      'I started in test engineering. At Shopee I wrote API automation for voucher services in Marketplace Promotions. At TikTok I test Data Insights products end to end and build internal tools like DataHelperV2. I finished a B.Tech in Software Engineering at NUS alongside both jobs. Outside work I build my own products: right now that’s Avenly, an event platform, Clozit, a fashion app, and Runner Readiness, which answers training questions from a runner’s Garmin data in Claude or ChatGPT.',
     ],
     howIWork: [
       'Small changes, shipped often.',

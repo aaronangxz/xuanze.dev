@@ -2,7 +2,8 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import DocWindow from '../../components/DocWindow.astro';
-import { projects, posts, projectHref } from '../../lib/content';
+import StagePill from '../../components/StagePill.astro';
+import { projects, posts, projectHref, statusNote } from '../../lib/content';
 
 export async function getStaticPaths() {
   const all = await projects();
@@ -38,7 +39,7 @@ const kindLabel = { product: 'product', work: 'built at work', side: 'side proje
       <Fragment slot="inspector">
         <h2>Details</h2>
         <dl class="insp">
-          <div><dt>status</dt><dd>{d.kind === 'product' && d.active ? <span class="status" style="font-weight:500">{d.status}</span> : d.status}</dd></div>
+          <div><dt>status</dt><dd>{d.stage ? <span class="stage-line"><StagePill stage={d.stage} />{statusNote(d) && <span>{statusNote(d)}</span>}</span> : d.status}</dd></div>
           {d.company && <div><dt>company</dt><dd>{d.company}</dd></div>}
           {d.role && <div><dt>role</dt><dd>{d.role}</dd></div>}
           <div><dt>period</dt><dd>{d.period}</dd></div>

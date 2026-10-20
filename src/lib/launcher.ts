@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 import { site } from '../site.config';
-import { posts, projects, projectHref, projectGroup, PROJECT_GROUPS, fmtMonth, noteTitle, noteGroup } from './content';
+import { posts, projects, projectHref, projectGroup, PROJECT_GROUPS, fmtMonth, noteTitle, noteGroup, stagePillHtml, statusNote } from './content';
 
 /** One row in the ⌘K launcher. `p` is the preview pane HTML; the action button is added on the client. */
 export interface LauncherItem {
@@ -21,7 +21,8 @@ export interface LauncherItem {
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const chips = (xs: readonly string[]) => (xs.length ? `<div class="chips">${xs.map((x) => `<span>${esc(x)}</span>`).join('')}</div>` : '');
-const preview = (k: string, h: string, p: string, extra = '') => `<span class="k">${esc(k)}</span><h2>${esc(h)}</h2><p>${esc(p)}</p>${extra}`;
+/** `kHtml` is trusted markup appended to the kicker (the stage pill). */
+const preview = (k: string, h: string, p: string, extra = '', kHtml = '') => `<span class="k">${esc(k)}${kHtml}</span><h2>${esc(h)}</h2><p>${esc(p)}</p>${extra}`;
 
 export async function launcherItems(): Promise<LauncherItem[]> {
   const items: LauncherItem[] = [];
@@ -47,7 +48,8 @@ export async function launcherItems(): Promise<LauncherItem[]> {
     items.push({
       g: pgroup(d), t: d.title, s: sub, i: 'box', img: d.logo, k: `${d.kind} ${pgroup(d)} ${d.stack.join(' ')} ${d.summary}`,
       href: href ?? '/projects', external: !!d.href, cta: d.href ? 'View on GitHub' : href ? 'Read the case study' : 'See all projects',
-      p: (d.logo ? `<img class="plogo" src="${esc(d.logo)}" alt="" width="44" height="44">` : '') + preview(`${d.kind === 'side' ? 'side project' : d.kind === 'work' ? 'built at work' : 'product'} · ${d.status}`, d.title, d.summary, chips(d.stack.slice(0, 5))),
+      p: (d.logo ? `<img class="plogo" src="${esc(d.logo)}" alt="" width="44" height="44">` : '') + preview(`${d.kind === 'side' ? 'side project' : d.kind === 'work' ? 'built at work' : 'product'}${d.stage ? ' ' : ` · ${d.status}`}`, d.title, d.summary, chips(d.stack.slice(0, 5)),
+        d.stage ? stagePillHtml(d.stage) + (statusNote(d) ? ` ${esc(statusNote(d))}` : '') : ''),
     });
   }
 
