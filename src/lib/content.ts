@@ -17,6 +17,13 @@ export async function projects() {
 /** Where a project row leads: its own link, its case study, or nowhere (listed only). */
 export const projectHref = (p: CollectionEntry<'projects'>) => p.data.href ?? (p.data.page ? `/projects/${p.id}` : null);
 
+/** Project lifecycle pills: one wording everywhere. */
+export const STAGE_LABEL = { live: 'Live', beta: 'Beta', building: 'Building' } as const;
+export type Stage = keyof typeof STAGE_LABEL;
+/** What `status` adds beyond the pill: "Live, invite-only" → "invite-only", "In beta" → "". */
+export const statusNote = (d: { status: string; stage?: Stage }) =>
+  d.stage ? d.status.replace(new RegExp(`^(in )?${STAGE_LABEL[d.stage]}\\b[\\s,·–-]*`, 'i'), '') : d.status;
+
 /** The one grouping of projects, shared by the Projects page and search. */
 export const PROJECT_GROUPS = ['Building now', 'Built at work', 'Side projects', 'Inactive'] as const;
 export type ProjectGroup = (typeof PROJECT_GROUPS)[number];

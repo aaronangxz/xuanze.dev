@@ -2,7 +2,7 @@
 :root {
   --bg: #ECEEF2; --win: #FFFFFF; --win2: #FAFBFC; --ink: #121417; --body: #343840; --muted: #5F6672; --faint: #8B919C;
   --line: #E2E5EA; --line2: #D3D8DF; --sel: #EDF0F5; --selline: #C3CCDA; --accent: #2C58B2; --chip: #F1F3F6;
-  --ok: #1E8A4C; --shadow: rgba(18, 20, 23, .22);
+  --ok: #1E8A4C; --warn: #A15C00; --shadow: rgba(18, 20, 23, .22);
   --c-kw: #7A3EB0; --c-str: #1F7A3A; --c-com: #8A8F98; --c-num: #B35C00;
   --draft: #FFE98A; --draft-line: #B58700;
   --sans: 'Hanken Grotesk', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -12,7 +12,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0E1013; --win: #16191E; --win2: #1A1D23; --ink: #ECEEF1; --body: #C9CDD4; --muted: #969DA8; --faint: #6E7580;
     --line: #262A31; --line2: #343A43; --sel: #1B2029; --selline: #3E4A5E; --accent: #9DB7E8; --chip: #20242B;
-    --ok: #4FD18B; --shadow: rgba(0, 0, 0, .6);
+    --ok: #4FD18B; --warn: #F2B65A; --shadow: rgba(0, 0, 0, .6);
     --c-kw: #D7A6F2; --c-str: #8FD9A8; --c-com: #7D848F; --c-num: #F2B47C;
     --draft: #5A4706; --draft-line: #E0B43A;
     color-scheme: dark;
@@ -21,7 +21,7 @@
 :root[data-theme="dark"] {
   --bg: #0E1013; --win: #16191E; --win2: #1A1D23; --ink: #ECEEF1; --body: #C9CDD4; --muted: #969DA8; --faint: #6E7580;
   --line: #262A31; --line2: #343A43; --sel: #1B2029; --selline: #3E4A5E; --accent: #9DB7E8; --chip: #20242B;
-  --ok: #4FD18B; --shadow: rgba(0, 0, 0, .6);
+  --ok: #4FD18B; --warn: #F2B65A; --shadow: rgba(0, 0, 0, .6);
   --c-kw: #D7A6F2; --c-str: #8FD9A8; --c-com: #7D848F; --c-num: #F2B47C;
   --draft: #5A4706; --draft-line: #E0B43A;
   color-scheme: dark;
@@ -63,8 +63,13 @@ kbd { font: 500 .6875rem var(--mono); padding: 2px 6px; border: 1px solid var(--
 @media (max-width: 860px) { .widgets { grid-template-columns: minmax(0, 1fr); } }
 .widget { background: var(--win); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .widget h2 { font-size: .8125rem; font-weight: 600; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
-.status { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
-.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 18%, transparent); }
+/* Lifecycle pill (StagePill.astro): same shape everywhere, colour by stage. */
+.pill { --c: var(--ok); display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px 1px 7px; border-radius: 999px; font: 500 .6875rem/1.6 var(--mono); letter-spacing: .02em; color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 28%, transparent); white-space: nowrap; vertical-align: middle; }
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.pill.beta { --c: var(--warn); }
+.pill.building { --c: var(--accent); }
+.stage-line { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mini .pill { align-self: center; }
 .widget p { color: var(--body); }
 /* Home: How I work, a full-width module between the search and the widgets */
 .widget .hiw-head { font-size: 1.25rem; font-weight: 600; letter-spacing: -.015em; color: var(--ink); line-height: 1.3; }
@@ -334,7 +339,6 @@ body { background: var(--amb-base); }
 .cta:hover { opacity: 1; filter: brightness(1.06); }
 .home h1 > span { background: linear-gradient(95deg, var(--head-a) 10%, var(--head-b) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .chips span { background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); box-shadow: inset 0 0 0 1px var(--glass-line); }
-.status::before { background: radial-gradient(circle at 35% 35%, #7BE3A8, var(--ok)); }
 .overlay { background: rgba(14, 18, 34, .32); -webkit-backdrop-filter: blur(22px) saturate(120%); backdrop-filter: blur(22px) saturate(120%); }
 .overlay .app { background: linear-gradient(140deg, var(--glass-a), var(--glass-b)); }
 .toast { background: linear-gradient(135deg, var(--cta-a), var(--cta-b)); color: var(--cta-ink); }

@@ -1,7 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Launcher from '../components/Launcher.astro';
+import StagePill from '../components/StagePill.astro';
 import { site } from '../site.config';
+import { projects } from '../lib/content';
+const stageOf = new Map((await projects()).map((p) => [`/projects/${p.id}`, p.data.stage]));
 const yr = (s: string) => s.split(' ').pop();
 // The line breaks at its commas, never mid-clause: each clause wraps as a unit.
 const heroClauses = site.hero.line.split(/(?<=,)\s+/);
@@ -46,7 +49,7 @@ const heroClauses = site.hero.line.split(/(?<=,)\s+/);
           {site.currently.map((c) => (
             <li>
               <div class={'logo' in c ? 'has-logo' : undefined}>{'logo' in c && <img class="mlogo" src={c.logo} alt="" width="28" height="28" />}<div><b>{c.href ? <a href={c.href}>{c.title}</a> : c.title}</b><small>{c.sub}</small></div></div>
-              <span>{c.meta}</span>
+              {c.href && stageOf.get(c.href) ? <StagePill stage={stageOf.get(c.href)!} /> : <span>{c.meta}</span>}
             </li>
           ))}
         </ul>
