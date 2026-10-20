@@ -1,7 +1,7 @@
 ---
 /** A project's lifecycle (live, beta, building) as a small coloured pill. */
-import { STAGE_LABEL, type Stage } from '../lib/content';
+import { stagePillHtml, type Stage } from '../lib/content';
 interface Props { stage: Stage }
 const { stage } = Astro.props;
 ---
-<span class={`pill ${stage}`}>{STAGE_LABEL[stage]}</span>
+<Fragment set:html={stagePillHtml(stage)} />

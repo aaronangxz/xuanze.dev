@@ -20,6 +20,8 @@ export const projectHref = (p: CollectionEntry<'projects'>) => p.data.href ?? (p
 /** Project lifecycle pills: one wording everywhere. */
 export const STAGE_LABEL = { live: 'Live', beta: 'Beta', building: 'Building' } as const;
 export type Stage = keyof typeof STAGE_LABEL;
+/** The pill's markup, shared by StagePill.astro and the ⌘K previews (built as HTML strings). */
+export const stagePillHtml = (stage: Stage) => `<span class="pill ${stage}">${STAGE_LABEL[stage]}</span>`;
 /** What `status` adds beyond the pill: "Live, invite-only" → "invite-only", "In beta" → "". */
 export const statusNote = (d: { status: string; stage?: Stage }) =>
   d.stage ? d.status.replace(new RegExp(`^(in )?${STAGE_LABEL[d.stage]}\\b[\\s,·–-]*`, 'i'), '') : d.status;
