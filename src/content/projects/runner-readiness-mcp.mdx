@@ -1,0 +1,166 @@
+---
+title: Runner Readiness
+kind: product
+summary: An MCP server that keeps a runner's Garmin history and answers training questions from it in Claude or ChatGPT. Am I recovered? Is my taper on track? Should I run outside tomorrow? An eval harness checks the model reads the answers right.
+status: Live, invite-only
+period: 2026 – now
+role: Designing and building it
+stack: [Python, MCP, SQLite, Starlette, OAuth 2.1, Claude API, Google Cloud, Cloudflare Tunnel, Open-Meteo, Rate Limiter]
+live: https://run.xuanze.dev
+logo: /logos/runner-readiness.png
+order: 3
+---
+import ArchDiagram from '../../components/ArchDiagram.astro';
+
+## The problem
+
+My watch collects everything: sleep, overnight HRV, resting heart rate, training load, every run lap by lap. What it doesn't do is answer the question I actually have on a Sunday morning ten days out from a race: *am I recovered enough for this tempo run, and is my taper working?*
+
+Several open-source Garmin MCP servers already exist. They hand a model raw numbers and leave the interpretation to it, so the answer depends on what the model guesses a "good" HRV is. And none of them test whether the model reads the data correctly. I wanted the opposite: the server does the interpreting with fixed, documented rules against **my own** baseline, and the model's job is to explain the result.
+
+## What it does
+
+- **Keeps the history.** Three times a day it pulls each runner's Garmin wellness, training load and activities into their own SQLite database, so questions are answered instantly and survive Garmin outages and expired logins.
+- **Answers runner questions with rules, not vibes.** Readiness for today, taper progress, race week, plan versus what was actually run, sleep, run performance and fitness (VO2max, race predictions, threshold). Every result carries the numbers it used, the rule that fired and how much data it had.
+- **Knows the plan.** A training plan is set up by chatting: paste it, a screenshot or a table, Claude converts it, the server validates it and shows a summary, and nothing is saved until the runner says yes. Each sync matches runs to planned sessions: completed, partial, missed, swapped to the next day, or `unverified` when the data can't tell.
+- **Checks the conditions.** For an upcoming run it rates the morning, midday and evening windows for heat (estimated WBGT) and air quality, and suggests the better window, the treadmill or another day.
+- **Sends an evening briefing.** A scheduled Claude task emails tomorrow's session, its best run window, how the last run went and the week so far. The verdict and coaching lines come from fixed rules in code; Claude only sends it.
+- **Draws cards.** In apps that support MCP Apps, readiness, sleep, taper, run performance and fitness come back as small visual cards, not just text.
+- **Works from Claude and ChatGPT**, on the phone or the web, with one connector URL and a sign-in.
+
+## How it fits together
+
+One small VM does everything. A systemd timer runs the sync; one ASGI process serves the MCP endpoint, the OAuth sign-in and the invite pages. Nothing listens on a public port: an outbound Cloudflare Tunnel publishes it as `run.xuanze.dev`.
+
+<ArchDiagram
+  caption="Runner Readiness: Garmin history in, rule-based answers out, on one free VM"
+  layers={[
+    { label: 'Runners', nodes: [
+      { id: 'ai', t: 'Claude · ChatGPT', s: 'phone or web,\ncustom connector', k: 'client' },
+      { id: 'invite', t: 'Invite page', s: 'consent, Garmin\nlogin, city', k: 'client' },
+    ] },
+    { label: 'Cloudflare', group: true, nodes: [
+      { id: 'cf', t: 'Tunnel', s: 'run.xuanze.dev\noutbound only', k: 'ext' },
+    ] },
+    { label: 'GCP e2-micro', group: true, nodes: [
+      { id: 'auth', t: 'OAuth 2.1', s: 'DCR, PKCE,\nemail-first sign-in' },
+      { id: 'mcp', t: 'MCP server', s: '28 tools, stateless,\nread-only DB access' },
+      { id: 'an', t: 'Analytics', s: 'pure functions\nover a DataSource', k: 'job' },
+      { id: 'sync', t: 'Sync', s: 'systemd timer\n09 · 13 · 21 local', k: 'job' },
+    ] },
+    { label: 'Storage and services', nodes: [
+      { id: 'reg', t: 'registry.db', s: 'runners, token\nhashes, audit log', k: 'data' },
+      { id: 'wx', t: 'Open-Meteo · NEA', s: 'weather,\nair quality', k: 'ext' },
+      { id: 'db', t: 'SQLite per runner', s: 'raw JSON +\nparsed tables', k: 'data' },
+      { id: 'garmin', t: 'Garmin Connect', s: 'private endpoints\ntokens only', k: 'ext' },
+    ] },
+  ]}
+  edges={[
+    ['ai', 'cf', 'MCP + OAuth'], ['invite', 'cf'],
+    ['cf', 'auth'], ['cf', 'mcp'],
+    ['auth', 'reg'], ['mcp', 'an'], ['an', 'db', 'read-only'], ['mcp', 'wx'],
+    ['sync', 'garmin', 'token refresh'], ['sync', 'db', 'upserts'],
+  ]}
+/>
+
+The code is split so each layer could be replaced on its own. `ingest/` is the only place that talks to Garmin. `analytics/` never touches Garmin or SQLite; it reads through a small `DataSource` protocol that returns daily wellness and load records, so the same rules could run on HealthKit or Oura data later. The MCP tools sit on top and add the things a model needs: units, the runner's timezone, `data_as_of`, and whether the Garmin login still works.
+
+## How a verdict is reached
+
+Readiness is the question the whole project started from, so it shows the approach best. Each signal is compared with the runner's own rolling 28-day baseline (the target day left out). With fewer than 14 days of data there is no baseline and no verdict, never a number made up from thin data. Signals become flags, flags become a verdict by a written rule, and the rule text goes back with the answer so the model can explain it in plain words instead of just saying "amber".
+
+<ArchDiagram
+  caption="Readiness: own baseline, explicit flags, a rule the model can quote"
+  layers={[
+    { label: 'Signals', nodes: [
+      { id: 'hrv', t: 'Overnight HRV', s: 'vs 28-day\nmean ± 1 SD', k: 'data' },
+      { id: 'rhr', t: 'Resting HR', s: 'vs 28-day mean', k: 'data' },
+      { id: 'sleep', t: 'Sleep', s: 'vs the previous\n7 nights', k: 'data' },
+    ] },
+    { label: 'Flags', nodes: [
+      { id: 'fh', t: 'HRV below band', k: 'job' },
+      { id: 'fr', t: 'RHR elevated', s: '≥ +5 bpm', k: 'job' },
+      { id: 'fs', t: 'Sleep short', s: '< 85% of usual', k: 'job' },
+    ] },
+    { label: 'Verdict', group: true, nodes: [
+      { id: 'red', t: 'Red', s: 'low HRV and\nRHR or sleep flag' },
+      { id: 'amber', t: 'Amber', s: 'any other flag' },
+      { id: 'green', t: 'Green', s: 'no flags' },
+    ] },
+    { label: 'What the model gets', nodes: [
+      { id: 'out', t: 'Result', s: 'numbers, rule text,\nmeaning, caveats', k: 'client' },
+      { id: 'hint', t: "Today's session", s: 'key run + red →\nswap with an easy day', k: 'client' },
+    ] },
+  ]}
+  edges={[
+    ['hrv', 'fh'], ['rhr', 'fr'], ['sleep', 'fs'],
+    ['fh', 'red'], ['fr', 'red'], ['fs', 'red'], ['fr', 'amber'], ['fs', 'amber'],
+    ['red', 'out'], ['amber', 'out'], ['green', 'out'], ['out', 'hint'],
+  ]}
+/>
+
+The same pattern runs through the other tools. The taper check compares the taper so far with the build block before it (load should drop, HRV hold, resting HR not climb), using a baseline taken before the taper so the taper can't move it. Plan matching is a table of named rules with the one that fired written down, and an interval session without structured laps is always `unverified`: auto-laps mix reps and recoveries, so guessing hit or miss would be wrong half the time.
+
+## Testing how the model reads it
+
+Deterministic tools are easy to unit test. The harder question is whether a model, given that output, says the right thing: quotes the real numbers, keeps the verdict, admits a gap in the data instead of filling it. So the project has its own eval harness.
+
+<ArchDiagram
+  caption="The eval harness: production tools on synthetic data, graded two ways"
+  layers={[
+    { label: 'Scenarios', nodes: [
+      { id: 'scn', t: '18 scenarios', s: 'bad taper, data gap,\nhaze tomorrow…', k: 'data' },
+      { id: 'gen', t: 'Generator', s: 'seeded synthetic\nhistory + forecasts', k: 'job' },
+    ] },
+    { label: 'Run', group: true, nodes: [
+      { id: 'db2', t: 'Temp runner DB', s: '"today" pinned', k: 'data' },
+      { id: 'loop', t: 'Tool-use loop', s: 'real tool schemas\nand instructions' },
+      { id: 'model', t: 'Model under test', s: 'Claude API', k: 'ext' },
+    ] },
+    { label: 'Grade', nodes: [
+      { id: 'det', t: 'Deterministic', s: 'numbers exist in tool\noutput, verdict, tools', k: 'job' },
+      { id: 'judge', t: 'LLM judge', s: 'rubric, calibrated\non hand labels', k: 'ext' },
+    ] },
+    { label: 'Report', nodes: [
+      { id: 'rep', t: 'Pass rates', s: 'per scenario, cost,\nfailing transcripts', k: 'client' },
+    ] },
+  ]}
+  edges={[
+    ['scn', 'gen'], ['gen', 'db2'], ['db2', 'loop'], ['loop', 'model'],
+    ['loop', 'det', 'transcript'], ['loop', 'judge'], ['det', 'rep'], ['judge', 'rep'],
+  ]}
+/>
+
+The harness uses the production server's own tool names, descriptions, schemas and instructions, and runs the real tool functions in-process, so a change to a tool description is measured exactly as it ships. Each scenario's expected verdict is checked against the tools' own output first, never against what a model said. API errors and turn-cap hits are logged as harness errors, not failed answers.
+
+What it found was as much about the graders and the tools as the model. The first failure was a grader bug: a correctly computed average was flagged as an invented number. The judge caught an overclaim the number checks couldn't ("body battery 70–77 is normal for you" when the band was 74–84). Several remaining failures traced back to tool wording: the description said `unverified` was "never a hit", which nudged the model towards "miss", and rewording it fixed those reruns. The judge agreed with my hand labels on 49 of 50 criteria and failed 5 of 5 deliberately bad answers.
+
+## Decisions worth explaining
+
+### Interpretation on the server, explanation in the model
+
+The server states facts and rules; the model advises. That keeps the numbers reproducible, makes the thresholds visible (they're named constants, documented as heuristics, not medical standards), and gives the evals something fixed to grade against. It also means a `null` day stays `null`: tool output lists every day in the range and says no data means no data.
+
+### Raw JSON is the source of truth
+
+Garmin's endpoints are private and undocumented, so every payload is stored as it arrived and the tables are derived from it. When a field turned out to live somewhere else, or bedtimes needed adding, the fix was a parser change and `rr reparse`, with no new calls to Garmin.
+
+### Be gentle with Garmin
+
+There's no public Garmin API for individuals, and repeated logins get accounts flagged. Scheduled syncs only ever refresh tokens and never retry a login. A 403 or 429 stops the run with no retry and alerts me, and a block from any runner pauses on-demand syncs for everyone, since they all share one server address. A runner who just finished a run can ask for a sync, limited to one per 15 minutes.
+
+### One database file per runner
+
+Isolation is physical: each runner has their own SQLite file and folder, there's no shared table and no `WHERE runner_id = ?` to forget. Tools never take a runner argument; the runner comes from the signed-in connection. A test runs every tool as one runner and checks nothing of another runner's comes back.
+
+### Sign-in that doesn't look like phishing
+
+Friends type a Garmin password into a page that isn't Garmin's, so the page aims to be honest rather than official: a "Not a Garmin website" badge on every screen, plain-words consent with an unticked checkbox, and a hostname on my own domain instead of a machine name containing "garmin". The password is used once in memory and never stored; a test runs the whole flow with a sentinel password and searches every log, database and temp file for it. Sign-in asks for the email first and only continues for invited runners, so a stranger who adds the connector never triggers a Garmin login.
+
+### Writes, but with rails
+
+The MCP started read-only. Friends can't write plan YAML, so plans now come in through chat, behind a preview that returns a confirm token tied to that runner and that exact text, an explicit yes, and an undo that restores the previous version. claude.ai also asks before each write tool runs.
+
+## Where it is
+
+Live at [run.xuanze.dev](https://run.xuanze.dev) for me and a few invited friends, connected from Claude and ChatGPT. 28 tools, about 560 tests, and the eval harness at 18 scenarios. Built in five days in October 2026 while tapering for a half marathon, which is also where the first real taper check came from. Next: open-sourcing it, then a Telegram front end over the same tools, with post-run feedback once a run is detected.
