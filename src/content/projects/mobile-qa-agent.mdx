@@ -1,12 +1,13 @@
 ---
-title: Mobile QA agent
+title: Parallax
 kind: work
-summary: An AI agent that runs written test cases on iOS and Android at the same time, the way a tester would, judges every step honestly, and boxes the exact spot where the two apps disagree.
+summary: An AI agent that runs written test cases on iOS and Android at the same time, a twin run, the way a tester would, judges every step honestly, and boxes the exact spot where the two apps disagree.
 status: Building · runs end to end on a public demo app
 stage: building
 period: 2026 – now
 role: Designing and building it
 stack: [Python, Pydantic, Appium, XCUITest, UiAutomator2, Claude API, Claude Agent SDK, Jinja2, GitHub Actions]
+logo: /logos/parallax.png
 order: 4
 ---
 import ArchDiagram from '../../components/ArchDiagram.astro';
@@ -24,6 +25,8 @@ import grid2 from './mobile-qa-agent/observe-grid-2.jpg';
 
 > Work in progress. This page follows what is built so far.
 
+Parallax is named after the optical effect it works by: one thing seen from two positions, where the shift between them is the finding. Here the one thing is a test case, the two positions are iOS and Android, and running them side by side is a **twin run**.
+
 ## The problem
 
 Most mobile QA teams keep their regression suites as written steps with expected results ("open the cart, remove the item, the total goes to zero") and run them by hand, once per platform. That costs three things:
@@ -37,7 +40,7 @@ The tools that run plain-language cases with AI mostly test one platform at a ti
 ## What it does
 
 - **Reads the test cases as written**, from Markdown, YAML or a mind map, into one platform-neutral plan.
-- **Runs each case on iOS and Android at once, in step.** Neither platform starts step N+1 until both have finished step N, so the two runs can be compared step by step. A platform that gets stuck times out and stops; the other carries on.
+- **Runs each case on iOS and Android at once, in step: a twin run.** Neither platform starts step N+1 until both have finished step N, so the two runs can be compared step by step. A platform that gets stuck times out and stops; the other carries on.
 - **Works like a tester.** For each step it looks at the screen, decides what to do, does it through Appium, looks again, and checks the result against the step's expected outcome.
 - **Says honestly what happened.** Every step ends as pass, fail (a real issue), or blocked with a typed reason: an ambiguous step, an element it couldn't find, an unexpected screen, a precondition that wasn't met, or something that needs a person. A blocked step is never counted as a pass.
 - **Boxes the evidence.** A failure or a divergence is drawn on the screenshot around the element that proves it, and repeats of one problem are grouped into a single finding.
@@ -62,7 +65,7 @@ The other two came from the comparator alone: iOS pre-selects the green swatch o
 ## How it fits together
 
 <ArchDiagram
-  caption="Mobile QA agent: one plan, two devices in lockstep, one report"
+  caption="Parallax: one plan, a twin run on two devices, one report"
   layers={[
     { label: 'Inputs', nodes: [
       { id: 'plan', t: 'Test cases', s: 'Markdown, YAML\nor mind map', k: 'client' },
