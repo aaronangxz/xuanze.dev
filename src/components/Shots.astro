@@ -1,0 +1,28 @@
+---
+/**
+ * Phone screenshots in a row, each opening full size on click. Four or more wrap to two per row on
+ * phones, so a screenshot is never squeezed below a readable width.
+ *
+ *   import cart from './mobile-qa-agent/ios-cart.jpg';
+ *   <Shots items={[{ src: cart, alt: '…', tag: 'iOS', cap: 'The cart says Green' }]} caption="…" />
+ *
+ * tag: a short mono label above the shot (platform, step number). cap: one line under it.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+interface Shot { src: ImageMetadata; alt: string; tag?: string; cap?: string }
+interface Props { items: Shot[]; caption?: string }
+const { items, caption } = Astro.props;
+---
+<figure class="shots" style={`--cols:${items.length}`} data-wrap={items.length > 3 ? '' : undefined}>
+  <div class="shots-row">
+    {items.map((s) => (
+      <div class="shot">
+        {s.tag && <span class="shot-tag">{s.tag}</span>}
+        <a href={s.src.src} target="_blank" rel="noopener"><Image src={s.src} alt={s.alt} widths={[220, 440]} sizes="(max-width: 700px) 50vw, 220px" /></a>
+        {s.cap && <p class="shot-cap">{s.cap}</p>}
+      </div>
+    ))}
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
